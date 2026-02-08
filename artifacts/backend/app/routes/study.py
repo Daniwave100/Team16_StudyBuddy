@@ -1,1 +1,4 @@
-# Chat / flashcards / quiz endpoints
+"""Study endpoints.
+
+Defines chat, ingest, flashcards, and quiz routes.
+"""
