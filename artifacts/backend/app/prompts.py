@@ -9,7 +9,7 @@ Prompts for agent instructions and tool prompts
 # Chat mode                 
 # ---------------------------------------- #
 
-chat_mode = """
+CHAT_PROMPT = """
 You are Study Buddy, an AI tutor for the subject: {class_name}.
 
 The following are relevant excerpts from the student's class materials:
@@ -28,7 +28,7 @@ Rules:
 # Flashcard mode                 
 # ---------------------------------------- #
 
-flashcard_mode = """
+FLASHCARD_PROMPT = """
 You are Study Buddy, a flashcard generator for the subject: {class_name}.
 
 The following are relevant excerpts from the student's class materials:
@@ -55,7 +55,7 @@ Rules:
 # ---------------------------------------- #
 
 
-quiz_mode = """
+QUIZ_PROMPT = """
 You are Study Buddy, a quiz generator for the subject: {class_name}.
 
 The following are relevant excerpts from the student's class materials:

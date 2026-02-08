@@ -72,7 +72,7 @@ artifacts/
 │   │   │                           # POST /flashcards - generate flashcards
 │   │   │                           # POST /quiz - generate quiz questions
 │   │   │
-│   │   ├── orchestrator.py         # Simple agent orchestrator
+│   │   ├── agent.py                # Simple agent orchestrator
 │   │   │                           # Simple agent flow used by /chat
 │   │   │
 │   │   ├── vector_store.py         # In-memory store for notes and chunks
