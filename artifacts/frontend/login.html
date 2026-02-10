@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>Login & Signup</title>
+    <link rel="stylesheet" href="style.css" />
+
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+
+</head>
+<body>
+    <main class="card">
+
+        <form id="login-form" novalidate>
+            <h1>Log In</h1>
+            <label>Email
+                <input type="email" id="login-email" required />
+            </label>
+            <label>Password
+                <input type="password" id="login-password" required />
+            </label>
+            <button type="submit">Login</button>
+
+            <div
+                id="g_id_onload"
+                data-client_id="YOUR_CLIENT_ID.apps.googleusercontent.com"
+                data-callback="handleCredentialResponse"
+                data-ux_mode="popup"
+                data-auto_select="false"
+            ></div>
+
+            <div class="g_id_signin"
+                data-type="standard"
+                data-size="large"
+                data-text="signin_with"
+                data-shape="pill"
+            ></div>
+
+            <p id="login-msg"></p>
+        </form>
+
+        <hr />
+        <form id="signup-form" novalidate>
+            <h1>Create Account</h1>
+            <label>Email
+                <input type="email" id="signup-email" required />
+            </label>
+            <label>Password
+                <input type="password" id="signup-password" required />
+            </label>
+            <label>Confirm password
+                <input type="password" id="confirm-password" required />
+            </label>
+            <button type="submit">Sign Up</button>
+            <p id="signup-msg"></p>
+        </form>
+
+    </main>
+
+    <script src="script.js" defer></script>
+</body>
+</html>
