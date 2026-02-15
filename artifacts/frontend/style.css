@@ -1,0 +1,73 @@
+* { box-sizing: border-box; }
+body {
+    font-family: system-ui, Arial, sans-serif;
+    background: #5a228b;
+    margin: 0;
+    min-height: 100vh;
+    display: grid;
+    place-items: center;
+    color: #1f2430;
+}
+.card {
+    background: #f5f6f8;
+    width: 360px;
+    padding: 24px;
+    border-radius: 16px;
+    box-shadow: 0 10px 30px rgba(0,0,0,.08);
+    display: grid;
+    gap: 16px;
+}
+
+hr {
+    border: 0;
+    height: 1px;
+    background: #d7d9de;
+    margin: 4px 0 8px;
+  }
+form {
+    display: grid;
+    gap: 12px;
+}
+label {
+    display: grid;
+    gap: 6px;
+    font-size: 14px;
+}
+input {
+    padding: 10px 12px;
+    border: 1px solid #d7d9de;
+    border-radius: 10px;
+    outline: none;
+    background: #fff;
+}
+input:focus {
+    border-color: #6cc7ff;
+    box-shadow: 0 0 0 3px rgba(108,124,255,.2);
+  }
+  button {
+    padding: 10px 12px;
+    border: 0;
+    border-radius: 10px;
+    background: #6c7cff;
+    color: #fff;
+    cursor: pointer;
+    font-weight: 600;
+    transition: filter .15s ease, transform .05s ease;
+  }
+  button:hover { filter: brightness(1.05); }
+  button:active { transform: translateY(1px); }
+  button:disabled { opacity: .6; cursor: not-allowed; }
+  
+  #login-msg,
+  #signup-msg {
+    min-height: 1.25em;
+    font-size: 14px;
+    color: #6b7280;
+  }
+  
+  .ok    { color: #0ea05a !important; }
+  .error { color: #e11d48 !important; }
+  
+  @media (max-width: 420px) {
+    .card { width: 92vw; padding: 18px; border-radius: 12px; }
+  }

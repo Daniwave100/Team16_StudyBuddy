@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StudyBuddy - Flashcards</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            gap: 20px;
+        }
+
+        /* Header */
+        header {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        header h1 {
+            color: #667eea;
+            font-size: 28px;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            background: #FFFFFF;
+            padding: 20px;
+            border-radius: 10px;
+            width: 250px;
+            height: fit-content;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .sidebar h2 {
+            color: #333;
+            font-size: 20px;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #667eea;
+        }
+
+        .class-list {
+            list-style: none;
+        }
+
+        .class-item {
+            padding: 12px;
+            margin-bottom: 8px;
+            background: #f5f5f5;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .class-item:hover {
+            background: #667eea;
+            color: white;
+            transform: translateX(5px);
+        }
+
+        .class-item.active {
+            background: #667eea;
+            color: white;
+        }
+
+        .deck-count {
+            background: rgba(0, 0, 0, 0.1);
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+        }
+
+        .deck-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+        }
+
+        /* Deck Card */
+        .deck-card {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .deck-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .deck-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+        }
+
+        /* Create New Deck Card */
+        .create-deck-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 200px;
+            border: 3px dashed rgba(255, 255, 255, 0.5);
+        }
+
+        .create-deck-card:hover {
+            border-color: white;
+            background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+        }
+
+        .create-icon {
+            font-size: 48px;
+            margin-bottom: 10px;
+        }
+
+        .create-deck-card h3 {
+            font-size: 20px;
+            font-weight: 600;
+        }
+
+        /* Regular Deck Card Content */
+        .deck-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 15px;
+        }
+
+        .deck-title {
+            color: #333;
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .deck-class {
+            color: #667eea;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .deck-stats {
+            display: flex;
+            gap: 15px;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #e0e0e0;
+        }
+
+        .stat {
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+        }
+
+        .stat-label {
+            color: #888;
+            font-size: 12px;
+        }
+
+        .stat-value {
+            color: #333;
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 6px;
+            background: #e0e0e0;
+            border-radius: 3px;
+            overflow: hidden;
+            margin-top: 10px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            transition: width 0.3s ease;
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        }
+
+        .modal-content h2 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            color: #333;
+            font-weight: 500;
+            margin-bottom: 8px;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
+            font-size: 14px;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: #e0e0e0;
+            color: #333;
+        }
+
+        .btn-secondary:hover {
+            background: #d0d0d0;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+            }
+
+            .sidebar {
+                width: 100%;
+            }
+
+            .deck-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>📚 StudyBuddy Flashcards</h1>
+    </header>
+
+    <div class="container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <h2>Filter by Class</h2>
+            <ul class="class-list" id="classList">
+                <li class="class-item active" data-class="all">
+                    <span>All Classes</span>
+                    <span class="deck-count" id="allCount">0</span>
+                </li>
+            </ul>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="deck-grid" id="deckGrid">
+                <!-- Create New Deck Card -->
+                <div class="deck-card create-deck-card" id="createDeckBtn">
+                    <div class="create-icon">+</div>
+                    <h3>Create New Deck</h3>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal" id="createDeckModal">
+        <div class="modal-content">
+            <h2>Create New Flashcard Deck</h2>
+            <form id="createDeckForm">
+                <div class="form-group">
+                    <label for="deckTitle">Deck Title</label>
+                    <input type="text" id="deckTitle" required placeholder="e.g., Chapter 5: Algorithms">
+                </div>
+                <div class="form-group">
+                    <label for="deckClass">Class</label>
+                    <select id="deckClass" required>
+                        <option value="">Select a class...</option>
+                    </select>
+                </div>
+                <div class="button-group">
+                    <button type="button" class="btn btn-secondary" id="cancelBtn">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Create Deck</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Sample data
+        const classes = [
+            { id: 'cs101', name: 'Computer Science 101', color: '#667eea' },
+            { id: 'math201', name: 'Calculus II', color: '#f093fb' },
+            { id: 'phys150', name: 'Physics I', color: '#4facfe' },
+            { id: 'eng210', name: 'Engineering Design', color: '#43e97b' }
+        ];
+
+        let decks = [
+            { id: 1, title: 'Data Structures Basics', class: 'cs101', cards: 24, mastered: 18 },
+            { id: 2, title: 'Sorting Algorithms', class: 'cs101', cards: 15, mastered: 10 },
+            { id: 3, title: 'Integration Techniques', class: 'math201', cards: 30, mastered: 22 },
+            { id: 4, title: 'Limits and Derivatives', class: 'math201', cards: 20, mastered: 15 },
+            { id: 5, title: "Newton's Laws", class: 'phys150', cards: 18, mastered: 12 },
+            { id: 6, title: 'Kinematics', class: 'phys150', cards: 25, mastered: 20 },
+            { id: 7, title: 'Design Process', class: 'eng210', cards: 12, mastered: 8 }
+        ];
+
+        let currentFilter = 'all';
+
+        // Initialize
+        function init() {
+            renderClassList();
+            renderDecks();
+            populateClassSelect();
+        }
+
+        // Render class list in sidebar
+        function renderClassList() {
+            const classList = document.getElementById('classList');
+            const allItem = classList.querySelector('[data-class="all"]');
+            
+            classes.forEach(cls => {
+                const count = decks.filter(d => d.class === cls.id).length;
+                const li = document.createElement('li');
+                li.className = 'class-item';
+                li.dataset.class = cls.id;
+                li.innerHTML = `
+                    <span>${cls.name}</span>
+                    <span class="deck-count">${count}</span>
+                `;
+                li.addEventListener('click', () => filterByClass(cls.id));
+                classList.appendChild(li);
+            });
+
+            updateAllCount();
+        }
+
+        // Update "All Classes" count
+        function updateAllCount() {
+            document.getElementById('allCount').textContent = decks.length;
+        }
+
+        // Filter decks by class
+        function filterByClass(classId) {
+            currentFilter = classId;
+            
+            // Update active state
+            document.querySelectorAll('.class-item').forEach(item => {
+                item.classList.remove('active');
+                if (item.dataset.class === classId) {
+                    item.classList.add('active');
+                }
+            });
+            
+            renderDecks();
+        }
+
+        // Render deck cards
+        function renderDecks() {
+            const deckGrid = document.getElementById('deckGrid');
+            const createBtn = document.getElementById('createDeckBtn');
+            
+            // Clear existing decks (keep create button)
+            deckGrid.innerHTML = '';
+            deckGrid.appendChild(createBtn);
+            
+            // Filter decks
+            const filteredDecks = currentFilter === 'all' 
+                ? decks 
+                : decks.filter(d => d.class === currentFilter);
+            
+            // Render each deck
+            filteredDecks.forEach(deck => {
+                const classInfo = classes.find(c => c.id === deck.class);
+                const progress = (deck.mastered / deck.cards) * 100;
+                
+                const deckCard = document.createElement('div');
+                deckCard.className = 'deck-card';
+                deckCard.innerHTML = `
+                    <div class="deck-header">
+                        <div>
+                            <div class="deck-title">${deck.title}</div>
+                            <div class="deck-class">${classInfo.name}</div>
+                        </div>
+                    </div>
+                    <div class="deck-stats">
+                        <div class="stat">
+                            <span class="stat-label">Total Cards</span>
+                            <span class="stat-value">${deck.cards}</span>
+                        </div>
+                        <div class="stat">
+                            <span class="stat-label">Mastered</span>
+                            <span class="stat-value">${deck.mastered}</span>
+                        </div>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: ${progress}%"></div>
+                    </div>
+                `;
+                
+                deckCard.addEventListener('click', () => openDeck(deck.id));
+                deckGrid.appendChild(deckCard);
+            });
+        }
+
+        // Populate class select in modal
+        function populateClassSelect() {
+            const select = document.getElementById('deckClass');
+            classes.forEach(cls => {
+                const option = document.createElement('option');
+                option.value = cls.id;
+                option.textContent = cls.name;
+                select.appendChild(option);
+            });
+        }
+
+        // Modal controls
+        const modal = document.getElementById('createDeckModal');
+        const createDeckBtn = document.getElementById('createDeckBtn');
+        const cancelBtn = document.getElementById('cancelBtn');
+        const createDeckForm = document.getElementById('createDeckForm');
+
+        createDeckBtn.addEventListener('click', () => {
+            modal.classList.add('active');
+        });
+
+        cancelBtn.addEventListener('click', () => {
+            modal.classList.remove('active');
+            createDeckForm.reset();
+        });
+
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                modal.classList.remove('active');
+                createDeckForm.reset();
+            }
+        });
+
+        // Create new deck
+        createDeckForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            const title = document.getElementById('deckTitle').value;
+            const classId = document.getElementById('deckClass').value;
+            
+            const newDeck = {
+                id: decks.length + 1,
+                title: title,
+                class: classId,
+                cards: 0,
+                mastered: 0
+            };
+            
+            decks.push(newDeck);
+            
+            // Update counts
+            updateAllCount();
+            const classItem = document.querySelector(`[data-class="${classId}"] .deck-count`);
+            if (classItem) {
+                classItem.textContent = decks.filter(d => d.class === classId).length;
+            }
+            
+            renderDecks();
+            modal.classList.remove('active');
+            createDeckForm.reset();
+            
+            alert(`Deck "${title}" created successfully!`);
+        });
+
+        // Open deck (placeholder)
+        function openDeck(deckId) {
+            const deck = decks.find(d => d.id === deckId);
+            alert(`Opening deck: ${deck.title}\n\nThis would navigate to the deck study interface.`);
+        }
+
+        // Initialize on load
+        init();
+    </script>
+</body>
+</html>
