@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StudyBuddy - Chat</title>
+    <link rel="stylesheet" href="css/chatbot-interface.css">
+</head>
+<body>
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <h2>StudyBuddy</h2>
+            <div class="class-badge" id="classBadge">
+                <span>💻</span>
+                <span id="className">Computer Science 101</span>
+            </div>
+        </div>
+
+        <button class="nav-button" onclick="changeClass()">← Change Class</button>
+        <button class="nav-button" onclick="newChat()">+ New Chat</button>
+        <button class="nav-button" onclick="clearHistory()">🗑️ Clear History</button>
+
+        <div class="chat-history">
+            <h3>Recent Chats</h3>
+            <div id="historyList">
+                <div class="history-item" onclick="loadChat('chat1')">
+                    <div class="history-title">Data Structures Questions</div>
+                    <div class="history-date">Today, 2:30 PM</div>
+                </div>
+                <div class="history-item" onclick="loadChat('chat2')">
+                    <div class="history-title">Algorithm Complexity</div>
+                    <div class="history-date">Yesterday, 4:15 PM</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Chat Area -->
+    <div class="chat-container">
+        <div class="chat-header">
+            <h1>💬 Study Assistant</h1>
+            <div class="status-indicator">
+                <span class="status-dot"></span>
+                <span>AI Ready</span>
+            </div>
+        </div>
+
+        <div class="messages-container" id="messagesContainer">
+            <div class="welcome-message" id="welcomeMessage">
+                <h2>👋 Welcome!</h2>
+                <p>I'm your AI study assistant. Ask me anything about your course materials!</p>
+                <div class="welcome-suggestions">
+                    <div class="suggestion-chip" onclick="sendSuggestion('Explain binary search trees')">
+                        Explain binary search trees
+                    </div>
+                    <div class="suggestion-chip" onclick="sendSuggestion('What is time complexity?')">
+                        What is time complexity?
+                    </div>
+                    <div class="suggestion-chip" onclick="sendSuggestion('Summarize the last lecture')">
+                        Summarize the last lecture
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="input-container">
+            <div class="file-preview" id="filePreview"></div>
+            <div class="input-wrapper">
+                <input type="file" id="fileInput" class="hidden" multiple accept=".pdf,.txt,.doc,.docx,.png,.jpg,.jpeg">
+                <button class="file-upload-btn" onclick="document.getElementById('fileInput').click()" title="Upload file">
+                    📎
+                </button>
+                <textarea 
+                    class="message-input" 
+                    id="messageInput" 
+                    placeholder="Type your message here..."
+                    rows="1"
+                ></textarea>
+                <button class="send-button" id="sendButton" onclick="sendMessage()" title="Send message">
+                    ➤
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/chatbot-interface.js"></script>
+</body>
+</html>
