@@ -71,3 +71,52 @@ input:focus {
   @media (max-width: 420px) {
     .card { width: 92vw; padding: 18px; border-radius: 12px; }
   }
+
+  .brand {
+  text-align: center;
+  display: grid;
+  gap: 6px;
+  margin-bottom: 8px;
+}
+
+.brand .logo {
+  font-size: 26px;
+  margin: 0;
+  letter-spacing: .3px;
+}
+
+.brand .tagline {
+  margin: 0;
+  color: #6b7280;
+  font-size: 14px;
+}
+
+.actions {
+  display: grid;
+  gap: 10px;
+}
+
+.btn-secondary {
+  background: #e7e9f7;
+  color: #2a2f3a;
+}
+
+.btn-secondary:hover {
+  filter: brightness(0.98);
+}
+
+.link-row {
+  text-align: center;
+  font-size: 14px;
+  color: #6b7280;
+}
+
+.link-row a {
+  color: #6c7cff;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.link-row a:hover {
+  text-decoration: underline;
+}

@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>StudyBuddy | Sign Up</title>
+
+  <link rel="stylesheet" href="style.css" />
+</head>
+
+<body>
+  <main class="card">
+    <header class="brand">
+      <h1 class="logo">StudyBuddy</h1>
+      <p class="tagline">Create an account to get started.</p>
+    </header>
+
+    <form id="signup-form" novalidate>
+      <h2 style="margin: 0;">Sign Up</h2>
+
+      <label>Email
+        <input type="email" id="signup-email" required />
+      </label>
+
+      <label>Password
+        <input type="password" id="signup-password" required />
+      </label>
+
+      <label>Confirm password
+        <input type="password" id="confirm-password" required />
+      </label>
+
+      <div class="actions">
+        <button type="submit">Sign Up</button>
+
+        <button class="btn-secondary" type="button" onclick="location.href='index.html'">
+          ⬅ Back
+        </button>
+      </div>
+
+      <p id="signup-msg"></p>
+
+      <div class="link-row">
+        Already have an account? <a href="login.html">Log in</a>
+      </div>
+    </form>
+  </main>
+
+  <script src="script.js" defer></script>
+</body>
+</html>
