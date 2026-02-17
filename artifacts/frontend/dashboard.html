@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>StudyBuddy | Chat</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+
+<body class="app-body">
+  <div class="app-shell">
+    <aside class="sb-sidebar">
+      <div class="sb-sidebar-top">
+        <div class="sb-brand">
+          <div class="sb-brand-title">StudyBuddy</div>
+          <div class="sb-brand-sub">Dashboard</div>
+        </div>
+
+        <button class="sb-primary" id="new-chat-btn">+ New chat</button>
+
+        <input class="sb-search" id="chat-search" type="search" placeholder="Search chats" />
+      </div>
+
+      <div class="sb-sidebar-section">
+        <button class="sb-collapse" type="button" aria-expanded="true" aria-controls="tools-panel" id="tools-toggle">
+          Study Tools
+          <span class="sb-caret" aria-hidden="true">▾</span>
+        </button>
+
+        <div id="tools-panel" class="sb-panel">
+          <button class="sb-item" data-go="flashcards.html">Flashcards</button>
+          <button class="sb-item" data-go="quizzes.html">Quizzes</button>
+          <button class="sb-item" data-go="revision.html">Basic Revision</button>
+          <button class="sb-item" data-go="subjects.html">Subjects</button>
+        </div>
+      </div>
+
+      <div class="sb-sidebar-section">
+        <button class="sb-collapse" type="button" aria-expanded="true" aria-controls="history-panel" id="history-toggle">
+          Recent Chats
+          <span class="sb-caret" aria-hidden="true">▾</span>
+        </button>
+
+        <div id="history-panel" class="sb-panel">
+          <button class="sb-chatrow" data-chat="welcome">Welcome chat</button>
+          <button class="sb-chatrow" data-chat="hw">Homework help</button>
+          <button class="sb-chatrow" data-chat="studyplan">Study plan</button>
+        </div>
+      </div>
+
+      <div class="sb-sidebar-bottom">
+        <button class="sb-ghost" type="button" onclick="location.href='index.html'">⬅ Back</button>
+      </div>
+    </aside>
+
+    <main class="sb-main">
+      <header class="sb-header">
+        <div class="sb-header-title">StudyBuddy Chatbot</div>
+        <div class="sb-header-sub">Ask anything — flashcards and quizzes are in the sidebar.</div>
+      </header>
+
+      <section class="sb-chat" id="chat-log" aria-label="Chat messages">
+        <div class="sb-msg sb-msg-bot">
+          <div class="sb-bubble">
+            Hey! I’m StudyBuddy 🤖 What are you studying today?
+          </div>
+        </div>
+      </section>
+
+      <form class="sb-composer" id="chat-form">
+        <input
+          class="sb-input"
+          id="chat-input"
+          type="text"
+          placeholder="Message StudyBuddy…"
+          autocomplete="off"
+        />
+        <button class="sb-send" type="submit">Send</button>
+      </form>
+    </main>
+  </div>
+
+  <script>
+    function wireToggle(btnId, panelId) {
+      const btn = document.getElementById(btnId);
+      const panel = document.getElementById(panelId);
+      btn.addEventListener("click", () => {
+        const expanded = btn.getAttribute("aria-expanded") === "true";
+        btn.setAttribute("aria-expanded", String(!expanded));
+        panel.style.display = expanded ? "none" : "grid";
+        btn.querySelector(".sb-caret").textContent = expanded ? "▸" : "▾";
+      });
+    }
+    wireToggle("tools-toggle", "tools-panel");
+    wireToggle("history-toggle", "history-panel");
+
+    document.querySelectorAll("[data-go]").forEach(btn => {
+      btn.addEventListener("click", () => {
+        window.location.href = btn.getAttribute("data-go");
+      });
+    });
+
+    document.getElementById("new-chat-btn").addEventListener("click", () => {
+      const log = document.getElementById("chat-log");
+      log.innerHTML = `
+        <div class="sb-msg sb-msg-bot">
+          <div class="sb-bubble">New chat started. What do you want to work on?</div>
+        </div>`;
+      document.getElementById("chat-input").focus();
+    });
+
+    function addMsg(text, who) {
+      const log = document.getElementById("chat-log");
+      const row = document.createElement("div");
+      row.className = "sb-msg " + (who === "user" ? "sb-msg-user" : "sb-msg-bot");
+      const bubble = document.createElement("div");
+      bubble.className = "sb-bubble";
+      bubble.textContent = text;
+      row.appendChild(bubble);
+      log.appendChild(row);
+      log.scrollTop = log.scrollHeight;
+    }
+
+    document.getElementById("chat-form").addEventListener("submit", (e) => {
+      e.preventDefault();
+      const input = document.getElementById("chat-input");
+      const text = input.value.trim();
+      if (!text) return;
+
+      addMsg(text, "user");
+      input.value = "";
+
+      setTimeout(() => {
+        addMsg("Got it — tell me your subject and what you’re stuck on.", "bot");
+      }, 250);
+    });
+  </script>
+</body>
+</html>

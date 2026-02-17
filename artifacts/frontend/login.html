@@ -1,62 +1,65 @@
 <!doctype html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8" />
-    <title>Login & Signup</title>
-    <link rel="stylesheet" href="style.css" />
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>StudyBuddy | Log In</title>
 
-    <script src="https://accounts.google.com/gsi/client" async defer></script>
+  <link rel="stylesheet" href="style.css" />
 
+  <!-- Google Sign-In (only needed on login page) -->
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
 </head>
+
 <body>
-    <main class="card">
+  <main class="card">
+    <header class="brand">
+      <h1 class="logo">StudyBuddy</h1>
+      <p class="tagline">Welcome back — let’s study smarter.</p>
+    </header>
 
-        <form id="login-form" novalidate>
-            <h1>Log In</h1>
-            <label>Email
-                <input type="email" id="login-email" required />
-            </label>
-            <label>Password
-                <input type="password" id="login-password" required />
-            </label>
-            <button type="submit">Login</button>
+    <form id="login-form" novalidate>
+      <h2 style="margin: 0;">Log In</h2>
 
-            <div
-                id="g_id_onload"
-                data-client_id="YOUR_CLIENT_ID.apps.googleusercontent.com"
-                data-callback="handleCredentialResponse"
-                data-ux_mode="popup"
-                data-auto_select="false"
-            ></div>
+      <label>Email
+        <input type="email" id="login-email" required />
+      </label>
 
-            <div class="g_id_signin"
-                data-type="standard"
-                data-size="large"
-                data-text="signin_with"
-                data-shape="pill"
-            ></div>
+      <label>Password
+        <input type="password" id="login-password" required />
+      </label>
 
-            <p id="login-msg"></p>
-        </form>
+      <div class="actions">
+        <button type="submit">Login</button>
 
-        <hr />
-        <form id="signup-form" novalidate>
-            <h1>Create Account</h1>
-            <label>Email
-                <input type="email" id="signup-email" required />
-            </label>
-            <label>Password
-                <input type="password" id="signup-password" required />
-            </label>
-            <label>Confirm password
-                <input type="password" id="confirm-password" required />
-            </label>
-            <button type="submit">Sign Up</button>
-            <p id="signup-msg"></p>
-        </form>
+        <div
+          id="g_id_onload"
+          data-client_id="YOUR_CLIENT_ID.apps.googleusercontent.com"
+          data-callback="handleCredentialResponse"
+          data-ux_mode="popup"
+          data-auto_select="false"
+        ></div>
 
-    </main>
+        <div class="g_id_signin"
+          data-type="standard"
+          data-size="large"
+          data-text="signin_with"
+          data-shape="pill"
+        ></div>
 
-    <script src="script.js" defer></script>
+        <button class="btn-secondary" type="button" onclick="location.href='index.html'">
+          ⬅ Back
+        </button>
+      </div>
+
+      <p id="login-msg"></p>
+
+      <div class="link-row">
+        Don’t have an account? <a href="signup.html">Sign up</a>
+      </div>
+    </form>
+  </main>
+
+  <script src="script.js" defer></script>
 </body>
 </html>
