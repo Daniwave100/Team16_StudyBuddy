@@ -38,3 +38,5 @@ These are the choices currently. Going for a purple base with accents of blue, g
     4E148C (purple)
     3D0E61 (dark purple)
     2C0735  (almost black purple)
+
+Note: This is the documentation for TM16-52
