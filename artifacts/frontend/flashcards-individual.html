@@ -101,6 +101,7 @@
             cursor: pointer;
         }
 
+        /* The actual visual "flip" is handled by this CSS rule, which rotates the element 180 degrees along the Y-axis when the flipped class is present */
         .flashcard.flipped {
             transform: rotateY(180deg);
         }
@@ -236,6 +237,7 @@
 
     <div class="main-content">
         <div class="flashcard-container">
+            <!-- The onclick attribute on the flashcard div calls the function above whenever a user clicks it. -->
             <div class="flashcard" id="flashcard" onclick="flipCard()">
                 <div class="card-face card-front">
                     <div class="card-label">Question</div>
@@ -306,6 +308,7 @@
             updateProgress();
         }
 
+        // This is the logic that toggles the flipped state on and off
         function flipCard() {
             document.getElementById('flashcard').classList.toggle('flipped');
         }
