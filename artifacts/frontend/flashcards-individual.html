@@ -252,6 +252,7 @@
             </div>
         </div>
 
+        <!-- These are the physical triggers in the interface that call the navigation functions -->
         <div class="controls">
             <button class="arrow-button" id="prevBtn" onclick="previousCard()">←</button>
             <div class="card-counter" id="counter">1 / 1</div>
@@ -292,6 +293,8 @@
         let currentCardIndex = 0;
         let knownCards = new Set();
 
+        // This is the "engine" of the switcher. It pulls the data from the flashcards array based on the current index and 
+        // updates the HTML elements. Crucially, it also removes the flipped class so the next card always starts on the question side.
         function loadCard() {
             const card = flashcards[currentCardIndex];
             document.getElementById('questionText').textContent = card.question;
@@ -313,6 +316,8 @@
             document.getElementById('flashcard').classList.toggle('flipped');
         }
 
+        // These functions increment or decrement the currentCardIndex and then call loadCard() 
+        // to refresh the screen with the new data
         function nextCard() {
             if (currentCardIndex < flashcards.length - 1) {
                 currentCardIndex++;
@@ -372,6 +377,8 @@
         }
 
         // Keyboard navigation
+        // The code also includes a "bonus" snippet at the bottom that allows you 
+        // to change cards using your Left and Right arrow keys
         document.addEventListener('keydown', function(event) {
             if (event.key === 'ArrowLeft') {
                 previousCard();
