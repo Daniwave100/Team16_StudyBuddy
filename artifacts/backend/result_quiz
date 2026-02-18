@@ -1,0 +1,24 @@
+def calculate_quiz_result(user_answers, quiz_data):
+    score = 0
+    total = len(quiz_data)
+    wrong_topics = []
+
+    for qid, info in quiz_data.items():
+        correct = info["correct"]
+        topic = info["topic"]
+
+        user_answer = user_answers.get(qid)
+
+        if user_answer == correct:
+            score += 1
+        else:
+            wrong_topics.append(topic)
+
+    percentage = (score / total) * 100 if total > 0 else 0
+
+    return {
+        "score": score,
+        "total": total,
+        "percentage": percentage,
+        "weak_topics": wrong_topics
+    }
