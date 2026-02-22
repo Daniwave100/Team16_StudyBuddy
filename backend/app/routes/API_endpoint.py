@@ -81,4 +81,4 @@ def generate_quiz(payload: GenerateQuizRequest):
         "topic": payload.topic,
         "num_questions": len(chosen),
         "questions": chosen
-    }
+    }# TM16-30: generate quiz endpoint
