@@ -83,3 +83,39 @@ class QuizSubmissionResult(BaseModel):
     time_taken: Optional[int] = None
     results: List[Dict]  # detailed results per question
     timestamp: str
+
+
+class ChatMessage(BaseModel):
+    """Individual chat message model."""
+    id: str
+    role: str  # 'user' or 'assistant'
+    content: str
+    timestamp: str
+    session_id: str
+
+
+class ChatSessionMetadata(BaseModel):
+    """Chat session metadata."""
+    id: str
+    class_id: str
+    title: str
+    message_count: int
+    created_at: str
+    updated_at: str
+    last_message_preview: Optional[str] = None
+
+
+class ChatSessionDetail(BaseModel):
+    """Detailed chat session with messages."""
+    id: str
+    class_id: str
+    title: str
+    messages: List[ChatMessage]
+    created_at: str
+    updated_at: str
+
+
+class ChatSessionListResponse(BaseModel):
+    """Response model for chat session list."""
+    sessions: List[ChatSessionMetadata]
+    total: int

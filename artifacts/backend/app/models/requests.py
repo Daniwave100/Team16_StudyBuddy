@@ -50,3 +50,9 @@ class QuizSubmissionRequest(BaseModel):
     quiz_id: str
     answers: Dict[str, str]  # question_id -> selected_answer
     time_taken: Optional[int] = None  # seconds
+
+
+class ChatSessionCreateRequest(BaseModel):
+    """Request model for creating a new chat session."""
+    class_id: str
+    title: Optional[str] = "New Conversation"
