@@ -3,7 +3,7 @@
 Used by route handlers for structured responses.
 """
 from pydantic import BaseModel
-from typing import Optional, List
+from typing import Optional, List, Dict
 
 
 class ChatResponse(BaseModel):
@@ -29,6 +29,7 @@ class FlashcardResponse(BaseModel):
 
 class QuizQuestion(BaseModel):
     """Individual quiz question model."""
+    id: Optional[str] = None
     question: str
     options: List[str]
     answer: str
@@ -41,3 +42,44 @@ class QuizResponse(BaseModel):
     class_id: str
     count: int
     timestamp: Optional[str] = None
+
+
+class QuizMetadata(BaseModel):
+    """Quiz metadata model."""
+    id: str
+    class_id: str
+    title: str
+    description: Optional[str] = None
+    difficulty: Optional[str] = "medium"
+    question_count: int
+    created_at: str
+    updated_at: Optional[str] = None
+
+
+class QuizDetail(BaseModel):
+    """Detailed quiz model with questions."""
+    id: str
+    class_id: str
+    title: str
+    description: Optional[str] = None
+    difficulty: Optional[str] = "medium"
+    questions: List[QuizQuestion]
+    created_at: str
+    updated_at: Optional[str] = None
+
+
+class QuizListResponse(BaseModel):
+    """Response model for quiz list."""
+    quizzes: List[QuizMetadata]
+    total: int
+
+
+class QuizSubmissionResult(BaseModel):
+    """Result of quiz submission."""
+    quiz_id: str
+    score: int  # percentage
+    correct_count: int
+    total_count: int
+    time_taken: Optional[int] = None
+    results: List[Dict]  # detailed results per question
+    timestamp: str
