@@ -1,23 +1,56 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<title>StudyBuddy</title>
-<link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>StudyBuddy | Welcome</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
 
-<body>
-  <main class="card" style="text-align:center;">
-    <h1>Welcome to StudyBuddy</h1>
-    <p>Your smarter way to study.</p>
+<body class="sbq">
+  <header class="sbq-topbar">
+    <div class="sbq-wrap">
+      <div class="sbq-brand">
+        <div>
+          <div class="sbq-title">StudyBuddy</div>
+          <div class="sbq-sub">Welcome</div>
+        </div>
+      </div>
 
-    <button onclick="location.href='login.html'">
-      Log In
-    </button>
+      <nav class="sbq-nav">
+        <a class="sbq-active" href="index.html">Home</a>
+        <a href="quiz.html">Quiz</a>
+        <a href="dashboard.html">Dashboard</a>
+      </nav>
 
-    <button onclick="location.href='signup.html'">
-      Sign Up
-    </button>
+      <div class="sbq-chip">👤 <strong>Guest</strong></div>
+    </div>
+  </header>
+
+  <main class="sbq-wrap">
+    <div class="sbq-grid sbq-cols-2">
+      <section class="sbq-card">
+        <h1 class="sbq-h1">Welcome to StudyBuddy.</h1>
+        <p class="sbq-p">Study tools in one place — quizzes, flashcards, revision, and chatbot.</p>
+
+        <div class="sbq-row">
+          <button class="sbq-btn primary" onclick="location.href='login.html'">Log In</button>
+          <button class="sbq-btn ghost" onclick="location.href='signup.html'">Sign Up</button>
+        </div>
+
+        <div class="sbq-divider"></div>
+        <p class="sbq-help">Just exploring? Go straight to the <a class="sbq-link" href="dashboard.html">Dashboard</a>.</p>
+      </section>
+
+      <aside class="sbq-card">
+        <h2 class="sbq-h2">What you can do</h2>
+        <p class="sbq-p">This is a frontend demo — you can wire login later.</p>
+        <div class="sbq-row">
+          <a class="sbq-btn" href="quiz.html">Take a quiz</a>
+          <a class="sbq-btn" href="dashboard.html">Open dashboard</a>
+        </div>
+      </aside>
+    </div>
   </main>
 </body>
 </html>

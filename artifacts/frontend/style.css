@@ -353,3 +353,204 @@ input:focus {
 .sb-chatrow {
   font-weight: 650;
 }
+
+
+:root{
+  --sbq-bg:#0b1020;
+  --sbq-panel:#111a33;
+  --sbq-card:#141f3d;
+  --sbq-border:rgba(255,255,255,.10);
+  --sbq-text:rgba(255,255,255,.92);
+  --sbq-muted:rgba(255,255,255,.70);
+  --sbq-muted2:rgba(255,255,255,.55);
+  --sbq-accent:#7c5cff;
+  --sbq-accent2:#38bdf8;
+  --sbq-shadow:0 18px 60px rgba(0,0,0,.45);
+  --sbq-radius:18px;
+  --sbq-radius2:14px;
+  --sbq-max:1050px;
+  --sbq-font: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+}
+
+body.sbq{
+  margin:0;
+  font-family:var(--sbq-font);
+  color:var(--sbq-text);
+  background:
+    radial-gradient(1100px 600px at 20% 0%, rgba(124,92,255,.18), transparent 60%),
+    radial-gradient(900px 500px at 90% 10%, rgba(56,189,248,.14), transparent 55%),
+    var(--sbq-bg);
+  min-height:100vh;
+}
+
+.sbq-wrap{
+  width:min(var(--sbq-max), 92vw);
+  margin:22px auto;
+}
+
+.sbq-topbar{
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  backdrop-filter: blur(10px);
+}
+
+.sbq-topbar .sbq-wrap{
+  display:grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items:center;
+  gap:14px;
+  margin-top: 0;
+}
+
+.sbq-brand{
+  justify-self:start;
+  display:flex;
+  align-items:center;
+  gap:12px;
+}
+.sbq-brand .sbq-title{
+  font-weight: 900;
+}
+.sbq-brand .sbq-sub{
+  font-size:12px;
+  color:var(--sbq-muted2);
+  font-weight:700;
+}
+
+.sbq-nav{
+  justify-self:center;
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+  padding:6px;
+  width: fit-content;
+  max-width: 520px;
+  border:1px solid var(--sbq-border);
+  background:rgba(255,255,255,.03);
+  border-radius:999px;
+  justify-content:center;
+}
+
+.sbq-nav a, .sbq-nav button{
+  border:0;
+  cursor:pointer;
+  color:var(--sbq-muted);
+  padding:9px 12px;
+  border-radius:999px;
+  background:transparent;
+  font-weight:700;
+  transition:.2s ease;
+  text-decoration:none;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+}
+
+.sbq-nav a.sbq-active,
+.sbq-nav button.sbq-active{
+  color:var(--sbq-text);
+  background:rgba(124,92,255,.20);
+  box-shadow: inset 0 0 0 1px rgba(124,92,255,.35);
+}
+.sbq-nav a:hover, .sbq-nav button:hover{
+  color:var(--sbq-text);
+  background:rgba(255,255,255,.06)
+}
+
+.sbq-chip{
+  justify-self:end;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:10px;
+  padding:10px 12px;
+  border-radius:999px;
+  border:1px solid var(--sbq-border);
+  background:rgba(255,255,255,.03);
+  color:var(--sbq-muted);
+  font-weight:800;
+}
+
+.sbq-grid{display:grid; gap:16px}
+@media(min-width: 900px){
+  .sbq-cols-2{grid-template-columns: 1.2fr .8fr}
+  .sbq-cols-3{grid-template-columns: 1.2fr .9fr .9fr}
+}
+
+.sbq-card{
+  background: linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.02));
+  border:1px solid var(--sbq-border);
+  border-radius: var(--sbq-radius);
+  box-shadow: var(--sbq-shadow);
+  padding:16px;
+}
+
+.sbq-h1{margin:0 0 8px; font-size:28px}
+.sbq-h2{margin:0 0 8px; font-size:18px}
+.sbq-p{margin:0 0 10px; color:var(--sbq-muted); line-height:1.45}
+
+.sbq-row{display:flex; gap:10px; align-items:center; flex-wrap:wrap}
+
+.sbq-btn{
+  border:0;
+  cursor:pointer;
+  padding:12px 14px;
+  border-radius:14px;
+  background:rgba(255,255,255,.06);
+  color:var(--sbq-text);
+  font-weight:800;
+  transition:.2s ease;
+  display:inline-flex;
+  align-items:center;
+  gap:10px;
+}
+.sbq-btn:hover{transform: translateY(-1px); background:rgba(255,255,255,.09)}
+.sbq-btn.primary{
+  background: linear-gradient(90deg, rgba(124,92,255,.95), rgba(56,189,248,.85));
+  box-shadow: 0 14px 40px rgba(124,92,255,.22);
+}
+.sbq-btn.ghost{
+  background:transparent;
+  box-shadow: inset 0 0 0 1px var(--sbq-border)
+}
+
+.sbq-divider{height:1px; background:var(--sbq-border); margin:12px 0}
+
+.sbq-field{
+  display:grid;
+  gap:6px;
+  margin-top: 8px;
+}
+
+.sbq-label{
+  font-size:13px;
+  color: var(--sbq-muted);
+  font-weight: 800;
+}
+
+.sbq-input{
+  padding:12px 12px;
+  border:1px solid var(--sbq-border);
+  border-radius: 14px;
+  background: rgba(255,255,255,.03);
+  color: var(--sbq-text);
+  outline: none;
+}
+.sbq-input::placeholder{color: rgba(255,255,255,.35)}
+.sbq-input:focus{
+  border-color: rgba(124,92,255,.45);
+  box-shadow: 0 0 0 3px rgba(124,92,255,.18);
+}
+
+.sbq-help{
+  font-size:13px;
+  color: var(--sbq-muted);
+}
+
+.sbq-link{
+  color: rgba(124,92,255,.95);
+  text-decoration:none;
+  font-weight:900;
+}
+.sbq-link:hover{text-decoration: underline}
