@@ -28,10 +28,13 @@ def run(mode, class_id, message=None, focus=None):
     # inject chunks into system prompt
 
     # call openaI and return response
+    agent = Agent(name="Assistant", instructions=system_prompt)
+    result = Runner.run_sync(agent, message)
+    return result
 
 # use this to test this functionality running
-if __name__ == "main":
-    agent = Agent(name="Assistant", instructions=mode)
+if __name__ == "__main__":
+    agent = Agent(name="Assistant", instructions=system_prompt)
 
     result = Runner.run_sync(agent, "Write a haiku")
     print(result.final_output)

@@ -1,62 +1,85 @@
 <!doctype html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8" />
-    <title>Login & Signup</title>
-    <link rel="stylesheet" href="style.css" />
-
-    <script src="https://accounts.google.com/gsi/client" async defer></script>
-
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>StudyBuddy | Log In</title>
+  <link rel="stylesheet" href="style.css" />
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
 </head>
-<body>
-    <main class="card">
+
+<body class="sbq">
+  <header class="sbq-topbar">
+    <div class="sbq-wrap">
+      <div class="sbq-brand">
+        <div>
+          <div class="sbq-title">StudyBuddy</div>
+          <div class="sbq-sub">Log In</div>
+        </div>
+      </div>
+
+      <nav class="sbq-nav">
+        <a href="index.html">Home</a>
+        <a href="quiz.html">Quiz</a>
+        <a href="dashboard.html">Dashboard</a>
+      </nav>
+
+      <div class="sbq-chip">🔒 <strong>Auth</strong></div>
+    </div>
+  </header>
+
+  <main class="sbq-wrap">
+    <div class="sbq-grid sbq-cols-2">
+      <section class="sbq-card">
+        <h1 class="sbq-h1">Welcome back.</h1>
+        <p class="sbq-p">Log in to keep your progress and saved content.</p>
 
         <form id="login-form" novalidate>
-            <h1>Log In</h1>
-            <label>Email
-                <input type="email" id="login-email" required />
-            </label>
-            <label>Password
-                <input type="password" id="login-password" required />
-            </label>
-            <button type="submit">Login</button>
+          <div class="sbq-field">
+            <div class="sbq-label">Email</div>
+            <input class="sbq-input" type="email" id="login-email" placeholder="you@syr.edu" required />
+          </div>
 
-            <div
-                id="g_id_onload"
-                data-client_id="YOUR_CLIENT_ID.apps.googleusercontent.com"
-                data-callback="handleCredentialResponse"
-                data-ux_mode="popup"
-                data-auto_select="false"
-            ></div>
+          <div class="sbq-field">
+            <div class="sbq-label">Password</div>
+            <input class="sbq-input" type="password" id="login-password" placeholder="••••••••" required />
+          </div>
 
-            <div class="g_id_signin"
-                data-type="standard"
-                data-size="large"
-                data-text="signin_with"
-                data-shape="pill"
-            ></div>
+          <div class="sbq-row" style="margin-top:12px">
+            <button class="sbq-btn primary" type="submit">Log In</button>
+            <button class="sbq-btn ghost" type="button" onclick="location.href='index.html'">Back</button>
+          </div>
 
-            <p id="login-msg"></p>
+          <p class="sbq-help" id="login-msg" style="margin-top:10px"></p>
+
+          <div class="sbq-divider"></div>
+
+          <div
+            id="g_id_onload"
+            data-client_id="YOUR_CLIENT_ID.apps.googleusercontent.com"
+            data-callback="handleCredentialResponse"
+            data-ux_mode="popup"
+            data-auto_select="false"
+          ></div>
+          <div class="g_id_signin" data-type="standard" data-size="large" data-text="signin_with" data-shape="pill"></div>
+
+          <p class="sbq-help" style="margin-top:10px">
+            Don’t have an account? <a class="sbq-link" href="signup.html">Sign up</a>
+          </p>
         </form>
+      </section>
 
-        <hr />
-        <form id="signup-form" novalidate>
-            <h1>Create Account</h1>
-            <label>Email
-                <input type="email" id="signup-email" required />
-            </label>
-            <label>Password
-                <input type="password" id="signup-password" required />
-            </label>
-            <label>Confirm password
-                <input type="password" id="confirm-password" required />
-            </label>
-            <button type="submit">Sign Up</button>
-            <p id="signup-msg"></p>
-        </form>
+      <aside class="sbq-card">
+        <h2 class="sbq-h2">Demo note</h2>
+        <p class="sbq-p">For now, login uses localStorage (frontend-only).</p>
+        <div class="sbq-row">
+          <a class="sbq-btn" href="dashboard.html">Go to dashboard</a>
+          <a class="sbq-btn" href="quiz.html">Try quiz UI</a>
+        </div>
+      </aside>
+    </div>
+  </main>
 
-    </main>
-
-    <script src="script.js" defer></script>
+  <script src="script.js" defer></script>
 </body>
 </html>
