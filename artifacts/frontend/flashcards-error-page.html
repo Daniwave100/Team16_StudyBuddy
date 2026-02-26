@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Deck Not Found — StudyBuddy</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .error-card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            padding: 60px 50px;
+            max-width: 480px;
+            width: 90%;
+            text-align: center;
+        }
+
+        .error-icon {
+            font-size: 64px;
+            margin-bottom: 20px;
+        }
+
+        .error-brand {
+            font-size: 14px;
+            font-weight: 600;
+            color: #667eea;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 16px;
+        }
+
+        .error-title {
+            font-size: 28px;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 12px;
+        }
+
+        .error-message {
+            font-size: 16px;
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 12px;
+        }
+
+        .error-id {
+            font-size: 13px;
+            color: #aaa;
+            margin-bottom: 36px;
+        }
+
+        .home-button {
+            display: inline-block;
+            padding: 14px 32px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: opacity 0.3s, transform 0.2s;
+        }
+
+        .home-button:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="error-card">
+        <div class="error-icon">📚</div>
+        <div class="error-brand">StudyBuddy</div>
+        <h2 class="error-title">Deck Not Found</h2>
+        <p class="error-message">The deck you're looking for doesn't exist or couldn't be loaded.</p>
+        <p class="error-id" id="errorId"></p>
+        <button class="home-button" onclick="window.location.href='flashcards-homepage.html'">
+            ← Back to Homepage
+        </button>
+    </div>
+
+    <script>
+        // If redirected with a deckId (e.g. flashcards-error-page.html?deckId=99),
+        // display it so the user knows which deck failed to load.
+        const params = new URLSearchParams(window.location.search);
+        const deckId = params.get('deckId');
+        if (deckId) {
+            document.getElementById('errorId').textContent = `Deck ID: ${deckId}`;
+        }
+    </script>
+
+</body>
+</html>

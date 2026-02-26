@@ -299,17 +299,7 @@
 
         // ── Error handling: if deckId is missing or invalid, show error screen ──
         if (!selectedDeck) {
-            document.body.innerHTML = `
-                <div style="display:flex; flex-direction:column; align-items:center;
-                            justify-content:center; height:100vh; color:white; font-family:sans-serif; text-align:center;">
-                    <h2 style="font-size:28px; margin-bottom:12px;">Deck not found.</h2>
-                    <p style="margin-bottom:24px; opacity:0.85;">The deck you're looking for doesn't exist or couldn't be loaded.</p>
-                    <button onclick="window.location.href='flashcards-homepage.html'"
-                            style="padding:12px 28px; background:white; color:#667eea;
-                                   border:none; border-radius:8px; cursor:pointer; font-size:16px; font-weight:600;">
-                        ← Back to Homepage
-                    </button>
-                </div>`;
+            window.location.href = `flashcards-error-page.html?deckId=${deckId}`;
         } else {
             // Update page title and sidebar with deck name and subject
             document.title = `${selectedDeck.title} — StudyBuddy`;
