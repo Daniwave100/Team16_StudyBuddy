@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -28,8 +27,15 @@
 
         .sidebar h2 {
             color: #667eea;
-            margin-bottom: 30px;
-            font-size: 24px;
+            margin-bottom: 6px;
+            font-size: 20px;
+            word-break: break-word;
+        }
+
+        .sidebar-subject {
+            color: #999;
+            font-size: 13px;
+            margin-bottom: 24px;
         }
 
         .nav-button {
@@ -222,7 +228,8 @@
 </head>
 <body>
     <div class="sidebar">
-        <h2>StudyBuddy</h2>
+        <h2 id="deckTitle">StudyBuddy</h2>
+        <div class="sidebar-subject" id="deckSubject"></div>
         <button class="nav-button" onclick="goHome()">← Back to Home</button>
         <button class="nav-button" onclick="shuffleCards()">🔀 Shuffle Cards</button>
         <button class="nav-button" onclick="resetProgress()">↺ Reset Progress</button>
@@ -266,7 +273,52 @@
     </div>
 
     <script>
-        // Sample flashcard data - replace with your actual data
+        // ── Deck + class data (mirrors homepage — swap for API fetch when backend is ready) ──
+        const classes = [
+            { id: 'cs101',   name: 'Computer Science 101' },
+            { id: 'math201', name: 'Calculus II' },
+            { id: 'phys150', name: 'Physics I' },
+            { id: 'eng210',  name: 'Engineering Design' }
+        ];
+
+        const decks = [
+            { id: 1, title: 'Data Structures Basics',  class: 'cs101',   cards: 24, mastered: 18 },
+            { id: 2, title: 'Sorting Algorithms',      class: 'cs101',   cards: 15, mastered: 10 },
+            { id: 3, title: 'Integration Techniques',  class: 'math201', cards: 30, mastered: 22 },
+            { id: 4, title: 'Limits and Derivatives',  class: 'math201', cards: 20, mastered: 15 },
+            { id: 5, title: "Newton's Laws",           class: 'phys150', cards: 18, mastered: 12 },
+            { id: 6, title: 'Kinematics',              class: 'phys150', cards: 25, mastered: 20 },
+            { id: 7, title: 'Design Process',          class: 'eng210',  cards: 12, mastered: 8  }
+        ];
+
+        // ── Read deckId from URL (e.g. flashcards-individual.html?deckId=3) ──
+        const params = new URLSearchParams(window.location.search);
+        const deckId = parseInt(params.get('deckId'));
+        const selectedDeck = decks.find(d => d.id === deckId);
+        const classInfo = selectedDeck ? classes.find(c => c.id === selectedDeck.class) : null;
+
+        // ── Error handling: if deckId is missing or invalid, show error screen ──
+        if (!selectedDeck) {
+            document.body.innerHTML = `
+                <div style="display:flex; flex-direction:column; align-items:center;
+                            justify-content:center; height:100vh; color:white; font-family:sans-serif; text-align:center;">
+                    <h2 style="font-size:28px; margin-bottom:12px;">Deck not found.</h2>
+                    <p style="margin-bottom:24px; opacity:0.85;">The deck you're looking for doesn't exist or couldn't be loaded.</p>
+                    <button onclick="window.location.href='flashcard-homepage.html'"
+                            style="padding:12px 28px; background:white; color:#667eea;
+                                   border:none; border-radius:8px; cursor:pointer; font-size:16px; font-weight:600;">
+                        ← Back to Homepage
+                    </button>
+                </div>`;
+        } else {
+            // Update page title and sidebar with deck name and subject
+            document.title = `${selectedDeck.title} — StudyBuddy`;
+            document.getElementById('deckTitle').textContent = selectedDeck.title;
+            document.getElementById('deckSubject').textContent = classInfo ? classInfo.name : '';
+        }
+
+        // ── Flashcard data (replace with API call when backend is ready) ──
+        // TODO: fetch(`/api/decks/${deckId}/cards`) and populate flashcards array
         let flashcards = [
             {
                 question: "What is the time complexity of binary search?",
@@ -293,21 +345,16 @@
         let currentCardIndex = 0;
         let knownCards = new Set();
 
-        // This is the "engine" of the switcher. It pulls the data from the flashcards array based on the current index and 
+        // This is the "engine" of the switcher. It pulls the data from the flashcards array based on the current index and
         // updates the HTML elements. Crucially, it also removes the flipped class so the next card always starts on the question side.
         function loadCard() {
             const card = flashcards[currentCardIndex];
             document.getElementById('questionText').textContent = card.question;
             document.getElementById('answerText').textContent = card.answer;
             document.getElementById('counter').textContent = `${currentCardIndex + 1} / ${flashcards.length}`;
-            
-            // Reset flip state
             document.getElementById('flashcard').classList.remove('flipped');
-            
-            // Update navigation buttons
             document.getElementById('prevBtn').disabled = currentCardIndex === 0;
             document.getElementById('nextBtn').disabled = currentCardIndex === flashcards.length - 1;
-            
             updateProgress();
         }
 
@@ -316,7 +363,7 @@
             document.getElementById('flashcard').classList.toggle('flipped');
         }
 
-        // These functions increment or decrement the currentCardIndex and then call loadCard() 
+        // These functions increment or decrement the currentCardIndex and then call loadCard()
         // to refresh the screen with the new data
         function nextCard() {
             if (currentCardIndex < flashcards.length - 1) {
@@ -333,9 +380,7 @@
         }
 
         function goHome() {
-            // Replace with your actual homepage URL
-            alert('Redirecting to homepage...\nUpdate the goHome() function with your homepage URL');
-            // window.location.href = 'index.html';
+            window.location.href = 'flashcards-homepage.html';
         }
 
         function shuffleCards() {
@@ -350,22 +395,18 @@
         function markKnown() {
             knownCards.add(currentCardIndex);
             updateProgress();
-            if (currentCardIndex < flashcards.length - 1) {
-                nextCard();
-            }
+            if (currentCardIndex < flashcards.length - 1) nextCard();
         }
 
         function markReview() {
             knownCards.delete(currentCardIndex);
             updateProgress();
-            if (currentCardIndex < flashcards.length - 1) {
-                nextCard();
-            }
+            if (currentCardIndex < flashcards.length - 1) nextCard();
         }
 
         function updateProgress() {
-            const percentage = (knownCards.size / flashcards.length) * 100;
-            document.getElementById('progressFill').style.width = percentage + '%';
+            const pct = (knownCards.size / flashcards.length) * 100;
+            document.getElementById('progressFill').style.width = pct + '%';
             document.getElementById('progressText').textContent = `${knownCards.size}/${flashcards.length}`;
         }
 
@@ -376,22 +417,16 @@
             loadCard();
         }
 
-        // Keyboard navigation
-        // The code also includes a "bonus" snippet at the bottom that allows you 
+        // The code also includes a "bonus" snippet at the bottom that allows you
         // to change cards using your Left and Right arrow keys
         document.addEventListener('keydown', function(event) {
-            if (event.key === 'ArrowLeft') {
-                previousCard();
-            } else if (event.key === 'ArrowRight') {
-                nextCard();
-            } else if (event.key === ' ') {
-                event.preventDefault();
-                flipCard();
-            }
+            if (event.key === 'ArrowLeft') previousCard();
+            else if (event.key === 'ArrowRight') nextCard();
+            else if (event.key === ' ') { event.preventDefault(); flipCard(); }
         });
 
-        // Initialize
-        loadCard();
+        // Only initialize if deck was found
+        if (selectedDeck) loadCard();
     </script>
 </body>
 </html>

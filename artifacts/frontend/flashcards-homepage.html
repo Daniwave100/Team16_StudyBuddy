@@ -388,12 +388,21 @@
         });
 
         function openDeck(deckId) {
-            const deck = decks.find(d => d.id === deckId);
-            alert(`Opening deck: ${deck.title}\n\nThis would navigate to the deck study interface.`);
+            // Save current sort so homepage can restore it when user comes back
+            sessionStorage.setItem('lastSort', currentSort);
+            window.location.href = `flashcards-individual.html?deckId=${deckId}`;
         }
 
         function init() {
             populateClassSelect();
+
+            // Restore sort selection if user came back from dashboard
+            const savedSort = sessionStorage.getItem('lastSort');
+            if (savedSort) {
+                currentSort = savedSort;
+                document.getElementById('sortSelect').value = savedSort;
+            }
+
             renderDecks();
         }
 
