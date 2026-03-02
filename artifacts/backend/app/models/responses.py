@@ -119,3 +119,18 @@ class ChatSessionListResponse(BaseModel):
     """Response model for chat session list."""
     sessions: List[ChatSessionMetadata]
     total: int
+
+
+class IngestedFile(BaseModel):
+    """Metadata for a single ingested file."""
+    filename: str
+    chunk_count: int
+
+
+class IngestResponse(BaseModel):
+    """Response model for ingest endpoint."""
+    class_id: str
+    files_indexed: int
+    chunks_indexed: int
+    files: List[IngestedFile]
+    timestamp: str

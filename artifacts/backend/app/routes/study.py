@@ -2,14 +2,57 @@
 
 Defines ingest, flashcards, and quiz generation routes.
 """
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, UploadFile, File, Form
 from app.models.requests import FlashcardRequest, QuizRequest
-from app.models.responses import FlashcardResponse, QuizResponse, Flashcard, QuizQuestion
+from app.models.responses import (
+    FlashcardResponse,
+    QuizResponse,
+    Flashcard,
+    QuizQuestion,
+    IngestResponse,
+    IngestedFile,
+)
 from app.agent import run
+from app.tools.ingest import ingest_files
 from datetime import datetime
 import json
 
 router = APIRouter()
+
+
+@router.post("/ingest", response_model=IngestResponse, status_code=201)
+async def ingest_study_materials(
+    class_id: str = Form(...),
+    files: list[UploadFile] = File(...),
+):
+    """Ingest uploaded files and index them for retrieval by class."""
+    try:
+        if not files:
+            raise HTTPException(status_code=400, detail="At least one file is required")
+
+        payloads: list[tuple[str, bytes]] = []
+        for uploaded_file in files:
+            if not uploaded_file.filename:
+                raise HTTPException(status_code=400, detail="Uploaded file must have a filename")
+            payloads.append((uploaded_file.filename, await uploaded_file.read()))
+
+        file_summaries = ingest_files(class_id=class_id, files=payloads)
+        if not file_summaries:
+            raise HTTPException(status_code=400, detail="No readable content found in uploaded files")
+
+        return IngestResponse(
+            class_id=class_id,
+            files_indexed=len(file_summaries),
+            chunks_indexed=sum(item["chunk_count"] for item in file_summaries),
+            files=[IngestedFile(**item) for item in file_summaries],
+            timestamp=datetime.utcnow().isoformat(),
+        )
+    except HTTPException:
+        raise
+    except ValueError as error:
+        raise HTTPException(status_code=400, detail=str(error))
+    except Exception as error:
+        raise HTTPException(status_code=500, detail=f"Error ingesting files: {str(error)}")
 
 
 @router.post("/flashcards", response_model=FlashcardResponse)
