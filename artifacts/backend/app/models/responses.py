@@ -21,10 +21,19 @@ class Flashcard(BaseModel):
 
 class FlashcardResponse(BaseModel):
     """Response model for flashcard generation endpoint."""
+    id: Optional[str] = None
     flashcards: List[Flashcard]
     class_id: str
     count: int
+    created_at: Optional[str] = None
+    updated_at: Optional[str] = None
     timestamp: Optional[str] = None
+
+
+class FlashcardListResponse(BaseModel):
+    """Response model for flashcard set list."""
+    flashcard_sets: List[FlashcardResponse]
+    total: int
 
 
 class QuizQuestion(BaseModel):

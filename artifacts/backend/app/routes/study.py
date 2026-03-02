@@ -6,6 +6,7 @@ from fastapi import APIRouter, HTTPException, UploadFile, File, Form
 from app.models.requests import FlashcardRequest, QuizRequest
 from app.models.responses import (
     FlashcardResponse,
+    FlashcardListResponse,
     QuizResponse,
     Flashcard,
     QuizQuestion,
@@ -15,9 +16,14 @@ from app.models.responses import (
 from app.agent import run
 from app.tools.ingest import ingest_files
 from datetime import datetime
+from typing import Optional
 import json
+import uuid
 
 router = APIRouter()
+
+# In-memory storage for flashcard sets (replace with database in production)
+flashcards_db = {}
 
 
 @router.post("/ingest", response_model=IngestResponse, status_code=201)
@@ -55,7 +61,7 @@ async def ingest_study_materials(
         raise HTTPException(status_code=500, detail=f"Error ingesting files: {str(error)}")
 
 
-@router.post("/flashcards", response_model=FlashcardResponse)
+@router.post("/flashcards", response_model=FlashcardResponse, status_code=201)
 async def generate_flashcards(request: FlashcardRequest):
     """
     Generate flashcards for a class based on uploaded materials.
@@ -81,21 +87,83 @@ async def generate_flashcards(request: FlashcardRequest):
         # Parse the JSON response from the agent
         try:
             flashcards_data = json.loads(response_text)
+            if not isinstance(flashcards_data, list):
+                raise HTTPException(status_code=500, detail="Invalid flashcard response format from AI")
             flashcards = [Flashcard(**card) for card in flashcards_data]
         except json.JSONDecodeError:
             raise HTTPException(status_code=500, detail="Failed to parse flashcard response from AI")
+
+        flashcard_set_id = str(uuid.uuid4())
+        timestamp = datetime.utcnow().isoformat()
+
+        flashcard_record = {
+            "id": flashcard_set_id,
+            "flashcards": [card.model_dump() for card in flashcards],
+            "class_id": request.class_id,
+            "count": len(flashcards),
+            "created_at": timestamp,
+            "updated_at": timestamp,
+            "timestamp": timestamp,
+        }
+
+        flashcards_db[flashcard_set_id] = flashcard_record
         
         return FlashcardResponse(
+            id=flashcard_set_id,
             flashcards=flashcards,
             class_id=request.class_id,
             count=len(flashcards),
-            timestamp=datetime.utcnow().isoformat()
+            created_at=timestamp,
+            updated_at=timestamp,
+            timestamp=timestamp,
         )
         
     except HTTPException:
         raise
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error generating flashcards: {str(e)}")
+
+
+@router.get("/flashcards", response_model=FlashcardListResponse)
+async def list_flashcard_sets(class_id: Optional[str] = None):
+    """Retrieve flashcard sets, optionally filtered by class ID."""
+    try:
+        flashcard_sets = list(flashcards_db.values())
+
+        if class_id:
+            flashcard_sets = [item for item in flashcard_sets if item["class_id"] == class_id]
+
+        return FlashcardListResponse(
+            flashcard_sets=[FlashcardResponse(**item) for item in flashcard_sets],
+            total=len(flashcard_sets),
+        )
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error retrieving flashcard sets: {str(e)}")
+
+
+@router.get("/flashcards/{flashcard_id}", response_model=FlashcardResponse)
+async def get_flashcard_set(flashcard_id: str):
+    """Retrieve a specific flashcard set by ID."""
+    if flashcard_id not in flashcards_db:
+        raise HTTPException(status_code=404, detail=f"Flashcard set with ID '{flashcard_id}' not found")
+
+    try:
+        return FlashcardResponse(**flashcards_db[flashcard_id])
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error retrieving flashcard set: {str(e)}")
+
+
+@router.delete("/flashcards/{flashcard_id}", status_code=204)
+async def delete_flashcard_set(flashcard_id: str):
+    """Delete a flashcard set by ID."""
+    if flashcard_id not in flashcards_db:
+        raise HTTPException(status_code=404, detail=f"Flashcard set with ID '{flashcard_id}' not found")
+
+    try:
+        del flashcards_db[flashcard_id]
+        return None
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error deleting flashcard set: {str(e)}")
 
 
 @router.post("/quiz", response_model=QuizResponse)
