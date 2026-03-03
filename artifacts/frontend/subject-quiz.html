@@ -1,0 +1,822 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>StudyBuddy — Subject Quizzes</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --bg:#020617;
+      --card:rgba(15,23,42,.92);
+      --border:rgba(30,64,175,.75);
+      --border2:rgba(51,65,85,.9);
+      --text:#e5e7eb;
+      --muted:#9ca3af;
+      --muted2:#6b7280;
+      --accent:#6366f1;
+      --good:#22c55e;
+      --bad:#ef4444;
+      --warn:#f59e0b;
+      --shadow:0 24px 80px rgba(15,23,42,.75);
+      --radius:18px;
+      --radius2:12px;
+      --font:'Inter',system-ui,sans-serif;
+    }
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+    body{
+      font-family:var(--font);
+      color:var(--text);
+      background:
+        radial-gradient(1100px 600px at 10% 0%,rgba(99,102,241,.22),transparent 60%),
+        radial-gradient(900px 500px at 100% 0%,rgba(56,189,248,.15),transparent 55%),
+        #020617;
+      min-height:100vh;
+      -webkit-font-smoothing:antialiased;
+    }
+
+    /* ── TOPBAR ── */
+    .topbar{
+      position:sticky;top:0;z-index:50;
+      backdrop-filter:blur(18px);
+      background:linear-gradient(to bottom,rgba(2,6,23,.95),rgba(2,6,23,.92));
+      border-bottom:1px solid rgba(15,23,42,.8);
+    }
+    .topbar-inner{
+      max-width:900px;margin:0 auto;
+      display:flex;align-items:center;justify-content:space-between;
+      padding:14px 16px;
+    }
+    .brand{display:flex;align-items:center;gap:10px;font-weight:600;}
+    .logo{
+      width:28px;height:28px;border-radius:10px;
+      background:conic-gradient(from 160deg,#6366f1,#22c55e,#38bdf8,#6366f1);
+      box-shadow:0 8px 26px rgba(15,23,42,.9);
+      flex-shrink:0;
+    }
+    .brand-name{font-size:15px;font-weight:700;}
+    .brand-sub{font-size:11px;color:var(--muted2);font-weight:700;}
+    .chip{
+      display:flex;align-items:center;gap:8px;
+      padding:6px 12px;border-radius:999px;
+      border:1px solid var(--border2);
+      background:rgba(15,23,42,.92);
+      font-size:13px;color:var(--muted);
+    }
+
+    /* ── LAYOUT ── */
+    .wrap{max-width:900px;margin:0 auto;padding:32px 16px 60px;}
+
+    /* ── CARDS ── */
+    .card{
+      background:radial-gradient(circle at top left,rgba(15,23,42,.9),rgba(15,23,42,.97));
+      border-radius:var(--radius);
+      border:1px solid var(--border);
+      box-shadow:var(--shadow);
+      padding:24px 22px;
+    }
+
+    .divider{
+      height:1px;width:100%;
+      background:radial-gradient(circle,rgba(148,163,184,.6),transparent 70%);
+      opacity:.6;margin:16px 0;
+    }
+
+    /* ── TYPOGRAPHY ── */
+    h1{font-size:26px;font-weight:800;letter-spacing:-.01em;margin-bottom:8px;}
+    h2{font-size:20px;font-weight:700;margin-bottom:6px;}
+    h3{font-size:16px;font-weight:700;margin-bottom:4px;}
+    p{color:var(--muted);font-size:14px;line-height:1.6;}
+    .small{font-size:13px;color:var(--muted);}
+
+    /* ── BUTTONS ── */
+    .btn{
+      border:0;cursor:pointer;
+      padding:10px 16px;border-radius:999px;
+      background:rgba(15,23,42,1);color:var(--text);
+      font-weight:600;font-size:14px;font-family:var(--font);
+      display:inline-flex;align-items:center;gap:8px;
+      transition:all .18s ease;
+      box-shadow:0 0 0 1px var(--border2);
+    }
+    .btn:hover{transform:translateY(-1px);box-shadow:0 16px 40px rgba(0,0,0,.45);}
+    .btn.primary{
+      background:linear-gradient(135deg,#6366f1,#38bdf8);
+      box-shadow:0 14px 40px rgba(79,70,229,.5);border:none;
+    }
+    .btn.primary:hover{filter:brightness(1.06);}
+    .btn.ghost{background:transparent;box-shadow:0 0 0 1px var(--border2);}
+    .btn.chatbot{
+      background:linear-gradient(135deg,#7c3aed,#4c1d95);
+      box-shadow:0 14px 40px rgba(109,40,217,.45);border:none;
+      color:#fff;
+    }
+    .btn.chatbot:hover{filter:brightness(1.08);}
+    .btn:disabled{opacity:.45;cursor:not-allowed;transform:none;box-shadow:none;}
+
+    /* ── PILLS / TAGS ── */
+    .pill{
+      display:inline-flex;align-items:center;gap:5px;
+      padding:5px 10px;border-radius:999px;
+      border:1px solid var(--border2);
+      background:rgba(15,23,42,.9);
+      color:var(--muted);font-size:12px;font-weight:600;
+    }
+    .pill.good{border-color:rgba(34,197,94,.7);color:rgba(220,252,231,.98);background:rgba(21,128,61,.28);}
+    .pill.bad{border-color:rgba(248,113,113,.8);color:rgba(254,242,242,.98);background:rgba(185,28,28,.32);}
+    .pill.warn{border-color:rgba(251,191,36,.75);color:rgba(255,251,235,.98);background:rgba(202,138,4,.35);}
+    .pill.hs{border-color:rgba(99,102,241,.6);color:#a5b4fc;background:rgba(99,102,241,.12);}
+    .pill.col{border-color:rgba(56,189,248,.6);color:#7dd3fc;background:rgba(56,189,248,.1);}
+
+    .tag{
+      font-size:12px;color:var(--muted);
+      border:1px solid var(--border2);padding:4px 9px;
+      border-radius:999px;background:rgba(15,23,42,.9);
+    }
+
+    /* ── PROGRESS ── */
+    .progress{
+      width:100%;height:8px;border-radius:999px;
+      background:rgba(15,23,42,1);
+      border:1px solid rgba(30,64,175,.7);overflow:hidden;
+    }
+    .progress>div{
+      height:100%;width:0%;
+      background:linear-gradient(90deg,#6366f1,#22c55e);
+      transition:width .3s ease;
+    }
+
+    /* ── KPI boxes ── */
+    .kpi-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:4px;}
+    .kpi{
+      padding:14px 12px 10px;border-radius:var(--radius2);
+      border:1px solid rgba(30,64,175,.8);
+      background:rgba(15,23,42,.9);
+    }
+    .kpi .big{font-size:24px;font-weight:800;}
+    .kpi .lbl{font-size:11px;color:var(--muted2);margin-top:3px;letter-spacing:.04em;text-transform:uppercase;}
+
+    /* ── SUBJECT GRID (home) ── */
+    .subject-grid{
+      display:grid;
+      grid-template-columns:repeat(auto-fill,minmax(260px,1fr));
+      gap:14px;margin-top:24px;
+    }
+    .subject-card{
+      background:radial-gradient(circle at top left,rgba(15,23,42,.88),rgba(15,23,42,.97));
+      border:1px solid rgba(30,64,175,.6);
+      border-radius:var(--radius);
+      padding:20px 18px;
+      transition:border-color .22s,transform .22s,box-shadow .22s;
+    }
+    .subject-card:hover{
+      border-color:rgba(99,102,241,.55);
+      transform:translateY(-3px);
+      box-shadow:0 20px 56px rgba(15,23,42,.7);
+    }
+    .subject-icon{font-size:26px;margin-bottom:8px;display:block;}
+    .subject-name{font-size:16px;font-weight:700;margin-bottom:4px;}
+    .subject-desc{font-size:12px;color:var(--muted2);margin-bottom:14px;}
+    .level-list{display:flex;flex-direction:column;gap:7px;}
+    .level-btn{
+      display:flex;align-items:center;justify-content:space-between;
+      padding:9px 12px;border-radius:10px;
+      border:1px solid rgba(51,65,85,.8);
+      background:rgba(15,23,42,.85);
+      cursor:pointer;font-size:13px;font-weight:600;
+      font-family:var(--font);color:var(--text);
+      transition:all .18s;text-align:left;
+    }
+    .level-btn:hover{
+      border-color:rgba(99,102,241,.6);
+      background:rgba(99,102,241,.08);
+      transform:translateX(3px);
+    }
+    .level-btn .lcount{font-size:11px;color:var(--muted2);font-weight:500;}
+
+    /* ── OPTION rows ── */
+    .list{display:flex;flex-direction:column;gap:9px;}
+    .opt{
+      display:flex;gap:10px;align-items:flex-start;
+      padding:12px 14px;border-radius:var(--radius2);
+      border:1px solid rgba(31,41,55,.95);
+      background:rgba(15,23,42,.9);
+      cursor:pointer;
+      transition:background .17s,border-color .17s,transform .15s;
+      user-select:none;
+    }
+    .opt:hover{background:rgba(15,23,42,1);border-color:rgba(79,70,229,.8);transform:translateY(-1px);}
+    .opt.selected{border-color:#6366f1;box-shadow:0 0 0 1px rgba(79,70,229,.7);}
+    .opt.correct{border-color:rgba(34,197,94,.75);background:rgba(21,128,61,.22);}
+    .opt.wrong{border-color:rgba(248,113,113,.8);background:rgba(185,28,28,.22);}
+    .opt.neutral-after{opacity:.42;pointer-events:none;}
+    .opt-marker{
+      width:28px;height:28px;border-radius:8px;flex-shrink:0;
+      display:flex;align-items:center;justify-content:center;
+      font-size:12px;font-weight:800;
+      background:rgba(99,102,241,.1);color:#818cf8;
+      transition:all .15s;
+    }
+    .opt.correct .opt-marker{background:rgba(34,197,94,.18);color:#4ade80;}
+    .opt.wrong   .opt-marker{background:rgba(248,113,113,.18);color:#f87171;}
+
+    /* ── EXPLANATION box ── */
+    .expl-box{
+      background:rgba(15,23,42,.9);
+      border:1px solid rgba(99,102,241,.3);
+      border-left:3px solid #6366f1;
+      border-radius:var(--radius2);
+      padding:16px 18px;margin-top:4px;
+    }
+    .expl-ttl{font-size:12px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:8px;}
+
+    /* ── REVIEW items ── */
+    .review-item{
+      padding:12px 14px;border-radius:var(--radius2);
+      border:1px solid rgba(31,41,55,.95);
+      background:rgba(15,23,42,.9);
+      display:flex;gap:12px;align-items:flex-start;justify-content:space-between;
+    }
+
+    /* ── WEAK TOPIC bar ── */
+    .weak-bar-wrap{margin-top:6px;}
+    .weak-bar{
+      height:6px;border-radius:999px;
+      background:linear-gradient(90deg,#f59e0b,#ef4444);
+      transition:width .4s ease;
+    }
+
+    /* ── CHATBOT CTA ── */
+    .chatbot-cta{
+      background:linear-gradient(135deg,rgba(109,40,217,.18),rgba(76,29,149,.12));
+      border:1px solid rgba(124,58,237,.35);
+      border-radius:var(--radius2);
+      padding:18px 20px;
+      display:flex;align-items:center;justify-content:space-between;
+      gap:14px;flex-wrap:wrap;
+      margin-top:4px;
+    }
+    .chatbot-cta-text h3{margin-bottom:4px;font-size:15px;}
+    .chatbot-cta-text p{font-size:13px;color:var(--muted);}
+
+    .row{display:flex;gap:10px;align-items:center;flex-wrap:wrap;}
+    .hidden{display:none!important;}
+
+    @media(max-width:480px){
+      .kpi-grid{grid-template-columns:repeat(2,1fr);}
+      h1{font-size:22px;}
+      .subject-grid{grid-template-columns:1fr;}
+    }
+  </style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<div class="topbar">
+  <div class="topbar-inner">
+    <div class="brand">
+      <div class="logo"></div>
+      <div>
+        <div class="brand-name">StudyBuddy</div>
+        <div class="brand-sub">Subject Quizzes</div>
+      </div>
+    </div>
+    <div class="row" style="gap:8px;">
+      <a href="quiz.html" class="chip" style="text-decoration:none;color:var(--muted);">← My Quizzes</a>
+      <a href="chatbot-interface.html" class="chip" style="text-decoration:none;color:var(--muted);">💬 Ask AI</a>
+    </div>
+  </div>
+</div>
+
+<main class="wrap">
+
+  <!-- ══ HOME ══ -->
+  <section id="page-home">
+    <div style="margin-bottom:28px;">
+      <h1>Subject Quizzes</h1>
+      <p>Choose a subject and difficulty level to start. Your results, weak topics, and AI-powered explanations are all one click away.</p>
+    </div>
+
+    <div class="subject-grid" id="subjectGrid"></div>
+  </section>
+
+  <!-- ══ QUIZ ══ -->
+  <section id="page-quiz" class="hidden">
+    <div class="card">
+      <!-- header -->
+      <div class="row" style="justify-content:space-between;align-items:flex-start;margin-bottom:4px;">
+        <div>
+          <h2 id="qzTitle">Quiz</h2>
+          <p class="small" id="qzMeta"></p>
+        </div>
+        <span class="pill" id="qzLevelPill"></span>
+      </div>
+
+      <div class="divider"></div>
+
+      <!-- progress row -->
+      <div class="row" style="justify-content:space-between;margin-bottom:8px;">
+        <span class="pill" id="qzCounter">Question 1 / 5</span>
+        <span class="pill" id="qzTopic"></span>
+      </div>
+      <div class="progress" style="margin-bottom:16px;"><div id="qzBar"></div></div>
+
+      <!-- question -->
+      <h3 id="qzText" style="font-size:17px;line-height:1.5;margin-bottom:6px;"></h3>
+      <p class="small" style="margin-bottom:14px;">Select one answer.</p>
+
+      <div id="qzOptions" class="list"></div>
+
+      <!-- explanation (shown after answer) -->
+      <div id="qzExpl" class="expl-box hidden" style="margin-top:14px;">
+        <div class="expl-ttl" id="qzExplLabel"></div>
+        <p class="small" id="qzExplText" style="margin-bottom:14px;line-height:1.65;"></p>
+        <button class="btn primary" id="qzNextBtn">Next →</button>
+      </div>
+
+      <div class="divider"></div>
+      <div class="row" style="justify-content:space-between;">
+        <button class="btn ghost" id="qzBackBtn">← Back to Subjects</button>
+        <span class="small" id="qzScoreLive" style="color:var(--muted2);"></span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ RESULTS ══ -->
+  <section id="page-results" class="hidden">
+    <div class="card">
+      <h2 id="resTitle">Your Results</h2>
+      <p class="small" id="resMeta"></p>
+      <div class="divider"></div>
+
+      <!-- KPIs -->
+      <div class="kpi-grid">
+        <div class="kpi"><div class="big" id="resPct">—</div><div class="lbl">Score</div></div>
+        <div class="kpi"><div class="big" id="resCorrect">—</div><div class="lbl">Correct</div></div>
+        <div class="kpi"><div class="big" id="resMissed">—</div><div class="lbl">Missed</div></div>
+      </div>
+
+      <div class="divider"></div>
+
+      <!-- Chatbot CTA -->
+      <div class="chatbot-cta">
+        <div class="chatbot-cta-text">
+          <h3>🤖 Want help understanding your mistakes?</h3>
+          <p>Ask StudyBuddy's AI to explain any question, topic, or concept from this quiz.</p>
+        </div>
+        <a id="chatbotLink" href="chatbot-interface.html" class="btn chatbot" style="text-decoration:none;white-space:nowrap;">
+          💬 Ask StudyBuddy
+        </a>
+      </div>
+
+      <div class="divider"></div>
+
+      <!-- Question review -->
+      <h3 style="margin-bottom:12px;">Question Review</h3>
+      <div class="list" id="resList"></div>
+
+      <div class="divider"></div>
+      <div class="row">
+        <button class="btn primary" id="resWeakBtn">See Weak Topics →</button>
+        <button class="btn ghost" id="resRetryBtn">Retry Quiz</button>
+        <button class="btn ghost" id="resHomeBtn">← All Subjects</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ WEAK TOPICS ══ -->
+  <section id="page-weak" class="hidden">
+    <div class="card">
+      <h2>Weak Topics</h2>
+      <p class="small">Topics where you missed questions — focus your study time here.</p>
+      <div class="divider"></div>
+
+      <div class="list" id="weakList"></div>
+
+      <div class="divider"></div>
+
+      <!-- Chatbot CTA -->
+      <div class="chatbot-cta">
+        <div class="chatbot-cta-text">
+          <h3>🤖 Get targeted help</h3>
+          <p>Tell StudyBuddy which topics you're struggling with and get a personalized study plan.</p>
+        </div>
+        <a id="chatbotLinkWeak" href="chatbot-interface.html" class="btn chatbot" style="text-decoration:none;white-space:nowrap;">
+          💬 Ask StudyBuddy
+        </a>
+      </div>
+
+      <div class="divider"></div>
+      <h3 style="margin-bottom:12px;">Suggested Next Steps</h3>
+      <div class="list" id="weakRec"></div>
+
+      <div class="divider"></div>
+      <div class="row">
+        <button class="btn primary" id="weakRetryBtn">Practice Again</button>
+        <button class="btn ghost" id="weakResultsBtn">← Back to Results</button>
+        <button class="btn ghost" id="weakHomeBtn">All Subjects</button>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<script>
+// ═══════════════════════════════════════════════
+//  QUIZ DATA
+// ═══════════════════════════════════════════════
+const QUIZ_DATA = {
+  "Algebra": {
+    icon: "∑",
+    desc: "Equations, functions, and algebraic structures",
+    levels: {
+      "High School": [
+        { id:"a-hs-1", topic:"Linear Equations", text:"Solve for x: 3x - 7 = 11", options:["x = 4","x = 6","x = 18/3","x = 2"], correct:1, explanation:"Add 7 to both sides: 3x = 18. Divide by 3: x = 6." },
+        { id:"a-hs-2", topic:"Slope", text:"What is the slope of the line passing through (1, 2) and (3, 8)?", options:["2","3","4","6"], correct:1, explanation:"Slope = (8-2)/(3-1) = 6/2 = 3." },
+        { id:"a-hs-3", topic:"Quadratics", text:"Which value satisfies x² - 5x + 6 = 0?", options:["x = 1","x = 2","x = 4","x = 5"], correct:1, explanation:"Factor: (x-2)(x-3)=0 → x=2 or x=3. Both 2 and 3 work; x=2 is listed." },
+        { id:"a-hs-4", topic:"Exponents", text:"Simplify: (2x³)(3x²)", options:["5x⁵","6x⁵","6x⁶","5x⁶"], correct:1, explanation:"Multiply coefficients: 2×3=6. Add exponents: x³⁺²=x⁵. Answer: 6x⁵." },
+        { id:"a-hs-5", topic:"Functions", text:"If f(x) = 2x + 3, what is f(4)?", options:["8","10","11","14"], correct:2, explanation:"f(4) = 2(4) + 3 = 8 + 3 = 11." },
+      ],
+      "College": [
+        { id:"a-co-1", topic:"Logarithms", text:"If log₂(x) + log₂(x-2) = 3, find x.", options:["x = 2","x = 4","x = 6","x = 8"], correct:1, explanation:"log₂(x(x-2))=3 → x(x-2)=8 → x²-2x-8=0 → (x-4)(x+2)=0. Since x>2, x=4." },
+        { id:"a-co-2", topic:"Geometric Series", text:"Sum of infinite geometric series with first term 6 and ratio 1/3?", options:["9","12","18","6"], correct:0, explanation:"S = a/(1-r) = 6/(1-1/3) = 6/(2/3) = 9." },
+        { id:"a-co-3", topic:"Complex Numbers", text:"How many solutions does z⁴ = 1 have in ℂ?", options:["1","2","3","4"], correct:3, explanation:"zⁿ=1 has exactly n roots in ℂ — the nth roots of unity. So z⁴=1 has 4 solutions." },
+        { id:"a-co-4", topic:"Matrices", text:"What is the determinant of [[2,3],[1,4]]?", options:["5","8","11","–5"], correct:0, explanation:"det = (2)(4)-(3)(1) = 8-3 = 5." },
+        { id:"a-co-5", topic:"Binomial Theorem", text:"How many terms are in the expansion of (a+b)⁷?", options:["6","7","8","9"], correct:2, explanation:"(a+b)ⁿ has n+1 terms. (a+b)⁷ has 8 terms." },
+      ]
+    }
+  },
+  "Calculus": {
+    icon: "∫",
+    desc: "Limits, derivatives, integrals, and series",
+    levels: {
+      "High School": [
+        { id:"c-hs-1", topic:"Limits", text:"What is lim(x→2) of (x²-4)/(x-2)?", options:["0","2","4","undefined"], correct:2, explanation:"Factor: (x+2)(x-2)/(x-2) = x+2. As x→2, limit = 4." },
+        { id:"c-hs-2", topic:"Derivatives", text:"Find f'(x) if f(x) = 4x³ - 2x.", options:["12x² - 2","4x² - 2","12x³ - 2","8x² - 2"], correct:0, explanation:"Power rule: d/dx(4x³)=12x², d/dx(2x)=2. So f'(x)=12x²-2." },
+        { id:"c-hs-3", topic:"Integration", text:"What is ∫3x² dx?", options:["6x + C","x³ + C","3x + C","x² + C"], correct:1, explanation:"∫3x² dx = 3·x³/3 + C = x³ + C." },
+        { id:"c-hs-4", topic:"Optimization", text:"f(x) = x² - 4x has a minimum at x =?", options:["0","1","2","4"], correct:2, explanation:"f'(x)=2x-4=0 → x=2. f''(x)=2>0 confirms minimum." },
+        { id:"c-hs-5", topic:"Chain Rule", text:"d/dx [sin(3x)] = ?", options:["cos(3x)","3cos(3x)","-3sin(3x)","-cos(3x)"], correct:1, explanation:"Chain rule: d/dx[sin(u)]=cos(u)·u'. Here u=3x, u'=3 → 3cos(3x)." },
+      ],
+      "College": [
+        { id:"c-co-1", topic:"MVT", text:"MVT for f(x)=x³ on [0,2]: f'(c) = ?", options:["4","3","2","6"], correct:0, explanation:"f'(c)=(f(2)-f(0))/(2-0)=(8-0)/2=4. c=2/√3 satisfies 3c²=4." },
+        { id:"c-co-2", topic:"Integrals", text:"Evaluate ∫₀^π sin(x) dx.", options:["0","1","2","π"], correct:2, explanation:"[-cos(x)]₀^π = -cos(π)+cos(0) = 1+1 = 2." },
+        { id:"c-co-3", topic:"Series", text:"Which test confirms Σ(1/n²) converges?", options:["Divergence test","p-series (p=2>1)","Ratio test","Root test"], correct:1, explanation:"p-series Σ(1/nᵖ) converges when p>1. Here p=2>1." },
+        { id:"c-co-4", topic:"Multivariable", text:"Gradient of f(x,y)=x²y at (2,3)?", options:["(12, 4)","(4, 12)","(6, 4)","(12, 3)"], correct:0, explanation:"∂f/∂x=2xy=12, ∂f/∂y=x²=4. Gradient=(12,4)." },
+        { id:"c-co-5", topic:"Taylor Series", text:"The Maclaurin series of cos(x) starts with:", options:["1 - x²/2! + x⁴/4!…","1 + x²/2! + x⁴/4!…","x - x³/3! + x⁵/5!…","1 - x + x²/2!…"], correct:0, explanation:"cos(x) = 1 - x²/2! + x⁴/4! - ⋯ (only even powers, alternating signs)." },
+      ]
+    }
+  },
+  "Physics": {
+    icon: "⚛",
+    desc: "Mechanics, energy, waves, and modern physics",
+    levels: {
+      "High School": [
+        { id:"p-hs-1", topic:"Newton's Laws", text:"A 5 kg object accelerates at 4 m/s². What net force acts on it?", options:["1.25 N","9 N","20 N","40 N"], correct:2, explanation:"F = ma = 5 × 4 = 20 N." },
+        { id:"p-hs-2", topic:"Kinematics", text:"A ball is dropped from rest and falls for 3 s. How far does it fall? (g=10 m/s²)", options:["15 m","30 m","45 m","90 m"], correct:2, explanation:"d = ½gt² = ½(10)(9) = 45 m." },
+        { id:"p-hs-3", topic:"Energy", text:"A 2 kg object moving at 6 m/s has kinetic energy of:", options:["12 J","18 J","36 J","72 J"], correct:2, explanation:"KE = ½mv² = ½(2)(36) = 36 J." },
+        { id:"p-hs-4", topic:"Waves", text:"If a wave has frequency 50 Hz and wavelength 4 m, what is its speed?", options:["12.5 m/s","46 m/s","54 m/s","200 m/s"], correct:3, explanation:"v = fλ = 50 × 4 = 200 m/s." },
+        { id:"p-hs-5", topic:"Gravity", text:"On the Moon (g≈1.6 m/s²), what is the weight of a 70 kg person?", options:["43.75 N","70 N","112 N","686 N"], correct:2, explanation:"W = mg = 70 × 1.6 = 112 N." },
+      ],
+      "College": [
+        { id:"p-co-1", topic:"Electrostatics", text:"Two +2μC charges 0.1 m apart. Force? (k=9×10⁹ N·m²/C²)", options:["0.36 N","3.6 N","36 N","360 N"], correct:1, explanation:"F=kq²/r²=(9×10⁹)(2×10⁻⁶)²/(0.01)=(9×10⁹)(4×10⁻¹²)/0.01=3.6 N." },
+        { id:"p-co-2", topic:"Optics", text:"Light in glass (n=1.5). Speed = ?", options:["1×10⁸ m/s","2×10⁸ m/s","3×10⁸ m/s","4.5×10⁸ m/s"], correct:1, explanation:"v = c/n = (3×10⁸)/1.5 = 2×10⁸ m/s." },
+        { id:"p-co-3", topic:"Faraday's Law", text:"Which equation is Faraday's law of induction?", options:["F=qE","ε=-dΦ/dt","B=μ₀I/2πr","∇·E=ρ/ε₀"], correct:1, explanation:"Faraday's law: ε = -dΦ/dt — EMF equals negative rate of change of magnetic flux." },
+        { id:"p-co-4", topic:"Quantum", text:"Heisenberg's Uncertainty Principle states:", options:["Energy is quantized","E=mc²","ΔxΔp ≥ ℏ/2","Electrons orbit in fixed shells"], correct:2, explanation:"ΔxΔp ≥ ℏ/2: position and momentum cannot both be known precisely at the same time." },
+        { id:"p-co-5", topic:"Thermodynamics", text:"The second law of thermodynamics states:", options:["Energy is conserved","Entropy of an isolated system never decreases","PV=nRT","Heat flows from cold to hot"], correct:1, explanation:"The 2nd law: entropy of an isolated system always increases or stays constant — never decreases." },
+      ]
+    }
+  },
+  "Chemistry": {
+    icon: "⚗",
+    desc: "Atoms, reactions, bonding, and thermodynamics",
+    levels: {
+      "High School": [
+        { id:"ch-hs-1", topic:"Atomic Structure", text:"How many neutrons does Carbon-14 have?", options:["6","7","8","14"], correct:2, explanation:"Carbon has 6 protons. Carbon-14 has mass number 14. Neutrons = 14-6 = 8." },
+        { id:"ch-hs-2", topic:"Bonding", text:"What type of bond forms between Na and Cl?", options:["Covalent","Metallic","Ionic","Hydrogen bond"], correct:2, explanation:"Na transfers an electron to Cl, forming an ionic bond between Na⁺ and Cl⁻." },
+        { id:"ch-hs-3", topic:"Stoichiometry", text:"In 2H₂ + O₂ → 2H₂O, how many moles of H₂O form from 4 mol H₂?", options:["2","4","6","8"], correct:1, explanation:"2 mol H₂ → 2 mol H₂O (1:1 ratio). So 4 mol H₂ → 4 mol H₂O." },
+        { id:"ch-hs-4", topic:"Periodic Trends", text:"Which element has the highest electronegativity?", options:["Oxygen","Chlorine","Nitrogen","Fluorine"], correct:3, explanation:"Fluorine has the highest electronegativity (3.98 on Pauling scale)." },
+        { id:"ch-hs-5", topic:"Acids & Bases", text:"What is the pH of a 0.001 M HCl solution?", options:["1","2","3","11"], correct:2, explanation:"HCl fully dissociates: [H⁺]=0.001=10⁻³ M. pH = -log(10⁻³) = 3." },
+      ],
+      "College": [
+        { id:"ch-co-1", topic:"Kinetics", text:"For A→B, rate doubles when [A] doubles. Order with respect to A?", options:["Zero","First","Second","Third"], correct:1, explanation:"Rate ∝ [A]¹ — doubling [A] doubles rate. This is first-order." },
+        { id:"ch-co-2", topic:"Thermodynamics", text:"ΔG = -50 kJ, T=298K, ΔS=+0.1 kJ/K. Find ΔH.", options:["-79.8 kJ","-20.2 kJ","+20.2 kJ","-50 kJ"], correct:1, explanation:"ΔH = ΔG + TΔS = -50 + (298)(0.1) = -50 + 29.8 = -20.2 kJ." },
+        { id:"ch-co-3", topic:"Quantum Chemistry", text:"What does the Born-Oppenheimer approximation assume?", options:["Electrons move slower than nuclei","Nuclear and electronic motions can be separated","All bonds are ionic","Orbitals are spherical"], correct:1, explanation:"Because nuclei are ~1836× heavier, electrons adjust instantaneously — so nuclear/electronic wavefunctions separate." },
+        { id:"ch-co-4", topic:"MO Theory", text:"In MO theory, out-of-phase orbital combination produces:", options:["Bonding MO","Non-bonding MO","Antibonding MO (σ*)","Hybrid orbital"], correct:2, explanation:"Out-of-phase combination → antibonding MO with a nodal plane between nuclei (σ* or π*)." },
+        { id:"ch-co-5", topic:"Equilibrium", text:"For N₂+3H₂⇌2NH₃, Kc expression is:", options:["[NH₃]²/[N₂][H₂]","[NH₃]²/[N₂][H₂]³","[N₂][H₂]³/[NH₃]²","[NH₃]/[N₂][H₂]"], correct:1, explanation:"Kc = [products]^stoich / [reactants]^stoich = [NH₃]²/([N₂][H₂]³)." },
+      ]
+    }
+  },
+  "Biology": {
+    icon: "⚕",
+    desc: "Cells, genetics, evolution, and molecular biology",
+    levels: {
+      "High School": [
+        { id:"b-hs-1", topic:"Cell Biology", text:"Which organelle produces ATP via cellular respiration?", options:["Nucleus","Ribosome","Mitochondria","Golgi"], correct:2, explanation:"Mitochondria are the site of aerobic cellular respiration and ATP production." },
+        { id:"b-hs-2", topic:"Genetics", text:"In a monohybrid cross Aa × Aa, what fraction of offspring are homozygous recessive?", options:["1/4","1/2","3/4","1"], correct:0, explanation:"Aa × Aa → 1 AA : 2 Aa : 1 aa. Homozygous recessive (aa) = 1/4." },
+        { id:"b-hs-3", topic:"Photosynthesis", text:"Where does the light-dependent reaction occur?", options:["Stroma","Cytoplasm","Thylakoid membrane","Outer chloroplast membrane"], correct:2, explanation:"Light-dependent reactions occur on the thylakoid membranes where chlorophyll absorbs light." },
+        { id:"b-hs-4", topic:"Evolution", text:"What is the unit of natural selection?", options:["Species","Population","Individual organism","Gene"], correct:2, explanation:"Natural selection acts on individual organisms — those with favorable traits survive and reproduce." },
+        { id:"b-hs-5", topic:"Ecology", text:"Which trophic level captures energy from the sun?", options:["Decomposers","Primary consumers","Producers","Secondary consumers"], correct:2, explanation:"Producers (plants, algae) are autotrophs that capture solar energy via photosynthesis." },
+      ],
+      "College": [
+        { id:"b-co-1", topic:"Molecular Biology", text:"In CRISPR-Cas9, what directs Cas9 to the correct genomic location?", options:["The PAM sequence","The guide RNA (gRNA)","The tracrRNA alone","The Cas9 protein itself"], correct:1, explanation:"The guide RNA (gRNA) base-pairs with the target DNA sequence, directing Cas9 to the precise cut site." },
+        { id:"b-co-2", topic:"Cell Cycle", text:"What is p53's primary role?", options:["Promote S-phase entry","Stimulate mitosis","Tumor suppressor — halt cycle or trigger apoptosis on DNA damage","Methylate histones"], correct:2, explanation:"p53 is activated by DNA damage, upregulating p21 (cell cycle arrest) and pro-apoptotic genes." },
+        { id:"b-co-3", topic:"Meiosis", text:"When do homologous chromosomes separate?", options:["Mitosis anaphase","Meiosis II anaphase","Meiosis I anaphase","Prophase II"], correct:2, explanation:"Homologs separate during Anaphase I of Meiosis I, reducing ploidy from 2n to n." },
+        { id:"b-co-4", topic:"Biochemistry", text:"Which molecule is the final electron acceptor in the ETC?", options:["NAD⁺","FAD","ATP","O₂"], correct:3, explanation:"O₂ is the final electron acceptor in aerobic respiration, forming water (H₂O)." },
+        { id:"b-co-5", topic:"Population Genetics", text:"Hardy-Weinberg equilibrium requires:", options:["Small population size","Natural selection","Random mating with no evolutionary forces","High mutation rate"], correct:2, explanation:"H-W requires: large population, random mating, no selection, no mutation, no gene flow." },
+      ]
+    }
+  }
+};
+
+// ═══════════════════════════════════════════════
+//  APP STATE
+// ═══════════════════════════════════════════════
+let state = {
+  subject: null,
+  level: null,
+  questions: [],
+  idx: 0,
+  answers: {},   // id → chosen index | null
+  score: null,
+};
+
+// ═══════════════════════════════════════════════
+//  HELPERS
+// ═══════════════════════════════════════════════
+const $ = id => document.getElementById(id);
+const PAGES = ["home","quiz","results","weak"];
+
+function showPage(name){
+  PAGES.forEach(p => {
+    const el = $("page-"+p);
+    if (el) el.classList.toggle("hidden", p !== name);
+  });
+  window.scrollTo(0,0);
+}
+
+function levelPillClass(level){
+  return level === "High School" ? "pill hs" : "pill col";
+}
+
+// ═══════════════════════════════════════════════
+//  BUILD HOME
+// ═══════════════════════════════════════════════
+function buildHome(){
+  const grid = $("subjectGrid");
+  grid.innerHTML = "";
+  Object.entries(QUIZ_DATA).forEach(([subj, data])=>{
+    const card = document.createElement("div");
+    card.className = "subject-card";
+    const levels = Object.entries(data.levels).map(([lvl, qs])=>`
+      <button class="level-btn" onclick="startQuiz('${subj}','${lvl}')">
+        <div>
+          <span class="${levelPillClass(lvl)}" style="font-size:11px;padding:3px 8px;">${lvl}</span>
+        </div>
+        <span class="lcount">${qs.length} questions →</span>
+      </button>
+    `).join("");
+
+    card.innerHTML = `
+      <span class="subject-icon">${data.icon}</span>
+      <div class="subject-name">${subj}</div>
+      <div class="subject-desc">${data.desc}</div>
+      <div style="height:1px;background:rgba(51,65,85,.5);margin-bottom:12px;"></div>
+      <div class="level-list">${levels}</div>
+    `;
+    grid.appendChild(card);
+  });
+}
+
+// ═══════════════════════════════════════════════
+//  START QUIZ
+// ═══════════════════════════════════════════════
+function startQuiz(subject, level){
+  const qs = QUIZ_DATA[subject].levels[level];
+  state = {
+    subject, level,
+    questions: qs,
+    idx: 0,
+    answers: Object.fromEntries(qs.map(q=>[q.id, null])),
+    score: null,
+  };
+  renderQuestion();
+  showPage("quiz");
+}
+
+// ═══════════════════════════════════════════════
+//  RENDER QUESTION
+// ═══════════════════════════════════════════════
+function renderQuestion(){
+  const { questions, idx, answers, subject, level } = state;
+  const q = questions[idx];
+  const chosen = answers[q.id];
+  const answered = chosen !== null;
+
+  $("qzTitle").textContent = `${subject} — ${level}`;
+  $("qzMeta").textContent = `${questions.length} questions`;
+  $("qzLevelPill").className = levelPillClass(level);
+  $("qzLevelPill").textContent = level;
+  $("qzCounter").textContent = `Question ${idx+1} / ${questions.length}`;
+  $("qzTopic").textContent = q.topic;
+  $("qzBar").style.width = `${(idx / questions.length)*100}%`;
+  $("qzText").textContent = q.text;
+
+  // live score
+  const doneCount = Object.values(answers).filter(v=>v!==null).length;
+  const correctSoFar = questions.filter((qq,i)=> i < idx && answers[qq.id] === qq.correct).length;
+  $("qzScoreLive").textContent = doneCount > 0 ? `${correctSoFar} correct so far` : "";
+
+  // options
+  const optCont = $("qzOptions");
+  optCont.innerHTML = "";
+  const MARKS = ["A","B","C","D"];
+  q.options.forEach((opt, i)=>{
+    const div = document.createElement("div");
+    let cls = "opt";
+    if (answered){
+      if (i === q.correct) cls += " correct";
+      else if (i === chosen) cls += " wrong";
+      else cls += " neutral-after";
+    }
+    div.className = cls;
+    div.innerHTML = `<div class="opt-marker">${MARKS[i]}</div><div><div style="font-weight:600">${opt}</div></div>`;
+    if (!answered){
+      div.addEventListener("click", ()=> selectAnswer(i));
+    }
+    optCont.appendChild(div);
+  });
+
+  // explanation
+  const expl = $("qzExpl");
+  if (answered){
+    expl.classList.remove("hidden");
+    const correct = chosen === q.correct;
+    $("qzExplLabel").textContent = correct ? "✓ Correct!" : "✗ Incorrect";
+    $("qzExplLabel").style.color = correct ? "#4ade80" : "#f87171";
+    $("qzExplText").textContent = q.explanation;
+    const isLast = idx === questions.length - 1;
+    $("qzNextBtn").textContent = isLast ? "View Results →" : "Next Question →";
+  } else {
+    expl.classList.add("hidden");
+  }
+}
+
+function selectAnswer(i){
+  const q = state.questions[state.idx];
+  state.answers[q.id] = i;
+  renderQuestion();
+}
+
+// ═══════════════════════════════════════════════
+//  RESULTS
+// ═══════════════════════════════════════════════
+function computeResults(){
+  const { questions, answers } = state;
+  let correct = 0;
+  const topicMisses = {};
+  const review = [];
+
+  questions.forEach(q=>{
+    const chosen = answers[q.id];
+    const ok = chosen === q.correct;
+    if (ok) correct++;
+    else topicMisses[q.topic] = (topicMisses[q.topic]||0)+1;
+    review.push({ q, chosen, ok });
+  });
+
+  const pct = Math.round((correct/questions.length)*100);
+  state.score = { correct, total: questions.length, pct, topicMisses, review };
+  return state.score;
+}
+
+function renderResults(){
+  const res = computeResults();
+  $("resTitle").textContent = `Results — ${state.subject}`;
+  $("resMeta").textContent = `${state.level} · ${res.total} questions`;
+  $("resPct").textContent = res.pct + "%";
+  $("resCorrect").textContent = `${res.correct} / ${res.total}`;
+  $("resMissed").textContent = res.total - res.correct;
+
+  // chatbot link — pass context via URL param
+  const weakTopics = Object.keys(res.topicMisses).join(", ") || "none";
+  const chatUrl = `chatbot-interface.html?context=${encodeURIComponent(`I just took a ${state.level} ${state.subject} quiz and scored ${res.pct}%. I struggled with: ${weakTopics}. Please help me review these topics.`)}`;
+  $("chatbotLink").href = chatUrl;
+  $("chatbotLinkWeak").href = chatUrl;
+
+  // review list
+  const list = $("resList");
+  list.innerHTML = "";
+  res.review.forEach((r,i)=>{
+    const div = document.createElement("div");
+    div.className = "review-item";
+    const chosen = r.chosen === null ? "Not answered" : r.q.options[r.chosen];
+    const correctAns = r.q.options[r.q.correct];
+    div.innerHTML = `
+      <div style="flex:1;min-width:0;">
+        <div style="font-weight:700;margin-bottom:3px;">${i+1}. ${r.q.text}</div>
+        <div class="small" style="margin-bottom:6px;">Topic: ${r.q.topic}</div>
+        <div style="height:1px;background:rgba(51,65,85,.4);margin:8px 0;"></div>
+        <div class="small"><strong>Your answer:</strong> ${chosen}</div>
+        <div class="small"><strong>Correct:</strong> ${correctAns}</div>
+        ${!r.ok ? `<div class="small" style="margin-top:6px;color:var(--muted);"><strong>Why:</strong> ${r.q.explanation}</div>` : ""}
+      </div>
+      <span class="${r.ok ? "pill good":"pill bad"}" style="flex-shrink:0;">${r.ok?"✓ Correct":"✗ Wrong"}</span>
+    `;
+    list.appendChild(div);
+  });
+
+  showPage("results");
+}
+
+// ═══════════════════════════════════════════════
+//  WEAK TOPICS
+// ═══════════════════════════════════════════════
+function renderWeakTopics(){
+  if (!state.score) computeResults();
+  const { topicMisses, total } = state.score;
+  const weakList = $("weakList");
+  weakList.innerHTML = "";
+
+  const entries = Object.entries(topicMisses).sort((a,b)=>b[1]-a[1]);
+
+  if (entries.length === 0){
+    weakList.innerHTML = `
+      <div class="review-item">
+        <div><div style="font-weight:700">No weak topics 🎉</div><div class="small">Perfect score — try a harder level!</div></div>
+        <span class="pill good">Perfect</span>
+      </div>`;
+  } else {
+    entries.forEach(([topic, misses])=>{
+      const pct = Math.round((misses / state.questions.filter(q=>q.topic===topic).length)*100);
+      const div = document.createElement("div");
+      div.className = "review-item";
+      div.style.flexDirection = "column";
+      div.style.alignItems = "stretch";
+      div.innerHTML = `
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+          <div>
+            <div style="font-weight:700">${topic}</div>
+            <div class="small">Missed ${misses} question${misses>1?"s":""} in this topic</div>
+          </div>
+          <span class="pill warn">Focus Here</span>
+        </div>
+        <div class="weak-bar-wrap">
+          <div style="height:5px;border-radius:999px;background:rgba(51,65,85,.5);overflow:hidden;">
+            <div class="weak-bar" style="width:${pct}%;"></div>
+          </div>
+          <div class="small" style="margin-top:4px;color:var(--muted2);">${pct}% missed rate</div>
+        </div>
+      `;
+      weakList.appendChild(div);
+    });
+  }
+
+  // recommendations
+  const rec = $("weakRec");
+  rec.innerHTML = "";
+  const recs = [
+    { title:"Review core concepts", desc:`Re-read your notes or textbook on ${entries.map(e=>e[0]).slice(0,2).join(" and ") || "these topics"}.` },
+    { title:"Ask StudyBuddy AI", desc:"Use the chatbot to get step-by-step explanations on anything you missed." },
+    { title:"Retry this quiz", desc:"Retake to measure improvement after reviewing your weak areas." },
+  ];
+  recs.forEach(x=>{
+    const div = document.createElement("div");
+    div.className = "review-item";
+    div.innerHTML = `<div><div style="font-weight:700">${x.title}</div><div class="small">${x.desc}</div></div><span class="pill">Next</span>`;
+    rec.appendChild(div);
+  });
+
+  showPage("weak");
+}
+
+// ═══════════════════════════════════════════════
+//  WIRE BUTTONS
+// ═══════════════════════════════════════════════
+$("qzNextBtn").addEventListener("click", ()=>{
+  if (state.idx < state.questions.length - 1){
+    state.idx++;
+    renderQuestion();
+  } else {
+    renderResults();
+  }
+});
+
+$("qzBackBtn").addEventListener("click", ()=> showPage("home"));
+
+$("resWeakBtn").addEventListener("click", ()=> renderWeakTopics());
+$("resRetryBtn").addEventListener("click", ()=>{ startQuiz(state.subject, state.level); });
+$("resHomeBtn").addEventListener("click", ()=> showPage("home"));
+
+$("weakRetryBtn").addEventListener("click", ()=>{ startQuiz(state.subject, state.level); });
+$("weakResultsBtn").addEventListener("click", ()=> showPage("results"));
+$("weakHomeBtn").addEventListener("click", ()=> showPage("home"));
+
+// ═══════════════════════════════════════════════
+//  INIT
+// ═══════════════════════════════════════════════
+buildHome();
+showPage("home");
+</script>
+</body>
+</html>
