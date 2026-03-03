@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>StudyBuddy Quiz Preview</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.2/babel.min.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: #0a0a0f; }
+  ::-webkit-scrollbar { width: 4px; }
+  ::-webkit-scrollbar-thumb { background: rgba(139,92,246,0.4); border-radius: 99px; }
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+const { useState } = React;
+
+const QUIZ_DATA = {
+  "Algebra / Pre-Calc": {
+    "High School": [
+      { id:"alg-hs-1", question:"Solve for x: 2x + 5 = 17", options:["x = 4","x = 6","x = 11","x = 3"], answer:1, explanation:"Subtract 5 from both sides: 2x = 12, then divide by 2: x = 6." },
+      { id:"alg-hs-2", question:"Which of the following is the slope of the line y = -3x + 7?", options:["7","3","-3","-7"], answer:2, explanation:"In slope-intercept form y = mx + b, m is the slope. Here m = -3." },
+    ],
+    "AP / Pre-College": [
+      { id:"alg-ap-1", question:"Find all real solutions: x⁴ - 5x² + 4 = 0", options:["x = ±1, ±2","x = ±1, ±4","x = 1, 4","x = ±2, ±4"], answer:0, explanation:"Let u = x². Then u²-5u+4=0 → (u-1)(u-4)=0 → x = ±1 or ±2." },
+    ],
+    "College Intro": [
+      { id:"alg-ci-1", question:"What is the domain of f(x) = √(4 - x²)?", options:["(-∞, ∞)","[-2, 2]","[0, 2]","(-2, 2)"], answer:1, explanation:"Need 4-x²≥0 → -2≤x≤2." },
+    ],
+    "College Advanced": [
+      { id:"alg-ca-1", question:"How many solutions does z⁵ = 1 have in ℂ?", options:["1","2","3","5"], answer:3, explanation:"By the Fundamental Theorem of Algebra, zⁿ=1 has exactly n roots in ℂ." },
+    ],
+  },
+  "Calculus": {
+    "High School": [
+      { id:"calc-hs-1", question:"What is the limit of (x² - 1)/(x - 1) as x → 1?", options:["0","1","2","undefined"], answer:2, explanation:"Factor: (x+1)(x-1)/(x-1) = x+1 → 2." },
+    ],
+    "AP / Pre-College": [
+      { id:"calc-ap-1", question:"Using the chain rule, find the derivative of f(x) = sin(x²).", options:["cos(x²)","2x·cos(x²)","2x·sin(x²)","-2x·cos(x²)"], answer:1, explanation:"f'(x)=2x·cos(x²)." },
+    ],
+    "College Intro": [
+      { id:"calc-ci-1", question:"What is lim(x→0) sin(x)/x?", options:["0","∞","1","undefined"], answer:2, explanation:"Squeeze theorem: 1." },
+    ],
+    "College Advanced": [
+      { id:"calc-ca-1", question:"What is the gradient of f(x,y) = x²y + y³ at (1, 2)?", options:["(4, 13)","(4, 1)","(1, 13)","(2, 13)"], answer:0, explanation:"∂f/∂x=4, ∂f/∂y=13." },
+    ],
+  },
+  "Physics": {
+    "High School": [
+      { id:"phys-hs-1", question:"A car accelerates from 0 to 20 m/s in 4 s. Acceleration?", options:["4 m/s²","5 m/s²","80 m/s²","2.5 m/s²"], answer:1, explanation:"a=Δv/Δt=5 m/s²." },
+    ],
+    "AP / Pre-College": [
+      { id:"phys-ap-1", question:"Projectile at 30° at 20 m/s. Horizontal velocity?", options:["10 m/s","10√3 m/s","20 m/s","20√3 m/s"], answer:1, explanation:"vₓ=10√3 m/s." },
+    ],
+    "College Intro": [
+      { id:"phys-ci-1", question:"Speed of light in medium n=1.5?", options:["2×10⁸ m/s","3×10⁸ m/s","4.5×10⁸ m/s","1.5×10⁸ m/s"], answer:0, explanation:"v=c/n=2×10⁸ m/s." },
+    ],
+    "College Advanced": [
+      { id:"phys-ca-1", question:"What does Heisenberg's Uncertainty Principle state?", options:["Energy & time can't both be precise","Position & momentum can't both be precisely measured","Electrons have wave-particle duality","Wavefunctions collapse on observation"], answer:1, explanation:"ΔxΔp≥ℏ/2." },
+    ],
+  },
+  "Chemistry": {
+    "High School": [
+      { id:"chem-hs-1", question:"How many protons does Carbon have?", options:["4","6","8","12"], answer:1, explanation:"Atomic number 6 = 6 protons." },
+    ],
+    "AP / Pre-College": [
+      { id:"chem-ap-1", question:"pH of a 0.01 M HCl solution?", options:["1","2","3","12"], answer:1, explanation:"pH=-log(0.01)=2." },
+    ],
+    "College Intro": [
+      { id:"chem-ci-1", question:"Which force gives water its high boiling point?", options:["London dispersion","Dipole-dipole","Hydrogen bonding","Ionic bonds"], answer:2, explanation:"Strong O-H···O hydrogen bonds." },
+    ],
+    "College Advanced": [
+      { id:"chem-ca-1", question:"What does Born-Oppenheimer approximation assume?", options:["Same speed","Motions separate — nuclei much heavier","All linear","QM negligible"], answer:1, explanation:"Nuclei ~1836× heavier → separation." },
+    ],
+  },
+  "Biology": {
+    "High School": [
+      { id:"bio-hs-1", question:"What is the powerhouse of the cell?", options:["Nucleus","Ribosome","Mitochondria","Golgi apparatus"], answer:2, explanation:"Mitochondria produce ATP." },
+    ],
+    "AP / Pre-College": [
+      { id:"bio-ap-1", question:"During which phase do homologous chromosomes separate?", options:["Meiosis I — Anaphase I","Meiosis II — Anaphase II","Mitosis — Anaphase","Prophase I"], answer:0, explanation:"Anaphase I." },
+    ],
+    "College Intro": [
+      { id:"bio-ci-1", question:"Role of mRNA in protein synthesis?", options:["Carries amino acids","Catalyzes peptide bonds","Carries genetic code to ribosome","Forms ribosome core"], answer:2, explanation:"mRNA carries genetic code." },
+    ],
+    "College Advanced": [
+      { id:"bio-ca-1", question:"Role of p53 in the cell cycle?", options:["Promotes division","Activates S-phase","Tumor suppressor — halts cycle or triggers apoptosis","Methylates histones"], answer:2, explanation:"p53 guards against DNA damage." },
+    ],
+  },
+};
+
+const SUBJECTS = Object.keys(QUIZ_DATA);
+const LEVELS = ["High School","AP / Pre-College","College Intro","College Advanced"];
+const SUBJECT_META = {
+  "Algebra / Pre-Calc":{icon:"∑"},
+  "Calculus":{icon:"∫"},
+  "Physics":{icon:"⚛"},
+  "Chemistry":{icon:"⚗"},
+  "Biology":{icon:"⚕"},
+};
+const LEVEL_META = {
+  "High School":      {color:"#c4b5fd",bg:"rgba(196,181,253,0.10)",border:"rgba(196,181,253,0.22)"},
+  "AP / Pre-College": {color:"#a78bfa",bg:"rgba(167,139,250,0.12)",border:"rgba(167,139,250,0.28)"},
+  "College Intro":    {color:"#8b5cf6",bg:"rgba(139,92,246,0.14)", border:"rgba(139,92,246,0.32)"},
+  "College Advanced": {color:"#7c3aed",bg:"rgba(124,58,237,0.18)", border:"rgba(124,58,237,0.38)"},
+};
+
+const CSS = `
+@import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600;700&display=swap');
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+::-webkit-scrollbar{width:4px;}::-webkit-scrollbar-thumb{background:rgba(139,92,246,0.4);border-radius:99px;}
+.sb-root{min-height:100vh;background:#0a0a0f;font-family:'DM Sans',sans-serif;color:#f0eeff;position:relative;overflow-x:hidden;}
+.sb-root::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse 90% 55% at 50% -5%,rgba(109,40,217,0.2) 0%,transparent 60%),radial-gradient(ellipse 50% 35% at 85% 95%,rgba(76,29,149,0.14) 0%,transparent 55%),radial-gradient(ellipse 35% 25% at 5% 80%,rgba(124,58,237,0.08) 0%,transparent 50%);pointer-events:none;z-index:0;}
+.sb-inner{position:relative;z-index:1;}
+.sb-nav{display:flex;align-items:center;justify-content:space-between;padding:0 36px;height:62px;border-bottom:1px solid rgba(139,92,246,0.15);backdrop-filter:blur(16px);background:rgba(10,10,15,0.8);position:sticky;top:0;z-index:100;}
+.sb-logo{font-family:'Syne',sans-serif;font-size:21px;font-weight:800;letter-spacing:-0.5px;background:linear-gradient(135deg,#a78bfa 0%,#7c3aed 45%,#4c1d95 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.sb-nav-tag{font-size:10.5px;font-weight:600;letter-spacing:2.5px;text-transform:uppercase;color:#5e5880;margin-left:8px;font-family:'DM Sans',sans-serif;-webkit-text-fill-color:#5e5880;}
+.sb-nav-meta{display:flex;align-items:center;gap:8px;font-size:12.5px;color:#5e5880;}
+.sb-nav-dot{width:5px;height:5px;border-radius:50%;background:#7c3aed;display:inline-block;}
+.sb-hero{text-align:center;padding:72px 24px 48px;max-width:700px;margin:0 auto;}
+.sb-eyebrow{display:inline-flex;align-items:center;gap:7px;font-size:10.5px;font-weight:700;letter-spacing:2.8px;text-transform:uppercase;color:#a78bfa;border:1px solid rgba(167,139,250,0.28);border-radius:99px;padding:6px 16px;margin-bottom:24px;background:rgba(167,139,250,0.06);}
+.sb-eyebrow-dot{width:5px;height:5px;border-radius:50%;background:#a78bfa;animation:sbBlink 2s ease-in-out infinite;}
+@keyframes sbBlink{0%,100%{opacity:1}50%{opacity:0.3}}
+.sb-hero-title{font-family:'Syne',sans-serif;font-size:clamp(36px,6vw,58px);font-weight:800;letter-spacing:-2px;color:#f0eeff;line-height:1.05;margin-bottom:18px;}
+.sb-hero-title em{font-style:normal;background:linear-gradient(135deg,#c4b5fd 0%,#8b5cf6 50%,#5b21b6 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.sb-hero-sub{font-size:16.5px;color:#a59fc7;font-weight:300;line-height:1.65;max-width:430px;margin:0 auto 36px;}
+.sb-stats{display:inline-flex;align-items:center;background:rgba(139,92,246,0.07);border:1px solid rgba(139,92,246,0.18);border-radius:16px;padding:0 4px;overflow:hidden;}
+.sb-stat{padding:16px 24px;text-align:center;}
+.sb-stat+.sb-stat{border-left:1px solid rgba(139,92,246,0.15);}
+.sb-stat-n{font-family:'Syne',sans-serif;font-size:26px;font-weight:800;background:linear-gradient(135deg,#a78bfa,#7c3aed);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1;margin-bottom:3px;}
+.sb-stat-l{font-size:10px;letter-spacing:1.2px;text-transform:uppercase;color:#5e5880;font-weight:600;}
+.sb-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(295px,1fr));gap:18px;max-width:1080px;margin:52px auto 0;padding:0 28px 72px;}
+.sb-card{background:#13131f;border:1px solid rgba(139,92,246,0.16);border-radius:20px;padding:26px 22px 22px;position:relative;overflow:hidden;transition:border-color 0.28s,transform 0.28s,box-shadow 0.28s;}
+.sb-card::before{content:'';position:absolute;inset:0;border-radius:20px;background:radial-gradient(circle at 80% 20%,rgba(124,58,237,0.07) 0%,transparent 55%);pointer-events:none;}
+.sb-card:hover{border-color:rgba(139,92,246,0.45);transform:translateY(-5px);box-shadow:0 24px 64px rgba(76,29,149,0.22),0 0 0 1px rgba(139,92,246,0.22);}
+.sb-card-icon{font-size:28px;display:block;margin-bottom:10px;filter:drop-shadow(0 0 10px rgba(139,92,246,0.4));}
+.sb-card-title{font-family:'Syne',sans-serif;font-size:16.5px;font-weight:700;color:#f0eeff;margin-bottom:6px;letter-spacing:-0.3px;}
+.sb-card-count{font-size:11.5px;color:#5e5880;margin-bottom:16px;}
+.sb-card-hr{height:1px;background:rgba(139,92,246,0.12);margin-bottom:13px;}
+.sb-level-list{display:flex;flex-direction:column;gap:7px;}
+.sb-lvl-btn{display:flex;align-items:center;gap:9px;border-radius:11px;padding:9px 12px;font-size:13px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;border:1px solid transparent;text-align:left;transition:all 0.2s;}
+.sb-lvl-btn:hover{transform:translateX(5px);filter:brightness(1.15);}
+.sb-lvl-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0;}
+.sb-lvl-count{margin-left:auto;font-size:11px;opacity:0.5;font-weight:700;}
+.sb-quiz-body{flex:1;max-width:720px;width:100%;margin:0 auto;padding:28px 24px 80px;}
+.sb-quiz-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:28px;flex-wrap:wrap;gap:12px;}
+.sb-back{background:rgba(139,92,246,0.08);border:1px solid rgba(139,92,246,0.25);border-radius:10px;color:#a78bfa;cursor:pointer;font-size:13px;font-weight:600;padding:8px 16px;font-family:'DM Sans',sans-serif;transition:all 0.2s;}
+.sb-back:hover{background:rgba(139,92,246,0.15);border-color:rgba(139,92,246,0.45);}
+.sb-chips{display:flex;gap:7px;flex-wrap:wrap;}
+.sb-chip{border-radius:99px;padding:5px 13px;font-size:12px;font-weight:600;font-family:'DM Sans',sans-serif;border:1px solid transparent;}
+.sb-score-chip{font-family:'Syne',sans-serif;font-size:13.5px;color:#c4b5fd;background:rgba(196,181,253,0.07);border:1px solid rgba(196,181,253,0.2);border-radius:10px;padding:7px 15px;font-weight:700;}
+.sb-prog-row{display:flex;justify-content:space-between;font-size:11.5px;color:#5e5880;margin-bottom:8px;}
+.sb-prog-track{height:3px;background:rgba(139,92,246,0.1);border-radius:99px;margin-bottom:30px;overflow:hidden;}
+.sb-prog-fill{height:100%;border-radius:99px;background:linear-gradient(90deg,#a78bfa,#7c3aed,#4c1d95);transition:width 0.55s cubic-bezier(.4,0,.2,1);box-shadow:0 0 8px rgba(139,92,246,0.5);}
+.sb-q-card{background:#13131f;border:1px solid rgba(139,92,246,0.18);border-radius:20px;padding:30px 28px 26px;margin-bottom:14px;position:relative;overflow:hidden;}
+.sb-q-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,#7c3aed,#a78bfa,#7c3aed);background-size:200%;animation:shimmer 3s linear infinite;}
+@keyframes shimmer{0%{background-position:0%}100%{background-position:200%}}
+.sb-q-label{font-family:'Syne',sans-serif;font-size:10.5px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:#7c3aed;margin-bottom:13px;}
+.sb-q-text{font-size:19px;font-weight:500;color:#f0eeff;line-height:1.55;letter-spacing:-0.2px;}
+.sb-opts{display:flex;flex-direction:column;gap:9px;margin-bottom:14px;}
+.sb-opt{display:flex;align-items:center;gap:12px;padding:14px 17px;border-radius:13px;font-size:14.5px;cursor:pointer;text-align:left;font-family:'DM Sans',sans-serif;font-weight:500;background:#13131f;border:1px solid rgba(139,92,246,0.16);color:#a59fc7;width:100%;transition:all 0.18s;}
+.sb-opt.live:hover{border-color:rgba(139,92,246,0.42);background:rgba(139,92,246,0.07);color:#f0eeff;transform:translateX(4px);}
+.sb-opt.correct{background:rgba(52,211,153,0.08);border-color:rgba(52,211,153,0.45);color:#34d399;}
+.sb-opt.wrong{background:rgba(248,113,113,0.08);border-color:rgba(248,113,113,0.4);color:#f87171;}
+.sb-opt.dimmed{opacity:0.38;cursor:default;}
+.sb-opt-mark{width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:11.5px;font-weight:800;flex-shrink:0;font-family:'Syne',sans-serif;background:rgba(139,92,246,0.1);color:#8b5cf6;transition:all 0.18s;}
+.sb-opt.correct .sb-opt-mark{background:rgba(52,211,153,0.14);color:#34d399;}
+.sb-opt.wrong .sb-opt-mark{background:rgba(248,113,113,0.14);color:#f87171;}
+.sb-expl{background:#13131f;border:1px solid rgba(139,92,246,0.2);border-left:3px solid #7c3aed;border-radius:15px;padding:20px 22px;margin-bottom:14px;}
+.sb-expl-ttl{font-family:'Syne',sans-serif;font-size:12px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:9px;}
+.sb-expl-body{font-size:14px;color:#a59fc7;line-height:1.68;margin-bottom:18px;}
+.sb-btn-primary{background:linear-gradient(135deg,#a78bfa 0%,#7c3aed 50%,#4c1d95 100%);color:#fff;border:none;border-radius:11px;padding:12px 28px;font-size:13.5px;font-weight:700;cursor:pointer;font-family:'Syne',sans-serif;letter-spacing:0.3px;transition:opacity 0.18s,transform 0.18s;box-shadow:0 4px 24px rgba(109,40,217,0.38);}
+.sb-btn-primary:hover{opacity:0.87;transform:translateY(-2px);}
+.sb-btn-ghost{background:rgba(139,92,246,0.09);color:#a78bfa;border:1px solid rgba(139,92,246,0.28);border-radius:11px;padding:12px 22px;font-size:13px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all 0.18s;}
+.sb-btn-ghost:hover{background:rgba(139,92,246,0.17);border-color:rgba(139,92,246,0.48);}
+.sb-results-body{max-width:600px;margin:0 auto;padding:44px 22px 80px;}
+.sb-results-card{background:#13131f;border:1px solid rgba(139,92,246,0.18);border-radius:24px;padding:48px 36px 40px;text-align:center;position:relative;overflow:hidden;}
+.sb-results-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,#a78bfa,#7c3aed,#4c1d95);border-radius:24px 24px 0 0;}
+.sb-results-halo{position:absolute;top:-80px;left:50%;transform:translateX(-50%);width:340px;height:340px;border-radius:50%;background:radial-gradient(circle,rgba(109,40,217,0.16) 0%,transparent 65%);pointer-events:none;}
+.sb-results-emoji{font-size:60px;display:block;margin-bottom:16px;position:relative;}
+.sb-results-grade{font-family:'Syne',sans-serif;font-size:32px;font-weight:800;letter-spacing:-0.8px;margin-bottom:6px;position:relative;}
+.sb-results-context{font-size:13px;color:#5e5880;margin-bottom:30px;position:relative;}
+.sb-score-box{display:inline-flex;align-items:baseline;gap:4px;background:rgba(139,92,246,0.09);border:1px solid rgba(139,92,246,0.22);border-radius:18px;padding:18px 36px;margin-bottom:8px;position:relative;}
+.sb-score-n{font-family:'Syne',sans-serif;font-size:56px;font-weight:800;background:linear-gradient(135deg,#c4b5fd,#8b5cf6);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1;}
+.sb-score-d{font-size:22px;color:#5e5880;}
+.sb-score-pct{font-family:'Syne',sans-serif;font-size:19px;font-weight:700;margin-bottom:30px;position:relative;}
+.sb-bk{text-align:left;max-height:230px;overflow-y:auto;display:flex;flex-direction:column;gap:6px;margin-bottom:28px;padding-right:4px;}
+.sb-bk-row{display:flex;align-items:flex-start;gap:10px;padding:9px 13px;border-radius:10px;font-size:13px;}
+.sb-bk-icon{font-size:13px;font-weight:800;flex-shrink:0;margin-top:1px;}
+.sb-bk-q{color:#a59fc7;line-height:1.4;}
+.sb-results-actions{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;position:relative;}
+.sb-a0{animation:sbUp 0.36s cubic-bezier(.4,0,.2,1) both;animation-delay:0ms;}
+.sb-a1{animation:sbUp 0.36s cubic-bezier(.4,0,.2,1) both;animation-delay:60ms;}
+.sb-a2{animation:sbUp 0.36s cubic-bezier(.4,0,.2,1) both;animation-delay:120ms;}
+.sb-a3{animation:sbUp 0.36s cubic-bezier(.4,0,.2,1) both;animation-delay:180ms;}
+.sb-a4{animation:sbUp 0.36s cubic-bezier(.4,0,.2,1) both;animation-delay:240ms;}
+.sb-fade{animation:sbUp 0.38s cubic-bezier(.4,0,.2,1) both;}
+@keyframes sbUp{from{opacity:0;transform:translateY(16px);}to{opacity:1;transform:translateY(0);}}
+`;
+
+function App() {
+  const [screen, setScreen] = useState("home");
+  const [selectedSubject, setSubject] = useState(null);
+  const [selectedLevel, setLevel] = useState(null);
+  const [questions, setQuestions] = useState([]);
+  const [currentQ, setCurrentQ] = useState(0);
+  const [selectedAnswer, setSelectedAnswer] = useState(null);
+  const [showExplanation, setShowExplanation] = useState(false);
+  const [score, setScore] = useState(0);
+  const [answers, setAnswers] = useState([]);
+  const [animKey, setAnimKey] = useState(0);
+
+  const totalQ = SUBJECTS.reduce((t,s)=>t+LEVELS.reduce((t2,l)=>t2+(QUIZ_DATA[s]?.[l]?.length||0),0),0);
+
+  const startQuiz = (subject, level) => {
+    const qs = QUIZ_DATA[subject]?.[level];
+    if (!qs?.length) return;
+    setSubject(subject); setLevel(level);
+    setQuestions(qs); setCurrentQ(0);
+    setSelectedAnswer(null); setShowExplanation(false);
+    setScore(0); setAnswers([]);
+    setAnimKey(k=>k+1);
+    setScreen("quiz");
+  };
+
+  const handleAnswer = (idx) => {
+    if (selectedAnswer !== null) return;
+    setSelectedAnswer(idx);
+    setShowExplanation(true);
+    const ok = idx === questions[currentQ].answer;
+    if (ok) setScore(s=>s+1);
+    setAnswers(a=>[...a,{chosen:idx,correct:ok}]);
+  };
+
+  const nextQ = () => {
+    if (currentQ+1 >= questions.length) { setScreen("results"); return; }
+    setCurrentQ(q=>q+1);
+    setSelectedAnswer(null); setShowExplanation(false);
+    setAnimKey(k=>k+1);
+  };
+
+  const MARKS = ["A","B","C","D"];
+
+  if (screen === "home") return (
+    <div className="sb-root">
+      <style dangerouslySetInnerHTML={{__html:CSS}}/>
+      <div className="sb-inner">
+        <nav className="sb-nav">
+          <div style={{display:"flex",alignItems:"baseline"}}>
+            <span className="sb-logo">StudyBuddy</span>
+            <span className="sb-nav-tag">Quiz</span>
+          </div>
+          <div className="sb-nav-meta">
+            <span className="sb-nav-dot"/>
+            {totalQ} questions available
+          </div>
+        </nav>
+        <div className="sb-hero sb-fade">
+          <div className="sb-eyebrow">
+            <span className="sb-eyebrow-dot"/>
+            Adaptive Learning Platform
+          </div>
+          <h1 className="sb-hero-title">Master Every<br/><em>Subject.</em></h1>
+          <p className="sb-hero-sub">Sharpen your skills with curated quizzes across math, physics, and science — from high school to advanced university level.</p>
+          <div className="sb-stats">
+            <div className="sb-stat"><div className="sb-stat-n">5</div><div className="sb-stat-l">Subjects</div></div>
+            <div className="sb-stat"><div className="sb-stat-n">4</div><div className="sb-stat-l">Levels</div></div>
+            <div className="sb-stat"><div className="sb-stat-n">{totalQ}</div><div className="sb-stat-l">Questions</div></div>
+          </div>
+        </div>
+        <div className="sb-grid">
+          {SUBJECTS.map((subj,si)=>{
+            const qCount=LEVELS.reduce((t,l)=>t+(QUIZ_DATA[subj]?.[l]?.length||0),0);
+            const lvlCount=LEVELS.filter(l=>QUIZ_DATA[subj]?.[l]?.length).length;
+            return (
+              <div key={subj} className={`sb-card sb-a${Math.min(si,4)}`}>
+                <span className="sb-card-icon">{SUBJECT_META[subj].icon}</span>
+                <div className="sb-card-title">{subj}</div>
+                <div className="sb-card-count">{qCount} questions · {lvlCount} difficulty levels</div>
+                <div className="sb-card-hr"/>
+                <div className="sb-level-list">
+                  {LEVELS.map(level=>{
+                    const qs=QUIZ_DATA[subj]?.[level];
+                    if(!qs?.length) return null;
+                    const lm=LEVEL_META[level];
+                    return (
+                      <button key={level} className="sb-lvl-btn"
+                        style={{background:lm.bg,color:lm.color,borderColor:lm.border}}
+                        onClick={()=>startQuiz(subj,level)}>
+                        <span className="sb-lvl-dot" style={{background:lm.color}}/>
+                        {level}
+                        <span className="sb-lvl-count">{qs.length} Q</span>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    </div>
+  );
+
+  if (screen === "quiz") {
+    const q = questions[currentQ];
+    const progress = (currentQ/questions.length)*100;
+    const isLast = currentQ+1===questions.length;
+    const lm = LEVEL_META[selectedLevel];
+    return (
+      <div className="sb-root" key={animKey}>
+        <style dangerouslySetInnerHTML={{__html:CSS}}/>
+        <div className="sb-inner">
+          <nav className="sb-nav">
+            <div style={{display:"flex",alignItems:"baseline"}}>
+              <span className="sb-logo">StudyBuddy</span>
+              <span className="sb-nav-tag">Quiz</span>
+            </div>
+            <div className="sb-score-chip">{score}&thinsp;/&thinsp;{currentQ+(selectedAnswer!==null?1:0)} correct</div>
+          </nav>
+          <div className="sb-quiz-body">
+            <div className="sb-quiz-top sb-fade">
+              <button className="sb-back" onClick={()=>setScreen("home")}>← Back to Subjects</button>
+              <div className="sb-chips">
+                <span className="sb-chip" style={{background:"rgba(255,255,255,0.04)",color:"#a59fc7",borderColor:"rgba(139,92,246,0.18)"}}>
+                  {SUBJECT_META[selectedSubject].icon} {selectedSubject}
+                </span>
+                <span className="sb-chip" style={{background:lm.bg,color:lm.color,borderColor:lm.border}}>{selectedLevel}</span>
+              </div>
+            </div>
+            <div className="sb-prog-row">
+              <span>Question {currentQ+1} of {questions.length}</span>
+              <span>{Math.round(progress)}% complete</span>
+            </div>
+            <div className="sb-prog-track"><div className="sb-prog-fill" style={{width:`${progress}%`}}/></div>
+            <div className="sb-q-card sb-fade">
+              <div className="sb-q-label">Question {currentQ+1}</div>
+              <div className="sb-q-text">{q.question}</div>
+            </div>
+            <div className="sb-opts">
+              {q.options.map((opt,idx)=>{
+                let cls="sb-opt";
+                if(selectedAnswer!==null){
+                  if(idx===q.answer) cls+=" correct";
+                  else if(idx===selectedAnswer) cls+=" wrong";
+                  else cls+=" dimmed";
+                } else cls+=" live";
+                return (
+                  <button key={idx} className={`${cls} sb-a${idx}`} onClick={()=>handleAnswer(idx)}>
+                    <span className="sb-opt-mark">{MARKS[idx]}</span>
+                    {opt}
+                  </button>
+                );
+              })}
+            </div>
+            {showExplanation && (
+              <div className="sb-expl sb-fade">
+                <div className="sb-expl-ttl" style={{color:selectedAnswer===q.answer?"#34d399":"#f87171"}}>
+                  {selectedAnswer===q.answer?"✓  Correct":"✗  Incorrect"}
+                </div>
+                <p className="sb-expl-body">{q.explanation}</p>
+                <button className="sb-btn-primary" onClick={nextQ}>{isLast?"View Results →":"Next Question →"}</button>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (screen === "results") {
+    const pct = Math.round((score/questions.length)*100);
+    const {emoji,grade,color} =
+      pct>=90?{emoji:"🏆",grade:"Outstanding!",color:"#c4b5fd"}:
+      pct>=70?{emoji:"🎯",grade:"Great Work!",color:"#a78bfa"}:
+      pct>=50?{emoji:"📖",grade:"Keep Practicing",color:"#fbbf24"}:
+              {emoji:"💪",grade:"Don't Give Up!",color:"#f87171"};
+    return (
+      <div className="sb-root">
+        <style dangerouslySetInnerHTML={{__html:CSS}}/>
+        <div className="sb-inner">
+          <nav className="sb-nav">
+            <div style={{display:"flex",alignItems:"baseline"}}>
+              <span className="sb-logo">StudyBuddy</span>
+              <span className="sb-nav-tag">Results</span>
+            </div>
+          </nav>
+          <div className="sb-results-body">
+            <div className="sb-results-card sb-fade">
+              <div className="sb-results-halo"/>
+              <span className="sb-results-emoji">{emoji}</span>
+              <div className="sb-results-grade" style={{color}}>{grade}</div>
+              <div className="sb-results-context">{SUBJECT_META[selectedSubject].icon} {selectedSubject} · {selectedLevel}</div>
+              <div className="sb-score-box">
+                <span className="sb-score-n">{score}</span>
+                <span className="sb-score-d">/ {questions.length}</span>
+              </div>
+              <div className="sb-score-pct" style={{color}}>{pct}%</div>
+              <div className="sb-bk">
+                {questions.map((q,i)=>(
+                  <div key={q.id} className="sb-bk-row" style={{background:answers[i]?.correct?"rgba(52,211,153,0.08)":"rgba(248,113,113,0.08)",border:`1px solid ${answers[i]?.correct?"rgba(52,211,153,0.2)":"rgba(248,113,113,0.18)"}`}}>
+                    <span className="sb-bk-icon" style={{color:answers[i]?.correct?"#34d399":"#f87171"}}>{answers[i]?.correct?"✓":"✗"}</span>
+                    <span className="sb-bk-q">{q.question}</span>
+                  </div>
+                ))}
+              </div>
+              <div className="sb-results-actions">
+                <button className="sb-btn-primary" onClick={()=>startQuiz(selectedSubject,selectedLevel)}>Retry Quiz</button>
+                <button className="sb-btn-ghost" onClick={()=>setScreen("home")}>← All Subjects</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
+</script>
+</body>
+</html>

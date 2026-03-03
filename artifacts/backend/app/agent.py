@@ -4,34 +4,50 @@ Routes call into this module to run the core study flow.
 """
 
 from agents import Agent, Runner
-import os
 from dotenv import load_dotenv
-from prompts import CHAT_PROMPT, FLASHCARD_PROMPT, QUIZ_PROMPT
+from pathlib import Path
+from app.prompts import CHAT_PROMPT, FLASHCARD_PROMPT, QUIZ_PROMPT
+from app.tools.retrieve import retrieve_context
 
 # Load environment variables
-load_dotenv()
+load_dotenv(Path(__file__).resolve().parents[2] / ".env")
 
-# get mode 
-system_prompt = ""
+def _build_context_block(class_id: str, query: str) -> str:
+    chunks = retrieve_context(class_id=class_id, query=query, top_k=5)
+    if not chunks:
+        return "No indexed content found for this class yet."
+
+    lines = []
+    for index, chunk in enumerate(chunks, start=1):
+        lines.append(f"[{index}] Source: {chunk['source']}\n{chunk['text']}")
+    return "\n\n".join(lines)
 
 def run(mode, class_id, message=None, focus=None):
 
-    if mode=="chat":
-        system_prompt = CHAT_PROMPT
+    if mode == "chat":
+        prompt_template = CHAT_PROMPT
     elif mode == "flashcard":
-        system_prompt = FLASHCARD_PROMPT
+        prompt_template = FLASHCARD_PROMPT
     elif mode == "quiz":
-        system_prompt = QUIZ_PROMPT
+        prompt_template = QUIZ_PROMPT
+    else:
+        raise ValueError(f"Unsupported mode: {mode}")
 
-    # retrieve from vector_store
-    
-    # inject chunks into system prompt
+    user_query = message or focus or "general study guidance"
+    retrieved_chunks = _build_context_block(class_id=class_id, query=user_query)
+
+    system_prompt = prompt_template.format(
+        class_name=class_id,
+        retrieved_chunks=retrieved_chunks,
+        user_focus_prompt=focus or "No specific focus provided",
+    )
 
     # call openaI and return response
+    agent = Agent(name="Assistant", instructions=system_prompt)
+    result = Runner.run_sync(agent, message or "Help me study this class.")
+    return result
 
 # use this to test this functionality running
-if __name__ == "main":
-    agent = Agent(name="Assistant", instructions=mode)
-
-    result = Runner.run_sync(agent, "Write a haiku")
+if __name__ == "__main__":
+    result = run(mode="chat", class_id="demo-class", message="Write a haiku")
     print(result.final_output)

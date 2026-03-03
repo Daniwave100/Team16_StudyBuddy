@@ -1,183 +1,412 @@
 <!doctype html>
-<!-- TM16-43 Committing on behalf of Azka (her commit won't link to Jira)-->
 <html lang="en">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>StudyBuddy (Dummy Quiz Demo)</title>
+  <title>StudyBuddy Quiz</title>
+
+  <!-- Modern web font -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
   <style>
     :root{
-      --bg:#0b1020;
-      --panel:#111a33;
-      --card:#141f3d;
-      --border:rgba(255,255,255,.10);
-      --text:rgba(255,255,255,.92);
-      --muted:rgba(255,255,255,.70);
-      --muted2:rgba(255,255,255,.55);
-      --accent:#7c5cff;
-      --accent2:#38bdf8;
+      --bg:#020617;
+      --surface:#020617;
+      --card:#020617;
+      --border:rgba(148,163,184,.35);
+      --text:#e5e7eb;
+      --muted:#9ca3af;
+      --muted2:#6b7280;
+      --accent:#6366f1;
+      --accent2:#22c55e;
       --good:#22c55e;
       --bad:#ef4444;
       --warn:#f59e0b;
-      --shadow:0 18px 60px rgba(0,0,0,.45);
+      --shadow:0 24px 80px rgba(15,23,42,.75);
       --radius:18px;
-      --radius2:14px;
-      --max:1050px;
-      --font: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+      --radius2:12px;
+      --max:760px;
+      --font:'Inter', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
     }
-    *{box-sizing:border-box}
+
+    *, *::before, *::after{
+      box-sizing:border-box;
+    }
+
     body{
       margin:0;
+      min-height:100vh;
       font-family:var(--font);
       color:var(--text);
       background:
-        radial-gradient(1100px 600px at 20% 0%, rgba(124,92,255,.18), transparent 60%),
-        radial-gradient(900px 500px at 90% 10%, rgba(56,189,248,.14), transparent 55%),
-        var(--bg);
+        radial-gradient(1100px 600px at 10% 0%, rgba(99,102,241,.24), transparent 60%),
+        radial-gradient(900px 500px at 100% 0%, rgba(56,189,248,.18), transparent 55%),
+        #020617;
+      -webkit-font-smoothing: antialiased;
     }
-    
-.topbar .wrap{
-  display:grid;
-  grid-template-columns: 1fr auto 1fr; /* left | center | right */
-  align-items:center;
-  gap:14px;
-}
 
+    .wrap{
+      max-width: var(--max);
+      margin: 0 auto;
+      padding: 20px 16px 40px;
+    }
 
-.top-left{justify-self:start; display:flex; align-items:center; gap:14px;}
-.top-center{justify-self:center;}
-.top-right{justify-self:end;}
+    .topbar{
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      backdrop-filter: blur(18px);
+      background: linear-gradient(to bottom, rgba(2,6,23,.95), rgba(2,6,23,.92));
+      border-bottom:1px solid rgba(15,23,42,.8);
+    }
 
-/* keep nav from growing into a big oval */
-.nav{
-  display:flex;
-  gap:8px;
-  flex-wrap:wrap;
-  padding:6px;
-  width: fit-content;            /* key */
-  max-width: 520px;              /* optional: keeps it tidy */
-  border:1px solid var(--border);
-  background:rgba(255,255,255,.03);
-  border-radius:999px;
-  justify-content:center;        /* centers buttons inside */
-}
-    .nav button{
-      border:0; cursor:pointer;
-      color:var(--muted);
-      padding:9px 12px;
+    .topbar .wrap{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      padding: 14px 16px;
+    }
+
+    .brand{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      font-weight:600;
+      letter-spacing:.01em;
+    }
+
+    .logo{
+      width:28px;
+      height:28px;
+      border-radius:10px;
+      background: conic-gradient(from 160deg, #6366f1, #22c55e, #38bdf8, #6366f1);
+      box-shadow: 0 8px 26px rgba(15,23,42,.9);
+    }
+
+    .chip{
+      display:flex;
+      align-items:center;
+      gap:8px;
+      padding:6px 12px;
       border-radius:999px;
-      background:transparent;
-      font-weight:700;
-      transition:.2s ease;
-    }
-    .nav button.active{
-      color:var(--text);
-      background:rgba(124,92,255,.20);
-      box-shadow: inset 0 0 0 1px rgba(124,92,255,.35);
-    }
-    .nav button:hover{color:var(--text); background:rgba(255,255,255,.06)}
-    .spacer{flex:1}
-    /* Right side container */
-.top-right{
-  justify-self:end;
-  display:flex;
-  align-items:center;   /* ⭐ vertical center */
-  height:100%;          /* ⭐ take full topbar height */
-}
-
-/* Make chip perfectly centered inside */
-.chip{
-  display:flex;
-  align-items:center;
-  justify-content:center;
-}
-    .grid{display:grid; gap:16px}
-    @media(min-width: 900px){
-      .cols-2{grid-template-columns: 1.2fr .8fr}
-      .cols-3{grid-template-columns: 1.2fr .9fr .9fr}
-    }
-    .card{
-      background: linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.02));
-      border:1px solid var(--border);
-      border-radius: var(--radius);
-      box-shadow: var(--shadow);
-      padding:16px;
-    }
-    h1{margin:0 0 8px; font-size:28px}
-    h2{margin:0 0 8px; font-size:18px}
-    h3{margin:0 0 8px; font-size:16px}
-    p{margin:0 0 10px; color:var(--muted); line-height:1.45}
-    .row{display:flex; gap:10px; align-items:center; flex-wrap:wrap}
-    .btn{
-      border:0; cursor:pointer;
-      padding:12px 14px;
-      border-radius:14px;
-      background:rgba(255,255,255,.06);
-      color:var(--text);
-      font-weight:800;
-      transition:.2s ease;
-      display:inline-flex; align-items:center; gap:10px;
-    }
-    .btn:hover{transform: translateY(-1px); background:rgba(255,255,255,.09)}
-    .btn.primary{
-      background: linear-gradient(90deg, rgba(124,92,255,.95), rgba(56,189,248,.85));
-      box-shadow: 0 14px 40px rgba(124,92,255,.22);
-    }
-    .btn.ghost{background:transparent; box-shadow: inset 0 0 0 1px var(--border)}
-    .btn:disabled{opacity:.55; cursor:not-allowed; transform:none}
-    .pill{
-      display:inline-flex; align-items:center; gap:8px;
-      padding:8px 10px; border-radius:999px;
-      border:1px solid var(--border);
-      background:rgba(255,255,255,.03);
-      color:var(--muted);
+      border:1px solid rgba(51,65,85,.9);
+      background:rgba(15,23,42,.92);
       font-size:13px;
-      font-weight:700;
+      color:var(--muted);
     }
-    .pill.good{background:rgba(34,197,94,.12); border-color:rgba(34,197,94,.35); color:rgba(235,255,242,.9)}
-    .pill.bad{background:rgba(239,68,68,.12); border-color:rgba(239,68,68,.35); color:rgba(255,235,235,.92)}
-    .pill.warn{background:rgba(245,158,11,.12); border-color:rgba(245,158,11,.35); color:rgba(255,245,232,.92)}
-    .divider{height:1px; background:var(--border); margin:12px 0}
+
+    main.wrap{
+      padding-top:32px;
+    }
+
+    h1{
+      margin:0 0 10px;
+      font-size:26px;
+      font-weight:700;
+      letter-spacing:.01em;
+    }
+
+    h2{
+      margin:0 0 6px;
+      font-size:20px;
+      font-weight:600;
+    }
+
+    h3{
+      margin:4px 0 6px;
+      font-size:17px;
+      font-weight:600;
+    }
+
+    p{
+      margin:0 0 10px;
+      color:var(--muted);
+      line-height:1.55;
+      font-size:14px;
+    }
+
+    .small{
+      font-size:13px;
+      color:var(--muted);
+    }
+
+    .wrap section{
+      margin-bottom:20px;
+    }
+
+    .card{
+      background: radial-gradient(circle at top left, rgba(15,23,42,.9), rgba(15,23,42,.96));
+      border-radius: var(--radius);
+      border:1px solid rgba(30,64,175,.85);
+      box-shadow: var(--shadow);
+      padding:20px 18px 18px;
+    }
+
+    .divider{
+      height:1px;
+      width:100%;
+      background:radial-gradient(circle, rgba(148,163,184,.7), transparent 70%);
+      opacity:.65;
+      margin:14px 0;
+    }
+
+    .row{
+      display:flex;
+      gap:10px;
+      align-items:center;
+      flex-wrap:wrap;
+    }
+
+    .grid{
+      display:grid;
+      gap:12px;
+    }
+
+    @media(min-width: 720px){
+      .grid.cols-2{
+        grid-template-columns: 2.1fr 1.2fr;
+      }
+    }
+
+    .btn{
+      border:0;
+      cursor:pointer;
+      padding:10px 14px;
+      border-radius:999px;
+      background:rgba(15,23,42,1);
+      color:var(--text);
+      font-weight:600;
+      font-size:14px;
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      transition:background .18s ease, transform .18s ease, box-shadow .18s ease, opacity .12s ease;
+      box-shadow:0 0 0 1px rgba(51,65,85,.9);
+    }
+
+    .btn:hover{
+      background:rgba(15,23,42,1);
+      transform:translateY(-1px);
+      box-shadow:0 16px 40px rgba(0,0,0,.45);
+    }
+
+    .btn.primary{
+      background:linear-gradient(135deg, #6366f1, #38bdf8);
+      box-shadow:0 14px 40px rgba(79,70,229,.55);
+      border:none;
+    }
+
+    .btn.primary:hover{
+      filter:brightness(1.05);
+    }
+
+    .btn.ghost{
+      background:transparent;
+      box-shadow:0 0 0 1px rgba(51,65,85,.9);
+    }
+
+    .btn:disabled{
+      opacity:.55;
+      cursor:not-allowed;
+      transform:none;
+      box-shadow:none;
+    }
+
+    .pill{
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      padding:6px 10px;
+      border-radius:999px;
+      border:1px solid rgba(51,65,85,.9);
+      background:rgba(15,23,42,.9);
+      color:var(--muted);
+      font-size:12px;
+      font-weight:600;
+    }
+
+    .pill.good{
+      border-color:rgba(34,197,94,.7);
+      color:rgba(220,252,231,.98);
+      background:rgba(21,128,61,.28);
+    }
+
+    .pill.bad{
+      border-color:rgba(248,113,113,.85);
+      color:rgba(254,242,242,.98);
+      background:rgba(185,28,28,.35);
+    }
+
+    .pill.warn{
+      border-color:rgba(251,191,36,.8);
+      color:rgba(255,251,235,.98);
+      background:rgba(202,138,4,.38);
+    }
+
     .progress{
-      width:100%; height:10px; border-radius:999px;
-      background: rgba(255,255,255,.06);
-      border: 1px solid var(--border);
+      width:100%;
+      height:10px;
+      border-radius:999px;
+      background:rgba(15,23,42,1);
+      border:1px solid rgba(30,64,175,.8);
       overflow:hidden;
     }
+
     .progress > div{
       height:100%;
       width:0%;
-      background: linear-gradient(90deg, rgba(124,92,255,.95), rgba(56,189,248,.85));
+      background:linear-gradient(90deg, #6366f1, #22c55e);
       transition: width .25s ease;
     }
+
+    .list{
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+    }
+
+    .item{
+      padding:10px 12px;
+      border-radius:var(--radius2);
+      border:1px solid rgba(31,41,55,.95);
+      background:rgba(15,23,42,.9);
+      display:flex;
+      gap:10px;
+      align-items:flex-start;
+      justify-content:space-between;
+    }
+
     .opt{
-      display:flex; gap:12px; align-items:flex-start;
-      padding:12px;
-      border-radius: var(--radius2);
-      border:1px solid var(--border);
-      background:rgba(255,255,255,.03);
+      display:flex;
+      gap:10px;
+      align-items:flex-start;
+      padding:11px 12px;
+      border-radius:var(--radius2);
+      border:1px solid rgba(31,41,55,.95);
+      background:rgba(15,23,42,.9);
       cursor:pointer;
-      transition:.15s ease;
+      transition:background .17s ease, border-color .17s ease, box-shadow .17s ease, transform .17s ease;
       user-select:none;
     }
-    .opt:hover{background:rgba(255,255,255,.05)}
-    .opt input{margin-top:3px}
-    .opt.selected{box-shadow: inset 0 0 0 1px rgba(124,92,255,.45)}
-    .opt.correct{border-color:rgba(34,197,94,.35); background:rgba(34,197,94,.10)}
-    .opt.wrong{border-color:rgba(239,68,68,.35); background:rgba(239,68,68,.10)}
-    .list{display:flex; flex-direction:column; gap:10px}
-    .item{
-      padding:12px; border-radius: var(--radius2);
-      background:rgba(255,255,255,.03);
-      border:1px solid var(--border);
-      display:flex; gap:12px; align-items:flex-start; justify-content:space-between;
+
+    .opt:hover{
+      background:rgba(15,23,42,1);
+      border-color:rgba(79,70,229,.9);
+      box-shadow:0 10px 28px rgba(15,23,42,.8);
+      transform:translateY(-1px);
     }
-    .hidden{display:none !important}
-    .kpi{padding:12px; border:1px solid var(--border); border-radius:14px; background:rgba(255,255,255,.03)}
-    .kpi .big{font-size:22px; font-weight:900}
-    .kpi .lbl{font-size:13px; color:var(--muted)}
-    .tag{font-size:12px; color:var(--muted); border:1px solid var(--border); padding:4px 8px; border-radius:999px}
-    .small{font-size:13px; color:var(--muted)}
+
+    .opt input{
+      margin-top:3px;
+      accent-color:#6366f1;
+    }
+
+    .opt.selected{
+      border-color:#6366f1;
+      box-shadow:0 0 0 1px rgba(79,70,229,.8);
+    }
+
+    .opt.correct{
+      border-color:rgba(34,197,94,.8);
+      background:rgba(21,128,61,.25);
+    }
+
+    .opt.wrong{
+      border-color:rgba(248,113,113,.85);
+      background:rgba(185,28,28,.25);
+    }
+
+    .hidden{
+      display:none !important;
+    }
+
+    .kpi{
+      padding:12px 12px 10px;
+      border-radius:var(--radius2);
+      border:1px solid rgba(30,64,175,.9);
+      background:rgba(15,23,42,.9);
+    }
+
+    .kpi .big{
+      font-size:22px;
+      font-weight:700;
+    }
+
+    .kpi .lbl{
+      font-size:12px;
+      color:var(--muted2);
+      margin-top:2px;
+      letter-spacing:.03em;
+      text-transform:uppercase;
+    }
+
+    .tag{
+      font-size:12px;
+      color:var(--muted);
+      border:1px solid rgba(51,65,85,.9);
+      padding:4px 9px;
+      border-radius:999px;
+      background:rgba(15,23,42,.9);
+    }
+
+    .field{
+      margin-top:14px;
+      display:flex;
+      flex-direction:column;
+      gap:6px;
+    }
+
+    .field-label{
+      font-size:13px;
+      color:var(--muted);
+      font-weight:600;
+      display:flex;
+      align-items:center;
+      gap:6px;
+    }
+
+    .field-inline{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+
+    input[type="number"],
+    input[type="text"],
+    input[type="email"],
+    input[type="password"]{
+      background:#020617;
+      border-radius:10px;
+      border:1px solid rgba(51,65,85,.9);
+      padding:7px 9px;
+      color:var(--text);
+      font-family:var(--font);
+      font-size:14px;
+    }
+
+    input[type="number"]:focus,
+    input[type="text"]:focus,
+    input[type="email"]:focus,
+    input[type="password"]:focus{
+      outline:none;
+      border-color:#38bdf8;
+      box-shadow:0 0 0 1px rgba(56,189,248,.65);
+    }
+
+    @media (max-width: 480px){
+      .topbar .wrap{
+        padding-inline:12px;
+      }
+      .card{
+        padding-inline:14px;
+      }
+      h1{
+        font-size:22px;
+      }
+    }
   </style>
 </head>
 
@@ -188,215 +417,89 @@
         <div class="logo"></div>
         <div>
           <div>StudyBuddy</div>
-          <div style="font-size:12px; color:var(--muted2); font-weight:700;">Dummy Quiz UI</div>
+          <div style="font-size:12px; color:var(--muted2); font-weight:700;">Quiz</div>
         </div>
       </div>
 
-      <div class="nav">
-        <button class="active" data-page="home">Home</button>
-        <button data-page="setup">Quiz Setup</button>
-        <button data-page="quiz">Take Quiz</button>
-        <button data-page="results">Results</button>
-        <button data-page="weak">Weak Topics</button>
-      </div>
-
-      <div class="spacer"></div>
-      <div class="chip">👤 <strong>Azka</strong> <span style="opacity:.7"></span></div>
+      <div class="chip">👤 <strong>Azka</strong></div>
     </div>
   </div>
 
   <main class="wrap">
-    <!-- test -->
-    <!-- HOME -->
-    <section id="home">
-      <div class="grid cols-3">
-        <div class="card">
-          <h1>Quick quizzes. Clear feedback.</h1>
-          <p>
-            This is a <strong>dummy</strong> frontend so you can preview what StudyBuddy looks like.
-            It includes a small sample quiz and a results + weak topics view.
-          </p>
-          <div class="row">
-            <button class="btn primary" id="btnGoSetup">Start a new quiz</button>
-            <button class="btn ghost" id="btnGoQuiz">Jump to quiz</button>
-          </div>
-          <div class="divider"></div>
-          <div class="row">
-            <span class="pill"> Auto feedback</span>
-            <span class="pill"> Topic breakdown</span>
-            <span class="pill"> Review mistakes</span>
-          </div>
-        </div>
-
-        <div class="card">
-          <p style="margin:0 0 6px; color:var(--muted); font-weight:800;">Today</p>
-          <div class="grid" style="grid-template-columns:repeat(2,1fr); gap:12px;">
-            <div class="kpi"><div class="big">1</div><div class="lbl">Quiz taken</div></div>
-            <div class="kpi"><div class="big" id="homeAvg">—</div><div class="lbl">Last score</div></div>
-            <div class="kpi"><div class="big">3</div><div class="lbl">Questions</div></div>
-            <div class="kpi"><div class="big">~2m</div><div class="lbl">Estimated time</div></div>
-          </div>
-          <div class="divider"></div>
-          <p class="small">Tip: after results, go to “Weak Topics” to see what to study next.</p>
-        </div>
-        <div class="card" style="margin-top:16px;">
-  <h2>Suggested next steps</h2>
-  <p class="small">Pick a topic to practice, or start a new quiz.</p>
-  <div class="row">
-    <button class="btn primary">Practice DFA/NFA</button>
-    <button class="btn">Practice Regex</button>
-    <button class="btn">Practice Proofs</button>
-  </div>
-</div>
-
-        <div class="card">
-          <p style="margin:0 0 6px; color:var(--muted); font-weight:800;">Preview topics</p>
-          <div class="list">
-            <div class="item">
-              <div>
-                <div style="font-weight:900">DFA/NFA basics</div>
-                <div class="small">Definitions + transitions</div>
-              </div>
-              <span class="pill">Core</span>
-            </div>
-            <div class="item">
-              <div>
-                <div style="font-weight:900">Regex ↔ NFA</div>
-                <div class="small">Build automata from patterns</div>
-              </div>
-              <span class="pill">Practice</span>
-            </div>
-            <div class="item">
-              <div>
-                <div style="font-weight:900">Regular vs non-regular</div>
-                <div class="small">Pumping lemma intuition</div>
-              </div>
-              <span class="pill">Harder</span>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-
     <!-- SETUP -->
     <section id="setup" class="hidden">
-      <div class="grid cols-2">
-        <div class="card">
-          <h2>Quiz setup (dummy)</h2>
-          <p>These settings don't change the questions — they just update the UI.</p>
+      <div class="card">
+        <h1>Automata practice quiz</h1>
+        <p>
+          Answer a few multiple-choice questions. When you’re done, you’ll see your score,
+          a breakdown by question, and which topics to review.
+        </p>
 
-          <div class="divider"></div>
+        <div class="divider"></div>
 
-          <div class="row" style="justify-content:space-between;">
-            <div>
-              <div class="small">Topic</div>
-              <div class="row" style="margin-top:6px;">
-                <span class="tag" id="setTopic">Automata</span>
-                <span class="tag" id="setDiff">Medium</span>
-                <span class="tag" id="setCount">3 questions</span>
-              </div>
+        <div class="row" style="justify-content:space-between; align-items:flex-start;">
+          <div>
+            <div class="small">Quiz summary</div>
+            <div class="row" style="margin-top:6px;">
+              <span class="tag" id="setTopic">Automata</span>
+              <span class="tag" id="setDiff">Medium</span>
+              <span class="tag" id="setCount">3 questions</span>
             </div>
-            <button class="btn primary" id="btnStart">Start quiz</button>
-          </div>
 
-          <div class="divider"></div>
-
-          <p class="small">
-            In the real app, your chatbot would provide content, you would generate questions from it,
-            and you would tag each question with a topic so we can calculate weak areas.
-          </p>
-        </div>
-
-        <div class="card">
-          <h2>What you’ll see</h2>
-          <div class="list">
-            <div class="item">
-              <div>
-                <div style="font-weight:900">Quiz page</div>
-                <div class="small">Progress bar, question card, answer options</div>
+            <div class="field">
+              <label class="field-label">
+                <input type="checkbox" id="enableTimer" /> Enable timer
+              </label>
+              <div class="field-inline">
+                <label class="small" for="timerMinutes">Time limit (minutes)</label>
+                <input type="number" id="timerMinutes" min="1" max="120" value="10" style="width:80px;" />
               </div>
-              <span class="pill">UI</span>
-            </div>
-            <div class="item">
-              <div>
-                <div style="font-weight:900">Results page</div>
-                <div class="small">Score, per-question review, explanations</div>
-              </div>
-              <span class="pill good">Feedback</span>
-            </div>
-            <div class="item">
-              <div>
-                <div style="font-weight:900">Weak Topics</div>
-                <div class="small">Topics you missed + what to study next</div>
-              </div>
-              <span class="pill warn">Action</span>
+              <p class="small">
+                If enabled, a countdown starts when the quiz begins. When time is up, your quiz
+                is automatically submitted.
+              </p>
             </div>
           </div>
+          <button class="btn primary" id="btnStart">Start quiz</button>
         </div>
       </div>
     </section>
 
     <!-- QUIZ -->
     <section id="quiz" class="hidden">
-      <div class="grid cols-2">
-        <div class="card">
-          <div class="row" style="justify-content:space-between;">
-            <div>
-              <h2 id="quizTitle">Dummy Automata Quiz</h2>
-              <p class="small" id="quizMeta">3 questions • Medium</p>
-            </div>
-            <span class="pill" id="topicPill">Topic: Mixed</span>
+      <div class="card">
+        <div class="row" style="justify-content:space-between; align-items:center;">
+          <div>
+            <h2 id="quizTitle">Automata quiz</h2>
+            <p class="small" id="quizMeta">3 questions • Medium</p>
           </div>
-
-          <div class="divider"></div>
-
-          <div class="row" style="justify-content:space-between;">
-            <span class="pill" id="qCounter">Question 1 / 3</span>
-            <span class="pill" id="qTopic">DFA</span>
-          </div>
-
-          <div style="margin:10px 0 12px;">
-            <div class="progress"><div id="bar"></div></div>
-          </div>
-
-          <h3 id="qText">Loading…</h3>
-          <p id="qHint" class="small">Pick one answer.</p>
-
-          <div id="options" class="list" style="margin-top:10px;"></div>
-
-          <div class="divider"></div>
-
-          <div class="row" style="justify-content:space-between;">
-            <button class="btn ghost" id="btnPrev">Back</button>
-            <div class="row">
-              <button class="btn" id="btnSkip">Skip</button>
-              <button class="btn primary" id="btnNext" disabled>Next</button>
-            </div>
-          </div>
+          <span class="pill" id="topicPill">Topic: Mixed</span>
         </div>
 
-        <div class="card">
-          <h2>Notes (dummy)</h2>
-          <p class="small">
-            In your real version, this side panel could show:
-            <strong>hint</strong>, <strong>definition</strong>, or a short excerpt from the chatbot.
-          </p>
-          <div class="divider"></div>
-          <div class="list" id="noteBox">
-            <div class="item">
-              <div>
-                <div style="font-weight:900">How scoring works</div>
-                <div class="small">We store your selected option per question.</div>
-              </div>
-              <span class="pill">Simple</span>
-            </div>
-            <div class="item">
-              <div>
-                <div style="font-weight:900">Weak topics</div>
-                <div class="small">We count misses per topic and recommend practice.</div>
-              </div>
-              <span class="pill warn">Useful</span>
-            </div>
+        <div class="divider"></div>
+
+        <div class="row" style="justify-content:space-between; align-items:center;">
+          <span class="pill" id="qCounter">Question 1 / 3</span>
+          <span class="pill" id="qTopic">DFA</span>
+          <span class="pill" id="timerDisplay">No timer</span>
+        </div>
+
+        <div style="margin:10px 0 12px;">
+          <div class="progress"><div id="bar"></div></div>
+        </div>
+
+        <h3 id="qText">Loading…</h3>
+        <p id="qHint" class="small">Pick one answer.</p>
+
+        <div id="options" class="list" style="margin-top:10px;"></div>
+
+        <div class="divider"></div>
+
+        <div class="row" style="justify-content:space-between;">
+          <button class="btn ghost" id="btnPrev">Back</button>
+          <div class="row">
+            <button class="btn" id="btnSkip">Skip</button>
+            <button class="btn primary" id="btnNext" disabled>Next</button>
           </div>
         </div>
       </div>
@@ -404,83 +507,52 @@
 
     <!-- RESULTS -->
     <section id="results" class="hidden">
-      <div class="grid cols-2">
-        <div class="card">
-          <h2>Your results</h2>
-          <p class="small">Dummy scoring based on your selections.</p>
+      <div class="card">
+        <h2>Your results</h2>
+        <p class="small">Here’s how you did on this quiz.</p>
 
-          <div class="divider"></div>
+        <div class="divider"></div>
 
-          <div class="grid" style="grid-template-columns:repeat(3,1fr); gap:12px;">
-            <div class="kpi"><div class="big" id="scorePct">—</div><div class="lbl">Score</div></div>
-            <div class="kpi"><div class="big" id="scoreRaw">—</div><div class="lbl">Correct</div></div>
-            <div class="kpi"><div class="big" id="missedCount">—</div><div class="lbl">Missed</div></div>
-          </div>
-
-          <div class="divider"></div>
-
-          <h3>Question review</h3>
-          <div class="list" id="reviewList"></div>
-
-          <div class="divider"></div>
-          <div class="row">
-            <button class="btn primary" id="goWeakTopics">See weak topics</button>
-            <button class="btn ghost" id="retryQuiz">Retry quiz</button>
-          </div>
+        <div class="grid" style="grid-template-columns:repeat(3,1fr); gap:12px;">
+          <div class="kpi"><div class="big" id="scorePct">—</div><div class="lbl">Score</div></div>
+          <div class="kpi"><div class="big" id="scoreRaw">—</div><div class="lbl">Correct</div></div>
+          <div class="kpi"><div class="big" id="missedCount">—</div><div class="lbl">Missed</div></div>
         </div>
 
-        <div class="card">
-          <h2>What this page shows</h2>
-          <div class="list">
-            <div class="item">
-              <div>
-                <div style="font-weight:900">Clear score summary</div>
-                <div class="small">So the user immediately understands performance.</div>
-              </div>
-              <span class="pill good">Good UX</span>
-            </div>
-            <div class="item">
-              <div>
-                <div style="font-weight:900">Explanations</div>
-                <div class="small">Each wrong answer includes a quick “why”.</div>
-              </div>
-              <span class="pill warn">Important</span>
-            </div>
-            <div class="item">
-              <div>
-                <div style="font-weight:900">Topic tags</div>
-                <div class="small">Used to compute weak areas (next screen).</div>
-              </div>
-              <span class="pill">Structure</span>
-            </div>
-          </div>
+        <div class="divider"></div>
+
+        <h3>Question review</h3>
+        <div class="list" id="reviewList"></div>
+
+        <div class="divider"></div>
+        <div class="row">
+          <button class="btn primary" id="goWeakTopics">See weak topics</button>
+          <button class="btn ghost" id="retryQuiz">Retry quiz</button>
         </div>
       </div>
     </section>
 
     <!-- WEAK TOPICS -->
     <section id="weak" class="hidden">
-      <div class="grid cols-2">
-        <div class="card">
-          <h2>Weak topics (dummy)</h2>
-          <p class="small">Based on what you missed. This is what you would show to help them improve.</p>
+      <div class="card">
+        <h2>Weak topics</h2>
+        <p class="small">Topics where you missed questions. Use this to decide what to review next.</p>
 
-          <div class="divider"></div>
+        <div class="divider"></div>
 
-          <div class="list" id="weakList"></div>
+        <div class="list" id="weakList"></div>
 
-          <div class="divider"></div>
+        <div class="divider"></div>
 
-          <div class="row">
-            <button class="btn primary" id="practiceAgain">Practice again</button>
-            <button class="btn ghost" id="backToResults">Back to results</button>
-          </div>
+        <div class="row">
+          <button class="btn primary" id="practiceAgain">Practice again</button>
+          <button class="btn ghost" id="backToResults">Back to results</button>
         </div>
 
-        <div class="card">
-          <h2>Recommended next steps</h2>
-          <div class="list" id="recommendations"></div>
-        </div>
+        <div class="divider"></div>
+
+        <h3>Suggested next steps</h3>
+        <div class="list" id="recommendations"></div>
       </div>
     </section>
 
@@ -532,20 +604,90 @@
     let idx = 0;
     const answers = {}; // questionId -> selected option index (or null)
     let lastScore = null;
+    const quizConfig = {
+      timerEnabled: false,
+      timerSeconds: 0,
+    };
+    let timerInterval = null;
+    let timerRemaining = 0;
 
     // ---------- Helpers ----------
     const $ = (id) => document.getElementById(id);
     const navButtons = document.querySelectorAll(".nav button");
-    const pages = ["home","setup","quiz","results","weak"];
+    const pages = ["setup","quiz","results","weak"];
 
     function showPage(name){
-      pages.forEach(p => $(p).classList.toggle("hidden", p !== name));
+      pages.forEach(p => {
+        const el = $(p);
+        if (el) el.classList.toggle("hidden", p !== name);
+      });
       navButtons.forEach(b => b.classList.toggle("active", b.dataset.page === name));
+    }
+
+    function formatTime(totalSeconds){
+      const m = Math.floor(totalSeconds / 60);
+      const s = totalSeconds % 60;
+      return `${m}:${s.toString().padStart(2,"0")}`;
+    }
+
+    function updateTimerDisplay(label){
+      const el = $("timerDisplay");
+      if (!el) return;
+      el.textContent = label;
+    }
+
+    function stopTimer(){
+      if (timerInterval){
+        clearInterval(timerInterval);
+        timerInterval = null;
+      }
+    }
+
+    function startTimer(){
+      stopTimer();
+      if (!quizConfig.timerEnabled || !quizConfig.timerSeconds){
+        updateTimerDisplay("No timer");
+        return;
+      }
+      timerRemaining = quizConfig.timerSeconds;
+      updateTimerDisplay(`Time left: ${formatTime(timerRemaining)}`);
+      timerInterval = setInterval(() => {
+        timerRemaining--;
+        if (timerRemaining <= 0){
+          stopTimer();
+          updateTimerDisplay("Time's up");
+          renderResults();
+          showPage("results");
+          return;
+        }
+        updateTimerDisplay(`Time left: ${formatTime(timerRemaining)}`);
+      }, 1000);
+    }
+
+    function applyTimerConfigFromUI(){
+      const enableEl = $("enableTimer");
+      const minutesEl = $("timerMinutes");
+      if (!enableEl || !minutesEl) return;
+      const enabled = enableEl.checked;
+      let mins = parseInt(minutesEl.value, 10);
+      if (Number.isNaN(mins) || mins <= 0){
+        quizConfig.timerEnabled = false;
+        quizConfig.timerSeconds = 0;
+      } else {
+        quizConfig.timerEnabled = enabled;
+        quizConfig.timerSeconds = enabled ? mins * 60 : 0;
+      }
     }
 
     function resetQuiz(){
       idx = 0;
       for (const q of QUESTIONS) answers[q.id] = null;
+      if (quizConfig.timerEnabled && quizConfig.timerSeconds > 0){
+        startTimer();
+      } else {
+        stopTimer();
+        updateTimerDisplay("No timer");
+      }
       renderQuestion();
     }
 
@@ -608,12 +750,11 @@
     }
 
     function renderResults(){
+      stopTimer();
       const res = computeResults();
       $("scorePct").textContent = res.pct + "%";
       $("scoreRaw").textContent = `${res.correctCount} / ${res.total}`;
       $("missedCount").textContent = (res.total - res.correctCount);
-
-      $("homeAvg").textContent = res.pct + "%";
 
       // review list
       const list = $("reviewList");
@@ -707,12 +848,22 @@
       });
     });
 
-    $("btnGoSetup").addEventListener("click", () => showPage("setup"));
-    $("btnGoQuiz").addEventListener("click", () => { resetQuiz(); showPage("quiz"); });
+    const startBtn = $("btnStart");
+    if (startBtn){
+      startBtn.addEventListener("click", () => {
+        applyTimerConfigFromUI();
+        resetQuiz();
+        showPage("quiz");
+      });
+    }
 
-    $("btnStart").addEventListener("click", () => { resetQuiz(); showPage("quiz"); });
-    $("goWeakTopics").addEventListener("click", () => { renderWeakTopics(); showPage("weak"); });
-    $("goWeak").addEventListener("click", () => { renderWeakTopics(); showPage("weak"); });
+    const goWeakBtn = $("goWeakTopics");
+    if (goWeakBtn){
+      goWeakBtn.addEventListener("click", () => {
+        renderWeakTopics();
+        showPage("weak");
+      });
+    }
 
     $("retryQuiz").addEventListener("click", () => { resetQuiz(); showPage("quiz"); });
     $("practiceAgain").addEventListener("click", () => { resetQuiz(); showPage("quiz"); });
@@ -731,6 +882,7 @@
         idx++;
         renderQuestion();
       } else {
+        $("bar").style.width = `100%`;
         renderResults();
         showPage("results");
       }
@@ -749,7 +901,7 @@
 
     // initial load
     resetQuiz();
-    showPage("home");
+    showPage("setup");
   </script>
 </body>
 </html>

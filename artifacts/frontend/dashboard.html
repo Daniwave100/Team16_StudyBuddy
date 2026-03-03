@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>StudyBuddy | Dashboard</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+
+<body class="sbq">
+  <header class="sbq-topbar">
+    <div class="sbq-wrap">
+      <div class="sbq-brand">
+        <div>
+          <div class="sbq-title">StudyBuddy</div>
+          <div class="sbq-sub">Dashboard</div>
+        </div>
+      </div>
+
+      <nav class="sbq-nav">
+        <a href="index.html">Home</a>
+        <a href="quiz.html">Quiz</a>
+        <a class="sbq-active" href="dashboard.html">Dashboard</a>
+      </nav>
+
+      <div class="sbq-chip">👤 <strong>Guest</strong></div>
+    </div>
+  </header>
+
+  <main class="sbq-wrap">
+    <div class="sbq-grid sbq-cols-3">
+      <section class="sbq-card">
+        <h1 class="sbq-h1">Your tools</h1>
+        <p class="sbq-p">Pick a study mode. (Pages can be placeholders for now.)</p>
+
+        <div class="sbq-row">
+          <a class="sbq-btn primary" href="quiz.html">Take a quiz</a>
+          <a class="sbq-btn" href="flashcards.html">Flashcards</a>
+          <a class="sbq-btn" href="revision.html">Basic revision</a>
+          <a class="sbq-btn" href="subjects.html">Subjects</a>
+        </div>
+
+        <div class="sbq-divider"></div>
+        <p class="sbq-help">
+          Want the chat-style dashboard? Keep that as a separate page (ex: <a class="sbq-link" href="chat-dashboard.html">Chat</a>).
+        </p>
+      </section>
+
+      <aside class="sbq-card">
+        <h2 class="sbq-h2">Today</h2>
+        <p class="sbq-p">Quick snapshot (dummy for now).</p>
+
+        <div class="sbq-divider"></div>
+        <div class="sbq-row">
+          <span class="sbq-btn ghost" style="pointer-events:none;">1 quiz</span>
+          <span class="sbq-btn ghost" style="pointer-events:none;">3 questions</span>
+          <span class="sbq-btn ghost" style="pointer-events:none;">~2m</span>
+        </div>
+      </aside>
+
+      <aside class="sbq-card">
+        <h2 class="sbq-h2">Next steps</h2>
+        <p class="sbq-p">Suggested actions (dummy).</p>
+
+        <div class="sbq-row">
+          <button class="sbq-btn">Review weak topics</button>
+          <button class="sbq-btn">Make flashcards</button>
+          <button class="sbq-btn">Start revision</button>
+        </div>
+      </aside>
+    </div>
+  </main>
+</body>
+</html>
