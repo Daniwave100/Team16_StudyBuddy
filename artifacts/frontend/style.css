@@ -1,5 +1,5 @@
 * { box-sizing: border-box; }
-body {
+body:not(.sbq):not(.app-body) {
     font-family: system-ui, Arial, sans-serif;
     background: #5a228b;
     margin: 0;
