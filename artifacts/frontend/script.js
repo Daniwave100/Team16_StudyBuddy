@@ -26,6 +26,62 @@ function isLoggedIn() {
   return localStorage.getItem("isLoggedIn") === "true";
 }
 
+// ==========================
+// AUTH API (SUPABASE)
+// ==========================
+const SUPABASE_URL = "https://dxmvxdpqlxymrmsutwwh.supabase.co";
+const SUPABASE_ANON_KEY = "sb_publishable_Ln49ryeUgDU337oysI9egg_8PY4fpwF";
+
+let supabaseClient = null;
+
+
+async function getSupabaseClient() {
+  if (supabaseClient) return supabaseClient;
+
+  const { createClient } = await import("https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm");
+  supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  return supabaseClient;
+}
+
+async function authSignup(email, password) {
+  try {
+    const supabase = await getSupabaseClient();
+    const { error } = await supabase.auth.signUp({
+      email,
+      password
+    });
+
+    if (error) {
+      return { success: false, error: error.message };
+    }
+
+    return { success: true, error: null };
+  } catch (err) {
+
+    return { success: false, error: "Could not connect to Supabase." };
+  }
+}
+
+async function authLogin(email, password) {
+  try {
+    const supabase = await getSupabaseClient();
+    const { error } = await supabase.auth.signInWithPassword({
+      email,
+      password
+    });
+
+    if (error) {
+      return { success: false, error: error.message };
+    }
+
+    return { success: true, error: null };
+  } catch (err) {
+
+    return { success: false, error: "Could not connect to Supabase." };
+  }
+}
+
+
 /* ===== Password toggle ===== */
 function wirePwToggle(inputId, btnId) {
   const input = document.getElementById(inputId);
@@ -75,22 +131,22 @@ function initLogin() {
   pwEl?.addEventListener("input", () => validateLive(false));
   validateLive(false);
 
-  form.addEventListener("submit", (e) => {
+    form.addEventListener("submit", async (e) => {
     e.preventDefault();
     if (!validateLive(true)) return;
 
     const email = emailEl.value.trim();
     const pw = pwEl.value;
 
-    const storedEmail = localStorage.getItem("userEmail");
-    const storedPw = localStorage.getItem("userPassword");
+    const result = await authLogin(email, pw);
 
-    if (email === storedEmail && pw === storedPw) {
+    if (result.success) {
       setMsg(msg, "Login successful! Redirecting…", "ok");
       setSession(email);
-      window.location.href = "dashboard.html";
+      window.location.href = "index.html";
     } else {
-      setMsg(msg, "Invalid email or password.", "error");
+      // TODO: When Supabase is connected, use the real auth error message if needed.
+      setMsg(msg, result.error || "Login failed.", "error");
     }
   });
 }
@@ -135,19 +191,23 @@ function initSignup() {
   confirmEl?.addEventListener("input", () => validateLive(false));
   validateLive(false);
 
-  form.addEventListener("submit", (e) => {
+    form.addEventListener("submit", async (e) => {
     e.preventDefault();
     if (!validateLive(true)) return;
 
     const email = emailEl.value.trim();
     const pw = pwEl.value;
 
-    localStorage.setItem("userEmail", email);
-    localStorage.setItem("userPassword", pw);
+    const result = await authSignup(email, pw);
 
-    setMsg(msg, "Signup successful! Redirecting…", "ok");
-    setSession(email);
-    window.location.href = "dashboard.html";
+    if (result.success) {
+      setMsg(msg, "Signup successful! Redirecting…", "ok");
+      setSession(email);
+      window.location.href = "index.html";
+    } else {
+      // TODO: When Supabase is connected, use the real auth error message if needed.
+      setMsg(msg, result.error || "Signup failed.", "error");
+    }
   });
 }
 
