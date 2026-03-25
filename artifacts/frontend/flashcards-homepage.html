@@ -169,6 +169,30 @@
   .deck-class  { color: #4f8ef7; font-size: 13px; font-weight: 500; }
   .deck-meta   { font-size: 12px; color: #4a5568; margin-top: 3px; }
 
+  /* ── TAG PILLS ── */
+  .tag-pills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 10px;
+  }
+  .tag-pill {
+    font-size: 11px;
+    font-weight: 500;
+    color: #c8d3ea;
+    background: rgba(79,142,247,0.12);
+    border: 1px solid rgba(79,142,247,0.25);
+    border-radius: 20px;
+    padding: 3px 10px;
+    white-space: nowrap;
+  }
+  .tag-pill.untagged {
+    color: #4a5568;
+    background: rgba(255,255,255,0.04);
+    border-color: rgba(255,255,255,0.08);
+    font-style: italic;
+  }
+
   .deck-stats {
     display: flex;
     gap: 18px;
@@ -231,6 +255,68 @@
   .form-group select option { background: #1a2133; }
   .form-group input::placeholder { color: #4a5568; }
   .form-group input:focus, .form-group select:focus { outline: none; border-color: #4f8ef7; }
+
+  /* ── TAG INPUT UI ── */
+  .tag-input-wrapper {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+  .tag-input-wrapper input {
+    flex: 1;
+  }
+  .tag-add-btn {
+    padding: 10px 16px;
+    background: rgba(79,142,247,0.15);
+    border: 1px solid rgba(79,142,247,0.3);
+    border-radius: 8px;
+    color: #4f8ef7;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background 0.2s, border-color 0.2s;
+    flex-shrink: 0;
+  }
+  .tag-add-btn:hover { background: rgba(79,142,247,0.25); border-color: rgba(79,142,247,0.5); }
+
+  .tag-preview {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 10px;
+    min-height: 0;
+  }
+  .tag-preview-pill {
+    font-size: 12px;
+    font-weight: 500;
+    color: #c8d3ea;
+    background: rgba(79,142,247,0.12);
+    border: 1px solid rgba(79,142,247,0.25);
+    border-radius: 20px;
+    padding: 4px 10px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .tag-remove-btn {
+    background: none;
+    border: none;
+    color: #4a5568;
+    cursor: pointer;
+    font-size: 14px;
+    line-height: 1;
+    padding: 0;
+    transition: color 0.2s;
+  }
+  .tag-remove-btn:hover { color: #f87171; }
+
+  .tag-error {
+    font-size: 12px;
+    color: #f87171;
+    margin-top: 6px;
+    min-height: 16px;
+  }
 
   .button-group { display: flex; gap: 10px; justify-content: flex-end; margin-top: 24px; }
 
@@ -300,19 +386,28 @@
   </div>
 </div>
 
-<!-- Modal -->
+<!-- Create Deck Modal -->
 <div class="modal" id="createDeckModal">
   <div class="modal-content">
     <h2>Create New Flashcard Deck</h2>
     <div class="form-group">
-      <label for="deckTitle">Deck Title</label>
-      <input type="text" id="deckTitle" placeholder="e.g., Chapter 5: Algorithms">
+      <label for="deckTitleInput">Deck Title</label>
+      <input type="text" id="deckTitleInput" placeholder="e.g., Chapter 5: Algorithms">
     </div>
     <div class="form-group">
       <label for="deckClass">Class</label>
       <select id="deckClass">
         <option value="">Select a class...</option>
       </select>
+    </div>
+    <div class="form-group">
+      <label>Tags (optional)</label>
+      <div class="tag-input-wrapper">
+        <input type="text" id="tagInput" placeholder="e.g., Biology, Chapter 3...">
+        <button class="tag-add-btn" id="tagAddBtn">+ Add</button>
+      </div>
+      <div class="tag-error" id="tagError"></div>
+      <div class="tag-preview" id="tagPreview"></div>
     </div>
     <div class="button-group">
       <button class="btn btn-secondary" id="cancelBtn">Cancel</button>
@@ -329,18 +424,21 @@
     { id: 'eng210',  name: 'Engineering Design' }
   ];
 
+  // ── TAG DATA STRUCTURE: tags field added as array of strings ──
   let decks = [
-    { id: 1, title: 'Data Structures Basics',  class: 'cs101',   cards: 24, mastered: 18, dateModified: new Date('2025-04-10') },
-    { id: 2, title: 'Sorting Algorithms',      class: 'cs101',   cards: 15, mastered: 10, dateModified: new Date('2025-04-01') },
-    { id: 3, title: 'Integration Techniques',  class: 'math201', cards: 30, mastered: 22, dateModified: new Date('2025-04-14') },
-    { id: 4, title: 'Limits and Derivatives',  class: 'math201', cards: 20, mastered: 15, dateModified: new Date('2025-03-28') },
-    { id: 5, title: "Newton's Laws",           class: 'phys150', cards: 18, mastered: 12, dateModified: new Date('2025-04-08') },
-    { id: 6, title: 'Kinematics',              class: 'phys150', cards: 25, mastered: 20, dateModified: new Date('2025-04-15') },
-    { id: 7, title: 'Design Process',          class: 'eng210',  cards: 12, mastered: 8,  dateModified: new Date('2025-03-20') }
+    { id: 1, title: 'Data Structures Basics',  class: 'cs101',   cards: 24, mastered: 18, dateModified: new Date('2025-04-10'), tags: ['Algorithms', 'CS Fundamentals'] },
+    { id: 2, title: 'Sorting Algorithms',      class: 'cs101',   cards: 15, mastered: 10, dateModified: new Date('2025-04-01'), tags: ['Algorithms', 'Performance'] },
+    { id: 3, title: 'Integration Techniques',  class: 'math201', cards: 30, mastered: 22, dateModified: new Date('2025-04-14'), tags: ['Calculus', 'Integration'] },
+    { id: 4, title: 'Limits and Derivatives',  class: 'math201', cards: 20, mastered: 15, dateModified: new Date('2025-03-28'), tags: ['Calculus', 'Derivatives'] },
+    { id: 5, title: "Newton's Laws",           class: 'phys150', cards: 18, mastered: 12, dateModified: new Date('2025-04-08'), tags: ['Mechanics', 'Forces'] },
+    { id: 6, title: 'Kinematics',              class: 'phys150', cards: 25, mastered: 20, dateModified: new Date('2025-04-15'), tags: ['Mechanics', 'Motion'] },
+    { id: 7, title: 'Design Process',          class: 'eng210',  cards: 12, mastered: 8,  dateModified: new Date('2025-03-20'), tags: ['Engineering', 'Process'] }
   ];
 
   let currentSort = 'name-asc';
+  let pendingTags = []; // tags being built in the modal
 
+  // ── SORT HELPERS ──
   function getSortedDecks() {
     const sorted = [...decks];
     switch (currentSort) {
@@ -373,6 +471,7 @@
     document.getElementById('sortBadge').textContent = labels[currentSort] || '';
   }
 
+  // ── RENDER DECK GRID ──
   function renderDecks() {
     const grid = document.getElementById('deckGrid');
     const createBtn = document.getElementById('createDeckBtn');
@@ -395,12 +494,19 @@
         grid.appendChild(hdr);
       }
 
+      // ── TAG PILLS: render assigned tags or "Untagged" fallback ──
+      const hasTags = deck.tags && deck.tags.length > 0;
+      const tagHTML = hasTags
+        ? deck.tags.map(t => `<span class="tag-pill">${t}</span>`).join('')
+        : `<span class="tag-pill untagged">Untagged</span>`;
+
       const card = document.createElement('div');
       card.className = 'deck-card';
       card.innerHTML = `
         <div class="deck-title">${deck.title}</div>
         <div class="deck-class">${cls.name}</div>
         <div class="deck-meta">Modified ${formatDate(deck.dateModified)}</div>
+        <div class="tag-pills">${tagHTML}</div>
         <div class="deck-stats">
           <div class="stat">
             <span class="stat-label">Total Cards</span>
@@ -435,6 +541,50 @@
     renderDecks();
   });
 
+  // ── TAG INPUT LOGIC ──
+  function renderTagPreview() {
+    const preview = document.getElementById('tagPreview');
+    preview.innerHTML = pendingTags.map((t, i) => `
+      <span class="tag-preview-pill">
+        ${t}
+        <button class="tag-remove-btn" onclick="removeTag(${i})">×</button>
+      </span>
+    `).join('');
+  }
+
+  function removeTag(idx) {
+    pendingTags.splice(idx, 1);
+    renderTagPreview();
+  }
+
+  function addTag() {
+    const input = document.getElementById('tagInput');
+    const errEl = document.getElementById('tagError');
+    const val = input.value.trim();
+
+    // Validation: empty tag
+    if (!val) {
+      errEl.textContent = 'Tag cannot be empty.';
+      return;
+    }
+    // Validation: duplicate tag (case-insensitive)
+    if (pendingTags.some(t => t.toLowerCase() === val.toLowerCase())) {
+      errEl.textContent = `"${val}" has already been added.`;
+      return;
+    }
+
+    errEl.textContent = '';
+    pendingTags.push(val);
+    input.value = '';
+    renderTagPreview();
+  }
+
+  document.getElementById('tagAddBtn').addEventListener('click', addTag);
+  document.getElementById('tagInput').addEventListener('keydown', e => {
+    if (e.key === 'Enter') { e.preventDefault(); addTag(); }
+  });
+
+  // ── MODAL ──
   const modal     = document.getElementById('createDeckModal');
   const cancelBtn = document.getElementById('cancelBtn');
   const submitBtn = document.getElementById('submitBtn');
@@ -444,16 +594,28 @@
   modal.addEventListener('click', e => { if (e.target === modal) { modal.classList.remove('active'); resetForm(); } });
 
   function resetForm() {
-    document.getElementById('deckTitle').value = '';
+    document.getElementById('deckTitleInput').value = '';
     document.getElementById('deckClass').value = '';
+    document.getElementById('tagInput').value = '';
+    document.getElementById('tagError').textContent = '';
+    pendingTags = [];
+    renderTagPreview();
   }
 
   submitBtn.addEventListener('click', () => {
-    const title   = document.getElementById('deckTitle').value.trim();
+    const title   = document.getElementById('deckTitleInput').value.trim();
     const classId = document.getElementById('deckClass').value;
     if (!title || !classId) { alert('Please fill in all fields.'); return; }
 
-    decks.push({ id: decks.length + 1, title, class: classId, cards: 0, mastered: 0, dateModified: new Date() });
+    decks.push({
+      id: decks.length + 1,
+      title,
+      class: classId,
+      cards: 0,
+      mastered: 0,
+      dateModified: new Date(),
+      tags: [...pendingTags]   // persist tags to deck data model
+    });
     renderDecks();
     modal.classList.remove('active');
     resetForm();

@@ -82,7 +82,31 @@
     font-size: 13px;
     color: #4f8ef7;
     font-weight: 500;
+    margin-bottom: 2px;
+  }
+
+  /* ── SIDEBAR TAG PILLS ── */
+  .sidebar-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
     margin-bottom: 6px;
+  }
+  .sidebar-tag-pill {
+    font-size: 11px;
+    font-weight: 500;
+    color: #c8d3ea;
+    background: rgba(79,142,247,0.12);
+    border: 1px solid rgba(79,142,247,0.22);
+    border-radius: 20px;
+    padding: 3px 9px;
+    white-space: nowrap;
+  }
+  .sidebar-tag-pill.untagged {
+    color: #4a5568;
+    background: rgba(255,255,255,0.04);
+    border-color: rgba(255,255,255,0.08);
+    font-style: italic;
   }
 
   .sidebar-btn {
@@ -279,6 +303,8 @@
   <div class="sidebar">
     <div class="sidebar-title" id="deckTitle">StudyBuddy</div>
     <div class="sidebar-subject" id="deckSubject"></div>
+    <!-- TAG PILLS displayed in sidebar -->
+    <div class="sidebar-tags" id="deckTags"></div>
     <button class="sidebar-btn" onclick="shuffleCards()">🔀 &nbsp;Shuffle Cards</button>
     <button class="sidebar-btn" onclick="resetProgress()">↺ &nbsp;Reset Progress</button>
     <div class="progress-section">
@@ -326,14 +352,16 @@
     { id: 'phys150', name: 'Physics I' },
     { id: 'eng210',  name: 'Engineering Design' }
   ];
+
+  // ── TAG DATA STRUCTURE: tags field consistent with homepage mock data ──
   const decks = [
-    { id: 1, title: 'Data Structures Basics',  class: 'cs101',   cards: 24, mastered: 18 },
-    { id: 2, title: 'Sorting Algorithms',      class: 'cs101',   cards: 15, mastered: 10 },
-    { id: 3, title: 'Integration Techniques',  class: 'math201', cards: 30, mastered: 22 },
-    { id: 4, title: 'Limits and Derivatives',  class: 'math201', cards: 20, mastered: 15 },
-    { id: 5, title: "Newton's Laws",           class: 'phys150', cards: 18, mastered: 12 },
-    { id: 6, title: 'Kinematics',              class: 'phys150', cards: 25, mastered: 20 },
-    { id: 7, title: 'Design Process',          class: 'eng210',  cards: 12, mastered: 8  }
+    { id: 1, title: 'Data Structures Basics',  class: 'cs101',   cards: 24, mastered: 18, tags: ['Algorithms', 'CS Fundamentals'] },
+    { id: 2, title: 'Sorting Algorithms',      class: 'cs101',   cards: 15, mastered: 10, tags: ['Algorithms', 'Performance'] },
+    { id: 3, title: 'Integration Techniques',  class: 'math201', cards: 30, mastered: 22, tags: ['Calculus', 'Integration'] },
+    { id: 4, title: 'Limits and Derivatives',  class: 'math201', cards: 20, mastered: 15, tags: ['Calculus', 'Derivatives'] },
+    { id: 5, title: "Newton's Laws",           class: 'phys150', cards: 18, mastered: 12, tags: ['Mechanics', 'Forces'] },
+    { id: 6, title: 'Kinematics',              class: 'phys150', cards: 25, mastered: 20, tags: ['Mechanics', 'Motion'] },
+    { id: 7, title: 'Design Process',          class: 'eng210',  cards: 12, mastered: 8,  tags: ['Engineering', 'Process'] }
   ];
 
   const params = new URLSearchParams(window.location.search);
@@ -348,14 +376,21 @@
     document.getElementById('deckTitle').textContent = selectedDeck.title;
     document.getElementById('deckSubject').textContent = classInfo ? classInfo.name : '';
     document.getElementById('navSub').textContent = selectedDeck.title;
+
+    // ── Render tag pills in sidebar ──
+    const tagsEl = document.getElementById('deckTags');
+    const hasTags = selectedDeck.tags && selectedDeck.tags.length > 0;
+    tagsEl.innerHTML = hasTags
+      ? selectedDeck.tags.map(t => `<span class="sidebar-tag-pill">${t}</span>`).join('')
+      : `<span class="sidebar-tag-pill untagged">Untagged</span>`;
   }
 
   let flashcards = [
-    { question: "What is the time complexity of binary search?", answer: "O(log n) - Binary search divides the search space in half with each iteration." },
-    { question: "What is encapsulation in OOP?", answer: "Encapsulation is bundling data and methods that operate on that data within a single unit (class), hiding internal state from outside access." },
-    { question: "What is the difference between stack and heap memory?", answer: "Stack: automatic allocation/deallocation, LIFO structure, faster access, limited size. Heap: manual management, flexible size, slower access, larger capacity." },
-    { question: "What is polymorphism?", answer: "Polymorphism allows objects of different classes to be treated as objects of a common superclass, enabling methods to behave differently based on the object type." },
-    { question: "What is a RESTful API?", answer: "A RESTful API is an architectural style for web services that uses HTTP methods (GET, POST, PUT, DELETE) and follows stateless communication principles." }
+    { question: "What is the time complexity of binary search?", answer: "O(log n) — Binary search halves the search space with each iteration." },
+    { question: "What is encapsulation in OOP?", answer: "Encapsulation bundles data and methods within a single class, hiding internal state from outside access." },
+    { question: "What is the difference between stack and heap memory?", answer: "Stack: automatic LIFO allocation, fast, limited size. Heap: manual management, flexible size, slower access." },
+    { question: "What is polymorphism?", answer: "Polymorphism allows objects of different classes to be treated as a common superclass, with methods behaving differently based on object type." },
+    { question: "What is a RESTful API?", answer: "A RESTful API uses HTTP methods (GET, POST, PUT, DELETE) and follows stateless communication principles for web services." }
   ];
 
   let currentCardIndex = 0;
