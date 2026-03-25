@@ -1,111 +1,142 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Deck Not Found — StudyBuddy</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Deck Not Found — StudyBuddy</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
 
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
+  body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: radial-gradient(ellipse at 60% 20%, #1a2744 0%, #0d1117 60%, #0a0e1a 100%);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+  }
 
-        .error-card {
-            background: rgba(255, 255, 255, 0.95);
-            border-radius: 16px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-            padding: 60px 50px;
-            max-width: 480px;
-            width: 90%;
-            text-align: center;
-        }
+  /* NAV */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    height: 56px;
+    background: rgba(10, 14, 26, 0.85);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid rgba(255,255,255,0.07);
+    display: flex;
+    align-items: center;
+    padding: 0 28px;
+    gap: 10px;
+  }
+  .nav-logo {
+    width: 32px; height: 32px;
+    background: linear-gradient(135deg, #4f8ef7, #a259f7);
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px;
+  }
+  .nav-title { font-size: 15px; font-weight: 700; color: #fff; }
+  .nav-sub { font-size: 13px; color: #6b7a99; margin-left: 2px; }
 
-        .error-icon {
-            font-size: 64px;
-            margin-bottom: 20px;
-        }
+  /* CARD */
+  .error-card {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 16px;
+    padding: 60px 50px;
+    max-width: 480px;
+    width: 90%;
+    text-align: center;
+    box-shadow: 0 0 40px rgba(79, 142, 247, 0.08);
+  }
 
-        .error-brand {
-            font-size: 14px;
-            font-weight: 600;
-            color: #667eea;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-bottom: 16px;
-        }
+  .error-icon { font-size: 56px; margin-bottom: 20px; }
 
-        .error-title {
-            font-size: 28px;
-            font-weight: 700;
-            color: #333;
-            margin-bottom: 12px;
-        }
+  .error-brand {
+    font-size: 12px;
+    font-weight: 600;
+    color: #4f8ef7;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    margin-bottom: 14px;
+  }
 
-        .error-message {
-            font-size: 16px;
-            color: #666;
-            line-height: 1.6;
-            margin-bottom: 12px;
-        }
+  .error-title {
+    font-size: 26px;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 12px;
+  }
 
-        .error-id {
-            font-size: 13px;
-            color: #aaa;
-            margin-bottom: 36px;
-        }
+  .error-message {
+    font-size: 15px;
+    color: #8a9bbf;
+    line-height: 1.65;
+    margin-bottom: 10px;
+  }
 
-        .home-button {
-            display: inline-block;
-            padding: 14px 32px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 16px;
-            font-weight: 600;
-            text-decoration: none;
-            transition: opacity 0.3s, transform 0.2s;
-        }
+  .error-id {
+    font-size: 12px;
+    color: #4a5568;
+    margin-bottom: 36px;
+    font-family: monospace;
+  }
 
-        .home-button:hover {
-            opacity: 0.9;
-            transform: translateY(-2px);
-        }
-    </style>
+  .divider {
+    border: none;
+    border-top: 1px solid rgba(255,255,255,0.07);
+    margin: 28px 0;
+  }
+
+  .home-button {
+    display: inline-block;
+    padding: 10px 22px;
+    background: transparent;
+    color: #c8d3ea;
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 50px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    text-decoration: none;
+    transition: background 0.2s, border-color 0.2s;
+    backdrop-filter: blur(6px);
+  }
+  .home-button:hover {
+    background: rgba(255,255,255,0.07);
+    border-color: rgba(255,255,255,0.25);
+  }
+</style>
 </head>
 <body>
 
-    <div class="error-card">
-        <div class="error-icon">📚</div>
-        <div class="error-brand">StudyBuddy</div>
-        <h2 class="error-title">Deck Not Found</h2>
-        <p class="error-message">The deck you're looking for doesn't exist or couldn't be loaded.</p>
-        <p class="error-id" id="errorId"></p>
-        <button class="home-button" onclick="window.location.href='flashcards-homepage.html'">
-            ← Back to Homepage
-        </button>
-    </div>
+<nav>
+  <div class="nav-logo">📚</div>
+  <span class="nav-title">StudyBuddy</span>
+  <span class="nav-sub">/ Error</span>
+</nav>
 
-    <script>
-        // If redirected with a deckId (e.g. flashcards-error-page.html?deckId=99),
-        // display it so the user knows which deck failed to load.
-        const params = new URLSearchParams(window.location.search);
-        const deckId = params.get('deckId');
-        if (deckId) {
-            document.getElementById('errorId').textContent = `Deck ID: ${deckId}`;
-        }
-    </script>
+<div class="error-card">
+  <div class="error-icon">🔍</div>
+  <div class="error-brand">StudyBuddy</div>
+  <h2 class="error-title">Deck Not Found</h2>
+  <hr class="divider">
+  <p class="error-message">The deck you're looking for doesn't exist or couldn't be loaded.</p>
+  <p class="error-id" id="errorId"></p>
+  <button class="home-button" onclick="window.location.href='flashcards-homepage.html'">
+    ← Back to Homepage
+  </button>
+</div>
 
+<script>
+  const params = new URLSearchParams(window.location.search);
+  const deckId = params.get('deckId');
+  if (deckId) {
+    document.getElementById('errorId').textContent = `Deck ID: ${deckId}`;
+  }
+</script>
 </body>
 </html>

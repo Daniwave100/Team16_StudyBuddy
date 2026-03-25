@@ -1,422 +1,409 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>StudyBuddy - Flashcards</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>StudyBuddy - Flashcards</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
 
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            display: flex;
-        }
+  body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: radial-gradient(ellipse at 60% 20%, #1a2744 0%, #0d1117 60%, #0a0e1a 100%);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    color: #fff;
+  }
 
-        .sidebar {
-            width: 250px;
-            background: rgba(255, 255, 255, 0.95);
-            padding: 30px 20px;
-            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
-        }
+  /* ── NAV ── */
+  nav {
+    height: 56px;
+    background: rgba(10, 14, 26, 0.85);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid rgba(255,255,255,0.07);
+    display: flex;
+    align-items: center;
+    padding: 0 28px;
+    gap: 10px;
+    flex-shrink: 0;
+  }
+  .nav-logo {
+    width: 38px; height: 38px;
+    background: linear-gradient(135deg, #4fc3a1, #4f8ef7, #a259f7);
+    border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px; flex-shrink: 0;
+  }
+  .nav-brand { display: flex; flex-direction: column; }
+  .nav-title { font-size: 15px; font-weight: 700; color: #fff; line-height: 1.2; }
+  .nav-sub   { font-size: 12px; color: #6b7a99; }
+  .nav-actions { margin-left: auto; display: flex; gap: 10px; }
+  .nav-btn {
+    padding: 8px 16px;
+    background: transparent;
+    color: #c8d3ea;
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 50px;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 500;
+    transition: background 0.2s, border-color 0.2s;
+  }
+  .nav-btn:hover { background: rgba(255,255,255,0.07); border-color: rgba(255,255,255,0.25); }
 
-        .sidebar h2 {
-            color: #667eea;
-            margin-bottom: 6px;
-            font-size: 20px;
-            word-break: break-word;
-        }
+  /* ── BODY LAYOUT ── */
+  .layout {
+    display: flex;
+    flex: 1;
+    overflow: hidden;
+  }
 
-        .sidebar-subject {
-            color: #999;
-            font-size: 13px;
-            margin-bottom: 24px;
-        }
+  /* ── SIDEBAR ── */
+  .sidebar {
+    width: 260px;
+    background: rgba(255,255,255,0.03);
+    border-right: 1px solid rgba(255,255,255,0.07);
+    padding: 28px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    flex-shrink: 0;
+  }
 
-        .nav-button {
-            width: 100%;
-            padding: 12px 20px;
-            background: #667eea;
-            color: white;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 16px;
-            transition: background 0.3s;
-            margin-bottom: 15px;
-        }
+  .sidebar-title {
+    font-size: 17px;
+    font-weight: 700;
+    color: #fff;
+    word-break: break-word;
+    line-height: 1.3;
+  }
+  .sidebar-subject {
+    font-size: 13px;
+    color: #4f8ef7;
+    font-weight: 500;
+    margin-bottom: 6px;
+  }
 
-        .nav-button:hover {
-            background: #5568d3;
-        }
+  .sidebar-btn {
+    width: 100%;
+    padding: 10px 16px;
+    background: transparent;
+    color: #c8d3ea;
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 500;
+    text-align: left;
+    transition: background 0.2s, border-color 0.2s;
+  }
+  .sidebar-btn:hover {
+    background: rgba(255,255,255,0.06);
+    border-color: rgba(255,255,255,0.22);
+  }
 
-        .progress {
-            margin-top: 30px;
-            padding-top: 20px;
-            border-top: 2px solid #e0e0e0;
-        }
+  .progress-section {
+    margin-top: auto;
+    padding-top: 20px;
+    border-top: 1px solid rgba(255,255,255,0.07);
+  }
+  .progress-label {
+    font-size: 12px;
+    color: #6b7a99;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 8px;
+  }
+  .progress-count {
+    font-size: 22px;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 10px;
+  }
+  .progress-bar {
+    width: 100%; height: 5px;
+    background: rgba(255,255,255,0.07);
+    border-radius: 3px; overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #4f8ef7, #a259f7);
+    transition: width 0.3s ease;
+  }
 
-        .progress-text {
-            color: #666;
-            font-size: 14px;
-            margin-bottom: 10px;
-        }
+  /* ── MAIN ── */
+  .main-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 40px;
+    gap: 32px;
+  }
 
-        .progress-bar {
-            width: 100%;
-            height: 8px;
-            background: #e0e0e0;
-            border-radius: 4px;
-            overflow: hidden;
-        }
+  /* ── FLASHCARD ── */
+  .flashcard-container {
+    perspective: 1000px;
+    width: 100%;
+    max-width: 620px;
+    height: 380px;
+  }
 
-        .progress-fill {
-            height: 100%;
-            background: #667eea;
-            transition: width 0.3s;
-        }
+  .flashcard {
+    width: 100%; height: 100%;
+    position: relative;
+    transform-style: preserve-3d;
+    transition: transform 0.6s;
+    cursor: pointer;
+  }
+  .flashcard.flipped { transform: rotateY(180deg); }
 
-        .main-content {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 40px;
-        }
+  .card-face {
+    position: absolute;
+    width: 100%; height: 100%;
+    backface-visibility: hidden;
+    border-radius: 16px;
+    border: 1px solid rgba(255,255,255,0.09);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 40px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+  }
 
-        .flashcard-container {
-            perspective: 1000px;
-            width: 100%;
-            max-width: 600px;
-            height: 400px;
-            margin-bottom: 40px;
-        }
+  .card-front {
+    background: rgba(255,255,255,0.05);
+  }
+  .card-back {
+    background: rgba(79,142,247,0.07);
+    border-color: rgba(79,142,247,0.2);
+    transform: rotateY(180deg);
+  }
 
-        .flashcard {
-            width: 100%;
-            height: 100%;
-            position: relative;
-            transform-style: preserve-3d;
-            transition: transform 0.6s;
-            cursor: pointer;
-        }
+  .card-label {
+    font-size: 11px;
+    color: #4f8ef7;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    margin-bottom: 20px;
+  }
+  .card-back .card-label { color: #a259f7; }
 
-        /* The actual visual "flip" is handled by this CSS rule, which rotates the element 180 degrees along the Y-axis when the flipped class is present */
-        .flashcard.flipped {
-            transform: rotateY(180deg);
-        }
+  .card-content {
+    font-size: 22px;
+    color: #fff;
+    text-align: center;
+    line-height: 1.55;
+  }
 
-        .card-face {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            backface-visibility: hidden;
-            background: white;
-            border-radius: 16px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 40px;
-        }
+  .flip-hint {
+    position: absolute;
+    bottom: 18px;
+    font-size: 12px;
+    color: #4a5568;
+  }
 
-        .card-front {
-            background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
-        }
+  /* ── CONTROLS ── */
+  .controls {
+    display: flex;
+    align-items: center;
+    gap: 28px;
+  }
 
-        .card-back {
-            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-            transform: rotateY(180deg);
-        }
+  .arrow-button {
+    width: 48px; height: 48px;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 50%;
+    font-size: 20px;
+    color: #c8d3ea;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.2s;
+  }
+  .arrow-button:hover:not(:disabled) {
+    background: rgba(79,142,247,0.2);
+    border-color: rgba(79,142,247,0.4);
+    color: #fff;
+  }
+  .arrow-button:disabled { opacity: 0.25; cursor: not-allowed; }
 
-        .card-label {
-            font-size: 14px;
-            color: #667eea;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-bottom: 20px;
-        }
+  .card-counter { font-size: 16px; color: #8a9bbf; font-weight: 600; min-width: 60px; text-align: center; }
 
-        .card-content {
-            font-size: 24px;
-            color: #333;
-            text-align: center;
-            line-height: 1.5;
-        }
+  /* ── ACTION BUTTONS ── */
+  .action-buttons { display: flex; gap: 12px; }
 
-        .flip-hint {
-            position: absolute;
-            bottom: 20px;
-            font-size: 12px;
-            color: #999;
-        }
+  .action-btn {
+    padding: 10px 22px;
+    background: transparent;
+    border: 1px solid rgba(255,255,255,0.15);
+    color: #c8d3ea;
+    border-radius: 50px;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 500;
+    transition: background 0.2s, border-color 0.2s;
+  }
+  .action-btn:hover { background: rgba(255,255,255,0.07); border-color: rgba(255,255,255,0.28); }
+  .action-btn.known  { border-color: rgba(79,247,141,0.3); color: #4ff78d; }
+  .action-btn.known:hover  { background: rgba(79,247,141,0.08); }
+  .action-btn.review { border-color: rgba(247,179,79,0.3); color: #f7b34f; }
+  .action-btn.review:hover { background: rgba(247,179,79,0.08); }
 
-        .controls {
-            display: flex;
-            align-items: center;
-            gap: 30px;
-        }
-
-        .arrow-button {
-            width: 50px;
-            height: 50px;
-            background: white;
-            border: none;
-            border-radius: 50%;
-            font-size: 24px;
-            cursor: pointer;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-            transition: all 0.3s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .arrow-button:hover {
-            background: #667eea;
-            color: white;
-            transform: scale(1.1);
-        }
-
-        .arrow-button:disabled {
-            opacity: 0.3;
-            cursor: not-allowed;
-        }
-
-        .arrow-button:disabled:hover {
-            background: white;
-            color: black;
-            transform: scale(1);
-        }
-
-        .card-counter {
-            font-size: 18px;
-            color: white;
-            font-weight: 600;
-        }
-
-        .action-buttons {
-            margin-top: 20px;
-            display: flex;
-            gap: 15px;
-        }
-
-        .action-btn {
-            padding: 10px 20px;
-            border: 2px solid white;
-            background: transparent;
-            color: white;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 14px;
-            transition: all 0.3s;
-        }
-
-        .action-btn:hover {
-            background: white;
-            color: #667eea;
-        }
-    </style>
+  @media (max-width: 768px) {
+    .sidebar { display: none; }
+    .main-content { padding: 24px 16px; }
+    .flashcard-container { height: 300px; }
+    .card-content { font-size: 18px; }
+  }
+</style>
 </head>
 <body>
-    <div class="sidebar">
-        <h2 id="deckTitle">StudyBuddy</h2>
-        <div class="sidebar-subject" id="deckSubject"></div>
-        <button class="nav-button" onclick="goHome()">← Back to Home</button>
-        <button class="nav-button" onclick="shuffleCards()">🔀 Shuffle Cards</button>
-        <button class="nav-button" onclick="resetProgress()">↺ Reset Progress</button>
-        
-        <div class="progress">
-            <div class="progress-text">Progress: <span id="progressText">0/0</span></div>
-            <div class="progress-bar">
-                <div class="progress-fill" id="progressFill"></div>
-            </div>
+
+<nav>
+  <div class="nav-logo">📚</div>
+  <div class="nav-brand">
+    <span class="nav-title">StudyBuddy</span>
+    <span class="nav-sub" id="navSub">Flashcards</span>
+  </div>
+  <div class="nav-actions">
+    <button class="nav-btn" onclick="goHome()">← Homepage</button>
+  </div>
+</nav>
+
+<div class="layout">
+  <div class="sidebar">
+    <div class="sidebar-title" id="deckTitle">StudyBuddy</div>
+    <div class="sidebar-subject" id="deckSubject"></div>
+    <button class="sidebar-btn" onclick="shuffleCards()">🔀 &nbsp;Shuffle Cards</button>
+    <button class="sidebar-btn" onclick="resetProgress()">↺ &nbsp;Reset Progress</button>
+    <div class="progress-section">
+      <div class="progress-label">Progress</div>
+      <div class="progress-count" id="progressText">0 / 0</div>
+      <div class="progress-bar">
+        <div class="progress-fill" id="progressFill" style="width:0%"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="main-content">
+    <div class="flashcard-container">
+      <div class="flashcard" id="flashcard" onclick="flipCard()">
+        <div class="card-face card-front">
+          <div class="card-label">Question</div>
+          <div class="card-content" id="questionText"></div>
+          <div class="flip-hint">Click to flip</div>
         </div>
+        <div class="card-face card-back">
+          <div class="card-label">Answer</div>
+          <div class="card-content" id="answerText"></div>
+          <div class="flip-hint">Click to flip back</div>
+        </div>
+      </div>
     </div>
 
-    <div class="main-content">
-        <div class="flashcard-container">
-            <!-- The onclick attribute on the flashcard div calls the function above whenever a user clicks it. -->
-            <div class="flashcard" id="flashcard" onclick="flipCard()">
-                <div class="card-face card-front">
-                    <div class="card-label">Question</div>
-                    <div class="card-content" id="questionText"></div>
-                    <div class="flip-hint">Click to flip</div>
-                </div>
-                <div class="card-face card-back">
-                    <div class="card-label">Answer</div>
-                    <div class="card-content" id="answerText"></div>
-                    <div class="flip-hint">Click to flip back</div>
-                </div>
-            </div>
-        </div>
-
-        <!-- These are the physical triggers in the interface that call the navigation functions -->
-        <div class="controls">
-            <button class="arrow-button" id="prevBtn" onclick="previousCard()">←</button>
-            <div class="card-counter" id="counter">1 / 1</div>
-            <button class="arrow-button" id="nextBtn" onclick="nextCard()">→</button>
-        </div>
-
-        <div class="action-buttons">
-            <button class="action-btn" onclick="markKnown()">✓ I Know This</button>
-            <button class="action-btn" onclick="markReview()">? Review Later</button>
-        </div>
+    <div class="controls">
+      <button class="arrow-button" id="prevBtn" onclick="previousCard()">←</button>
+      <div class="card-counter" id="counter">1 / 1</div>
+      <button class="arrow-button" id="nextBtn" onclick="nextCard()">→</button>
     </div>
 
-    <script>
-        // ── Deck + class data (mirrors homepage — swap for API fetch when backend is ready) ──
-        const classes = [
-            { id: 'cs101',   name: 'Computer Science 101' },
-            { id: 'math201', name: 'Calculus II' },
-            { id: 'phys150', name: 'Physics I' },
-            { id: 'eng210',  name: 'Engineering Design' }
-        ];
+    <div class="action-buttons">
+      <button class="action-btn known"  onclick="markKnown()">✓ &nbsp;I Know This</button>
+      <button class="action-btn review" onclick="markReview()">? &nbsp;Review Later</button>
+    </div>
+  </div>
+</div>
 
-        const decks = [
-            { id: 1, title: 'Data Structures Basics',  class: 'cs101',   cards: 24, mastered: 18 },
-            { id: 2, title: 'Sorting Algorithms',      class: 'cs101',   cards: 15, mastered: 10 },
-            { id: 3, title: 'Integration Techniques',  class: 'math201', cards: 30, mastered: 22 },
-            { id: 4, title: 'Limits and Derivatives',  class: 'math201', cards: 20, mastered: 15 },
-            { id: 5, title: "Newton's Laws",           class: 'phys150', cards: 18, mastered: 12 },
-            { id: 6, title: 'Kinematics',              class: 'phys150', cards: 25, mastered: 20 },
-            { id: 7, title: 'Design Process',          class: 'eng210',  cards: 12, mastered: 8  }
-        ];
+<script>
+  const classes = [
+    { id: 'cs101',   name: 'Computer Science 101' },
+    { id: 'math201', name: 'Calculus II' },
+    { id: 'phys150', name: 'Physics I' },
+    { id: 'eng210',  name: 'Engineering Design' }
+  ];
+  const decks = [
+    { id: 1, title: 'Data Structures Basics',  class: 'cs101',   cards: 24, mastered: 18 },
+    { id: 2, title: 'Sorting Algorithms',      class: 'cs101',   cards: 15, mastered: 10 },
+    { id: 3, title: 'Integration Techniques',  class: 'math201', cards: 30, mastered: 22 },
+    { id: 4, title: 'Limits and Derivatives',  class: 'math201', cards: 20, mastered: 15 },
+    { id: 5, title: "Newton's Laws",           class: 'phys150', cards: 18, mastered: 12 },
+    { id: 6, title: 'Kinematics',              class: 'phys150', cards: 25, mastered: 20 },
+    { id: 7, title: 'Design Process',          class: 'eng210',  cards: 12, mastered: 8  }
+  ];
 
-        // ── Read deckId from URL (e.g. flashcards-individual.html?deckId=3) ──
-        const params = new URLSearchParams(window.location.search);
-        const deckId = parseInt(params.get('deckId'));
-        const selectedDeck = decks.find(d => d.id === deckId);
-        const classInfo = selectedDeck ? classes.find(c => c.id === selectedDeck.class) : null;
+  const params = new URLSearchParams(window.location.search);
+  const deckId = parseInt(params.get('deckId'));
+  const selectedDeck = decks.find(d => d.id === deckId);
+  const classInfo = selectedDeck ? classes.find(c => c.id === selectedDeck.class) : null;
 
-        // ── Error handling: if deckId is missing or invalid, show error screen ──
-        if (!selectedDeck) {
-            window.location.href = `flashcards-error-page.html?deckId=${deckId}`;
-        } else {
-            // Update page title and sidebar with deck name and subject
-            document.title = `${selectedDeck.title} — StudyBuddy`;
-            document.getElementById('deckTitle').textContent = selectedDeck.title;
-            document.getElementById('deckSubject').textContent = classInfo ? classInfo.name : '';
-        }
+  if (!selectedDeck) {
+    window.location.href = `flashcards-error-page.html?deckId=${deckId}`;
+  } else {
+    document.title = `${selectedDeck.title} — StudyBuddy`;
+    document.getElementById('deckTitle').textContent = selectedDeck.title;
+    document.getElementById('deckSubject').textContent = classInfo ? classInfo.name : '';
+    document.getElementById('navSub').textContent = selectedDeck.title;
+  }
 
-        // ── Flashcard data (replace with API call when backend is ready) ──
-        // TODO: fetch(`/api/decks/${deckId}/cards`) and populate flashcards array
-        let flashcards = [
-            {
-                question: "What is the time complexity of binary search?",
-                answer: "O(log n) - Binary search divides the search space in half with each iteration."
-            },
-            {
-                question: "What is encapsulation in OOP?",
-                answer: "Encapsulation is bundling data and methods that operate on that data within a single unit (class), hiding internal state from outside access."
-            },
-            {
-                question: "What is the difference between stack and heap memory?",
-                answer: "Stack: automatic allocation/deallocation, LIFO structure, faster access, limited size. Heap: manual management, flexible size, slower access, larger capacity."
-            },
-            {
-                question: "What is polymorphism?",
-                answer: "Polymorphism allows objects of different classes to be treated as objects of a common superclass, enabling methods to behave differently based on the object type."
-            },
-            {
-                question: "What is a RESTful API?",
-                answer: "A RESTful API is an architectural style for web services that uses HTTP methods (GET, POST, PUT, DELETE) and follows stateless communication principles."
-            }
-        ];
+  let flashcards = [
+    { question: "What is the time complexity of binary search?", answer: "O(log n) - Binary search divides the search space in half with each iteration." },
+    { question: "What is encapsulation in OOP?", answer: "Encapsulation is bundling data and methods that operate on that data within a single unit (class), hiding internal state from outside access." },
+    { question: "What is the difference between stack and heap memory?", answer: "Stack: automatic allocation/deallocation, LIFO structure, faster access, limited size. Heap: manual management, flexible size, slower access, larger capacity." },
+    { question: "What is polymorphism?", answer: "Polymorphism allows objects of different classes to be treated as objects of a common superclass, enabling methods to behave differently based on the object type." },
+    { question: "What is a RESTful API?", answer: "A RESTful API is an architectural style for web services that uses HTTP methods (GET, POST, PUT, DELETE) and follows stateless communication principles." }
+  ];
 
-        let currentCardIndex = 0;
-        let knownCards = new Set();
+  let currentCardIndex = 0;
+  let knownCards = new Set();
 
-        // This is the "engine" of the switcher. It pulls the data from the flashcards array based on the current index and
-        // updates the HTML elements. Crucially, it also removes the flipped class so the next card always starts on the question side.
-        function loadCard() {
-            const card = flashcards[currentCardIndex];
-            document.getElementById('questionText').textContent = card.question;
-            document.getElementById('answerText').textContent = card.answer;
-            document.getElementById('counter').textContent = `${currentCardIndex + 1} / ${flashcards.length}`;
-            document.getElementById('flashcard').classList.remove('flipped');
-            document.getElementById('prevBtn').disabled = currentCardIndex === 0;
-            document.getElementById('nextBtn').disabled = currentCardIndex === flashcards.length - 1;
-            updateProgress();
-        }
+  function loadCard() {
+    const card = flashcards[currentCardIndex];
+    document.getElementById('questionText').textContent = card.question;
+    document.getElementById('answerText').textContent = card.answer;
+    document.getElementById('counter').textContent = `${currentCardIndex + 1} / ${flashcards.length}`;
+    document.getElementById('flashcard').classList.remove('flipped');
+    document.getElementById('prevBtn').disabled = currentCardIndex === 0;
+    document.getElementById('nextBtn').disabled = currentCardIndex === flashcards.length - 1;
+    updateProgress();
+  }
 
-        // This is the logic that toggles the flipped state on and off
-        function flipCard() {
-            document.getElementById('flashcard').classList.toggle('flipped');
-        }
+  function flipCard() { document.getElementById('flashcard').classList.toggle('flipped'); }
+  function nextCard() { if (currentCardIndex < flashcards.length - 1) { currentCardIndex++; loadCard(); } }
+  function previousCard() { if (currentCardIndex > 0) { currentCardIndex--; loadCard(); } }
+  function goHome() { window.location.href = 'flashcards-homepage.html'; }
 
-        // These functions increment or decrement the currentCardIndex and then call loadCard()
-        // to refresh the screen with the new data
-        function nextCard() {
-            if (currentCardIndex < flashcards.length - 1) {
-                currentCardIndex++;
-                loadCard();
-            }
-        }
+  function shuffleCards() {
+    for (let i = flashcards.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [flashcards[i], flashcards[j]] = [flashcards[j], flashcards[i]];
+    }
+    currentCardIndex = 0;
+    loadCard();
+  }
 
-        function previousCard() {
-            if (currentCardIndex > 0) {
-                currentCardIndex--;
-                loadCard();
-            }
-        }
+  function markKnown()  { knownCards.add(currentCardIndex);    updateProgress(); if (currentCardIndex < flashcards.length - 1) nextCard(); }
+  function markReview() { knownCards.delete(currentCardIndex); updateProgress(); if (currentCardIndex < flashcards.length - 1) nextCard(); }
 
-        function goHome() {
-            window.location.href = 'flashcards-homepage.html';
-        }
+  function updateProgress() {
+    const pct = (knownCards.size / flashcards.length) * 100;
+    document.getElementById('progressFill').style.width = pct + '%';
+    document.getElementById('progressText').textContent = `${knownCards.size} / ${flashcards.length}`;
+  }
 
-        function shuffleCards() {
-            for (let i = flashcards.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [flashcards[i], flashcards[j]] = [flashcards[j], flashcards[i]];
-            }
-            currentCardIndex = 0;
-            loadCard();
-        }
+  function resetProgress() { knownCards.clear(); currentCardIndex = 0; updateProgress(); loadCard(); }
 
-        function markKnown() {
-            knownCards.add(currentCardIndex);
-            updateProgress();
-            if (currentCardIndex < flashcards.length - 1) nextCard();
-        }
+  document.addEventListener('keydown', e => {
+    if (e.key === 'ArrowLeft') previousCard();
+    else if (e.key === 'ArrowRight') nextCard();
+    else if (e.key === ' ') { e.preventDefault(); flipCard(); }
+  });
 
-        function markReview() {
-            knownCards.delete(currentCardIndex);
-            updateProgress();
-            if (currentCardIndex < flashcards.length - 1) nextCard();
-        }
-
-        function updateProgress() {
-            const pct = (knownCards.size / flashcards.length) * 100;
-            document.getElementById('progressFill').style.width = pct + '%';
-            document.getElementById('progressText').textContent = `${knownCards.size}/${flashcards.length}`;
-        }
-
-        function resetProgress() {
-            knownCards.clear();
-            currentCardIndex = 0;
-            updateProgress();
-            loadCard();
-        }
-
-        // The code also includes a "bonus" snippet at the bottom that allows you
-        // to change cards using your Left and Right arrow keys
-        document.addEventListener('keydown', function(event) {
-            if (event.key === 'ArrowLeft') previousCard();
-            else if (event.key === 'ArrowRight') nextCard();
-            else if (event.key === ' ') { event.preventDefault(); flipCard(); }
-        });
-
-        // Only initialize if deck was found
-        if (selectedDeck) loadCard();
-    </script>
+  if (selectedDeck) loadCard();
+</script>
 </body>
 </html>
