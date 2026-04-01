@@ -757,6 +757,43 @@ const CSS = `
 .sb-bk-q { color: #a59fc7; line-height: 1.4; }
 .sb-results-actions { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; position: relative; }
 
+/* ── SHARE BUTTON ── */
+.sb-btn-share {
+  background: rgba(139,92,246,0.09);
+  color: #a78bfa;
+  border: 1px solid rgba(139,92,246,0.28);
+  border-radius: 11px;
+  padding: 12px 22px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: 'DM Sans', sans-serif;
+  transition: all 0.18s;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+.sb-btn-share:hover { background: rgba(139,92,246,0.17); border-color: rgba(139,92,246,0.48); }
+
+/* Toast feedback */
+.sb-toast {
+  position: fixed;
+  bottom: 28px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #1a1a2e;
+  border: 1px solid rgba(139,92,246,0.35);
+  border-radius: 12px;
+  padding: 12px 22px;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: #c4b5fd;
+  z-index: 999;
+  animation: sbUp 0.3s cubic-bezier(.4,0,.2,1) both;
+  box-shadow: 0 8px 32px rgba(76,29,149,0.35);
+  pointer-events: none;
+}
+
 /* ── ANIMATIONS ── */
 .sb-a0 { animation: sbUp 0.36s cubic-bezier(.4,0,.2,1) both; animation-delay: 0ms;   }
 .sb-a1 { animation: sbUp 0.36s cubic-bezier(.4,0,.2,1) both; animation-delay: 60ms;  }
@@ -785,6 +822,7 @@ export default function StudyBuddyQuiz() {
   const [score, setScore]                     = useState(0);
   const [answers, setAnswers]                 = useState([]);
   const [animKey, setAnimKey]                 = useState(0);
+  const [toast, setToast]                     = useState(null);
 
   const totalQ = SUBJECTS.reduce((t,s)=> t + LEVELS.reduce((t2,l)=> t2+(QUIZ_DATA[s]?.[l]?.length||0),0),0);
 
@@ -979,6 +1017,21 @@ export default function StudyBuddyQuiz() {
   // ── RESULTS ──────────────────────────────
   if (screen === "results") {
     const pct = Math.round((score/questions.length)*100);
+
+    const showToast = (msg) => {
+      setToast(msg);
+      setTimeout(() => setToast(null), 2500);
+    };
+
+    const handleShare = async () => {
+      const text = `📊 StudyBuddy Quiz Results\n${SUBJECT_META[selectedSubject].icon} ${selectedSubject} · ${selectedLevel}\n🎯 Score: ${score}/${questions.length} (${pct}%)\n${pct>=90?"🏆 Outstanding!":pct>=70?"🎯 Great Work!":pct>=50?"📖 Keep Practicing":"💪 Don't Give Up!"}`;
+      if (navigator.share) {
+        try { await navigator.share({ title: "StudyBuddy Quiz", text }); } catch(_) {}
+      } else {
+        await navigator.clipboard.writeText(text);
+        showToast("📋  Results copied to clipboard!");
+      }
+    };
     const {emoji,grade,color} =
       pct>=90 ? {emoji:"🏆",grade:"Outstanding!",    color:"#c4b5fd"} :
       pct>=70 ? {emoji:"🎯",grade:"Great Work!",     color:"#a78bfa"} :
@@ -1030,7 +1083,11 @@ export default function StudyBuddyQuiz() {
                 <button className="sb-btn-ghost" onClick={()=>setScreen("home")}>
                   ← All Subjects
                 </button>
+                <button className="sb-btn-share" onClick={handleShare} title="Share result">
+                  🔗 Share
+                </button>
               </div>
+              {toast && <div className="sb-toast">{toast}</div>}
             </div>
           </div>
         </div>
