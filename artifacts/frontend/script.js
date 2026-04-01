@@ -20,6 +20,7 @@ function setSession(email) {
 }
 function clearSession() {
   localStorage.removeItem("isLoggedIn");
+  localStorage.removeItem("userEmail");
 
 }
 function isLoggedIn() {
@@ -143,7 +144,7 @@ function initLogin() {
     if (result.success) {
       setMsg(msg, "Login successful! Redirecting…", "ok");
       setSession(email);
-      window.location.href = "index.html";
+      window.location.href = "dashboard.html";
     } else {
       // TODO: When Supabase is connected, use the real auth error message if needed.
       setMsg(msg, result.error || "Login failed.", "error");
@@ -203,7 +204,7 @@ function initSignup() {
     if (result.success) {
       setMsg(msg, "Signup successful! Redirecting…", "ok");
       setSession(email);
-      window.location.href = "index.html";
+      window.location.href = "login.html";
     } else {
       // TODO: When Supabase is connected, use the real auth error message if needed.
       setMsg(msg, result.error || "Signup failed.", "error");
@@ -211,32 +212,41 @@ function initSignup() {
   });
 }
 
-function initDashboard() {
+async function initDashboard() {
   const onDashboard = document.title.includes("Dashboard");
   if (!onDashboard) return;
 
   const chip = document.querySelector("#user-chip strong");
   const logoutBtn = document.getElementById("logout-btn");
 
-  const loggedIn = localStorage.getItem("isLoggedIn") === "true";
-  const email = localStorage.getItem("userEmail");
+  try {
+    const supabase = await getSupabaseClient();
+    const { data, error } = await supabase.auth.getSession();
 
-  if (!loggedIn) {
-    // Guest mode: allow viewing dashboard
-    if (chip) chip.textContent = "Guest";
-    if (logoutBtn) logoutBtn.style.display = "none";
-    return;
-  }
+    if (error || !data?.session) {
+      clearSession();
+      window.location.href = "login.html";
+      return;
+    }
 
-  // Logged-in mode
-  if (chip && email) chip.textContent = email;
+    const user = data.session.user;
+    const email = user?.email || "User";
 
-  if (logoutBtn) {
-    logoutBtn.style.display = "inline-flex";
-    logoutBtn.addEventListener("click", () => {
-      localStorage.removeItem("isLoggedIn");
-      window.location.href = "index.html";
-    });
+    setSession(email);
+
+    if (chip) chip.textContent = email;
+
+    if (logoutBtn) {
+      logoutBtn.style.display = "inline-flex";
+      logoutBtn.addEventListener("click", async () => {
+        await supabase.auth.signOut();
+        clearSession();
+        window.location.href = "index.html";
+      });
+    }
+  } catch (err) {
+    clearSession();
+    window.location.href = "login.html";
   }
 }
 
