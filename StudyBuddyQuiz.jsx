@@ -757,7 +757,25 @@ const CSS = `
 .sb-bk-q { color: #a59fc7; line-height: 1.4; }
 .sb-results-actions { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; position: relative; }
 
-/* ── SHARE BUTTON ── */
+/* ── SAVE / SHARE BUTTONS ── */
+.sb-btn-save {
+  background: rgba(52,211,153,0.10);
+  color: #34d399;
+  border: 1px solid rgba(52,211,153,0.35);
+  border-radius: 11px;
+  padding: 12px 22px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: 'DM Sans', sans-serif;
+  transition: all 0.18s;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+.sb-btn-save:hover { background: rgba(52,211,153,0.18); border-color: rgba(52,211,153,0.55); }
+.sb-btn-save.saved { opacity: 0.6; cursor: default; }
+
 .sb-btn-share {
   background: rgba(139,92,246,0.09);
   color: #a78bfa;
@@ -823,6 +841,7 @@ export default function StudyBuddyQuiz() {
   const [answers, setAnswers]                 = useState([]);
   const [animKey, setAnimKey]                 = useState(0);
   const [toast, setToast]                     = useState(null);
+  const [quizSaved, setQuizSaved]             = useState(false);
 
   const totalQ = SUBJECTS.reduce((t,s)=> t + LEVELS.reduce((t2,l)=> t2+(QUIZ_DATA[s]?.[l]?.length||0),0),0);
 
@@ -834,6 +853,7 @@ export default function StudyBuddyQuiz() {
     setSelectedAnswer(null); setShowExplanation(false);
     setScore(0); setAnswers([]);
     setAnimKey(k=>k+1);
+    setQuizSaved(false);
     setScreen("quiz");
   };
 
@@ -1023,6 +1043,22 @@ export default function StudyBuddyQuiz() {
       setTimeout(() => setToast(null), 2500);
     };
 
+    const handleSave = () => {
+      if (quizSaved) return;
+      const entry = {
+        subject: selectedSubject,
+        level: selectedLevel,
+        score,
+        total: questions.length,
+        pct,
+        date: new Date().toLocaleDateString(),
+      };
+      const prev = JSON.parse(localStorage.getItem("studybuddy_saved") || "[]");
+      localStorage.setItem("studybuddy_saved", JSON.stringify([entry, ...prev]));
+      setQuizSaved(true);
+      showToast("✓  Quiz result saved!");
+    };
+
     const handleShare = async () => {
       const text = `📊 StudyBuddy Quiz Results\n${SUBJECT_META[selectedSubject].icon} ${selectedSubject} · ${selectedLevel}\n🎯 Score: ${score}/${questions.length} (${pct}%)\n${pct>=90?"🏆 Outstanding!":pct>=70?"🎯 Great Work!":pct>=50?"📖 Keep Practicing":"💪 Don't Give Up!"}`;
       if (navigator.share) {
@@ -1082,6 +1118,13 @@ export default function StudyBuddyQuiz() {
                 </button>
                 <button className="sb-btn-ghost" onClick={()=>setScreen("home")}>
                   ← All Subjects
+                </button>
+                <button
+                  className={`sb-btn-save${quizSaved?" saved":""}`}
+                  onClick={handleSave}
+                  title={quizSaved?"Already saved":"Save result"}
+                >
+                  {quizSaved ? "✓ Saved" : "💾 Save Quiz"}
                 </button>
                 <button className="sb-btn-share" onClick={handleShare} title="Share result">
                   🔗 Share
