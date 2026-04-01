@@ -85,6 +85,7 @@ class QuizListResponse(BaseModel):
 
 class QuizSubmissionResult(BaseModel):
     """Result of quiz submission."""
+    id: Optional[str] = None
     quiz_id: str
     score: int  # percentage
     correct_count: int
@@ -92,6 +93,12 @@ class QuizSubmissionResult(BaseModel):
     time_taken: Optional[int] = None
     results: List[Dict]  # detailed results per question
     timestamp: str
+
+
+class QuizSubmissionHistoryResponse(BaseModel):
+    """Response model for quiz submission history."""
+    submissions: List[QuizSubmissionResult]
+    total: int
 
 
 class ChatMessage(BaseModel):

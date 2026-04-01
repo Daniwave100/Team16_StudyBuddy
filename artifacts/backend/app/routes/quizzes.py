@@ -5,7 +5,8 @@ Handles CRUD operations for quizzes including creation, retrieval, update, delet
 from fastapi import APIRouter, HTTPException
 from app.models.requests import QuizCreateRequest, QuizUpdateRequest, QuizSubmissionRequest
 from app.models.responses import (
-    QuizMetadata, QuizDetail, QuizListResponse, QuizSubmissionResult, QuizQuestion
+    QuizMetadata, QuizDetail, QuizListResponse, QuizSubmissionResult, QuizQuestion,
+    QuizSubmissionHistoryResponse
 )
 from app.agent import run
 from datetime import datetime
@@ -15,8 +16,9 @@ import uuid
 
 router = APIRouter()
 
-# In-memory storage for quizzes (replace with database in production)
+# In-memory storage (replace with database in production)
 quizzes_db = {}
+submissions_db = {}  # quiz_id -> list of QuizSubmissionResult dicts
 
 
 @router.post("/quizzes", response_model=QuizDetail, status_code=201)
@@ -251,16 +253,49 @@ async def submit_quiz(quiz_id: str, request: QuizSubmissionRequest):
         
         total_count = len(questions)
         score = round((correct_count / total_count) * 100) if total_count > 0 else 0
-        
-        return QuizSubmissionResult(
+
+        submission_id = str(uuid.uuid4())
+        timestamp = datetime.utcnow().isoformat()
+
+        submission = QuizSubmissionResult(
+            id=submission_id,
             quiz_id=quiz_id,
             score=score,
             correct_count=correct_count,
             total_count=total_count,
             time_taken=request.time_taken,
             results=results,
-            timestamp=datetime.utcnow().isoformat()
+            timestamp=timestamp
         )
-        
+
+        # Store submission in history
+        if quiz_id not in submissions_db:
+            submissions_db[quiz_id] = []
+        submissions_db[quiz_id].append(submission.model_dump())
+
+        return submission
+
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error submitting quiz: {str(e)}")
+
+
+@router.get("/quizzes/{quiz_id}/submissions", response_model=QuizSubmissionHistoryResponse)
+async def get_quiz_submissions(quiz_id: str):
+    """
+    Retrieve all past submission results for a quiz.
+
+    Args:
+        quiz_id: The unique identifier of the quiz
+
+    Returns:
+        QuizSubmissionHistoryResponse with list of past submissions
+    """
+    if quiz_id not in quizzes_db:
+        raise HTTPException(status_code=404, detail=f"Quiz with ID '{quiz_id}' not found")
+
+    history = submissions_db.get(quiz_id, [])
+
+    return QuizSubmissionHistoryResponse(
+        submissions=[QuizSubmissionResult(**s) for s in history],
+        total=len(history)
+    )
