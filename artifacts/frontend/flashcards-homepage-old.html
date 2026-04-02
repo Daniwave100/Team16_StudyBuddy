@@ -1,0 +1,640 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>StudyBuddy - Flashcards</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: radial-gradient(ellipse at 60% 20%, #1a2744 0%, #0d1117 60%, #0a0e1a 100%);
+    min-height: 100vh;
+    color: #fff;
+  }
+
+  /* ── NAV ── */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    height: 56px;
+    background: rgba(10, 14, 26, 0.85);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid rgba(255,255,255,0.07);
+    display: flex;
+    align-items: center;
+    padding: 0 28px;
+    gap: 10px;
+    z-index: 100;
+  }
+  .nav-logo {
+    width: 38px; height: 38px;
+    background: linear-gradient(135deg, #4fc3a1, #4f8ef7, #a259f7);
+    border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px; flex-shrink: 0;
+  }
+  .nav-brand { display: flex; flex-direction: column; }
+  .nav-title { font-size: 15px; font-weight: 700; color: #fff; line-height: 1.2; }
+  .nav-sub   { font-size: 12px; color: #6b7a99; }
+  .nav-actions { margin-left: auto; display: flex; gap: 10px; }
+  .nav-btn {
+    padding: 8px 16px;
+    background: transparent;
+    color: #c8d3ea;
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 50px;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 500;
+    transition: background 0.2s, border-color 0.2s;
+    backdrop-filter: blur(6px);
+  }
+  .nav-btn:hover { background: rgba(255,255,255,0.07); border-color: rgba(255,255,255,0.25); }
+
+  /* ── PAGE ── */
+  .page-wrapper {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 84px 28px 40px;
+  }
+
+  .page-header { margin-bottom: 28px; }
+  .page-header h1 { font-size: 32px; font-weight: 700; color: #fff; }
+  .page-header p  { font-size: 15px; color: #6b7a99; margin-top: 6px; }
+
+  /* ── TOOLBAR ── */
+  .toolbar {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 12px;
+    padding: 12px 18px;
+    margin-bottom: 28px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .toolbar label { font-weight: 600; color: #8a9bbf; font-size: 13px; white-space: nowrap; }
+
+  .sort-select {
+    padding: 8px 36px 8px 12px;
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 8px;
+    font-size: 13px;
+    color: #c8d3ea;
+    background: rgba(255,255,255,0.06) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%234f8ef7' d='M6 8L1 3h10z'/%3E%3C/svg%3E") no-repeat right 12px center;
+    appearance: none;
+    cursor: pointer;
+    transition: border-color 0.2s;
+    min-width: 220px;
+  }
+  .sort-select option, .sort-select optgroup { background: #1a2133; color: #c8d3ea; }
+  .sort-select:focus { outline: none; border-color: #4f8ef7; }
+
+  .sort-badge { margin-left: auto; font-size: 12px; color: #4a5568; }
+
+  /* ── SUBJECT GROUP HEADER ── */
+  .subject-group-header {
+    grid-column: 1 / -1;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-top: 8px;
+  }
+  .subject-group-header span {
+    font-weight: 600;
+    color: #c8d3ea;
+    font-size: 13px;
+    background: rgba(79,142,247,0.15);
+    border: 1px solid rgba(79,142,247,0.25);
+    padding: 4px 14px;
+    border-radius: 20px;
+    white-space: nowrap;
+  }
+  .subject-group-header hr { flex: 1; border: none; border-top: 1px solid rgba(255,255,255,0.07); }
+
+  /* ── DECK GRID ── */
+  .deck-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 18px;
+  }
+
+  /* ── DECK CARD ── */
+  .deck-card {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.09);
+    border-radius: 14px;
+    padding: 22px;
+    transition: transform 0.2s, border-color 0.2s, box-shadow 0.2s;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+  }
+  .deck-card:hover {
+    transform: translateY(-4px);
+    border-color: rgba(79,142,247,0.35);
+    box-shadow: 0 8px 30px rgba(79,142,247,0.1);
+  }
+  .deck-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 3px;
+    background: linear-gradient(90deg, #4f8ef7, #a259f7);
+  }
+
+  /* ── CREATE CARD ── */
+  .create-deck-card {
+    background: rgba(79,142,247,0.06);
+    border: 1px dashed rgba(79,142,247,0.3);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 200px;
+    gap: 10px;
+  }
+  .create-deck-card::before { display: none; }
+  .create-deck-card:hover {
+    background: rgba(79,142,247,0.1);
+    border-color: rgba(79,142,247,0.6);
+    box-shadow: 0 8px 30px rgba(79,142,247,0.08);
+  }
+  .create-icon { font-size: 36px; color: #4f8ef7; }
+  .create-deck-card h3 { font-size: 16px; font-weight: 600; color: #4f8ef7; }
+
+  .deck-title  { color: #fff; font-size: 17px; font-weight: 600; margin-bottom: 4px; }
+  .deck-class  { color: #4f8ef7; font-size: 13px; font-weight: 500; }
+  .deck-meta   { font-size: 12px; color: #4a5568; margin-top: 3px; }
+
+  /* ── TAG PILLS ── */
+  .tag-pills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 10px;
+  }
+  .tag-pill {
+    font-size: 11px;
+    font-weight: 500;
+    color: #c8d3ea;
+    background: rgba(79,142,247,0.12);
+    border: 1px solid rgba(79,142,247,0.25);
+    border-radius: 20px;
+    padding: 3px 10px;
+    white-space: nowrap;
+  }
+  .tag-pill.untagged {
+    color: #4a5568;
+    background: rgba(255,255,255,0.04);
+    border-color: rgba(255,255,255,0.08);
+    font-style: italic;
+  }
+
+  .deck-stats {
+    display: flex;
+    gap: 18px;
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px solid rgba(255,255,255,0.07);
+  }
+  .stat { display: flex; flex-direction: column; gap: 3px; }
+  .stat-label { color: #6b7a99; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; }
+  .stat-value { color: #fff; font-size: 18px; font-weight: 700; }
+
+  .progress-bar {
+    width: 100%; height: 5px;
+    background: rgba(255,255,255,0.07);
+    border-radius: 3px; overflow: hidden;
+    margin-top: 12px;
+  }
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #4f8ef7, #a259f7);
+    transition: width 0.3s ease;
+  }
+
+  /* ── MODAL ── */
+  .modal {
+    display: none;
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: rgba(0,0,0,0.6);
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(4px);
+  }
+  .modal.active { display: flex; }
+
+  .modal-content {
+    background: #111827;
+    border: 1px solid rgba(255,255,255,0.1);
+    padding: 32px;
+    border-radius: 16px;
+    width: 90%;
+    max-width: 480px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+  }
+  .modal-content h2 { color: #fff; font-size: 20px; margin-bottom: 24px; }
+
+  .form-group { margin-bottom: 18px; }
+  .form-group label { display: block; color: #8a9bbf; font-size: 13px; font-weight: 500; margin-bottom: 8px; }
+  .form-group input, .form-group select {
+    width: 100%; padding: 11px 14px;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 8px;
+    font-size: 14px;
+    color: #fff;
+    transition: border-color 0.2s;
+  }
+  .form-group select option { background: #1a2133; }
+  .form-group input::placeholder { color: #4a5568; }
+  .form-group input:focus, .form-group select:focus { outline: none; border-color: #4f8ef7; }
+
+  /* ── TAG INPUT UI ── */
+  .tag-input-wrapper {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+  .tag-input-wrapper input {
+    flex: 1;
+  }
+  .tag-add-btn {
+    padding: 10px 16px;
+    background: rgba(79,142,247,0.15);
+    border: 1px solid rgba(79,142,247,0.3);
+    border-radius: 8px;
+    color: #4f8ef7;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background 0.2s, border-color 0.2s;
+    flex-shrink: 0;
+  }
+  .tag-add-btn:hover { background: rgba(79,142,247,0.25); border-color: rgba(79,142,247,0.5); }
+
+  .tag-preview {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 10px;
+    min-height: 0;
+  }
+  .tag-preview-pill {
+    font-size: 12px;
+    font-weight: 500;
+    color: #c8d3ea;
+    background: rgba(79,142,247,0.12);
+    border: 1px solid rgba(79,142,247,0.25);
+    border-radius: 20px;
+    padding: 4px 10px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .tag-remove-btn {
+    background: none;
+    border: none;
+    color: #4a5568;
+    cursor: pointer;
+    font-size: 14px;
+    line-height: 1;
+    padding: 0;
+    transition: color 0.2s;
+  }
+  .tag-remove-btn:hover { color: #f87171; }
+
+  .tag-error {
+    font-size: 12px;
+    color: #f87171;
+    margin-top: 6px;
+    min-height: 16px;
+  }
+
+  .button-group { display: flex; gap: 10px; justify-content: flex-end; margin-top: 24px; }
+
+  .btn { padding: 10px 22px; border: none; border-radius: 50px; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+  .btn-primary {
+    background: linear-gradient(135deg, #4f8ef7 0%, #a259f7 100%);
+    color: white;
+  }
+  .btn-primary:hover { opacity: 0.88; transform: translateY(-1px); }
+  .btn-secondary {
+    background: transparent;
+    color: #c8d3ea;
+    border: 1px solid rgba(255,255,255,0.15);
+  }
+  .btn-secondary:hover { background: rgba(255,255,255,0.07); }
+
+  @media (max-width: 768px) {
+    .deck-grid { grid-template-columns: 1fr; }
+    .toolbar { flex-wrap: wrap; }
+    .sort-badge { width: 100%; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-logo">📚</div>
+  <div class="nav-brand">
+    <span class="nav-title">StudyBuddy</span>
+    <span class="nav-sub">Flashcards</span>
+  </div>
+  <div class="nav-actions">
+    <button class="nav-btn" onclick="window.location.href='index.html'">← Homepage</button>
+    <button class="nav-btn">💬 Ask AI</button>
+  </div>
+</nav>
+
+<div class="page-wrapper">
+  <div class="page-header">
+    <h1>My Flashcard Decks</h1>
+    <p>Choose a deck to study, or create a new one to get started.</p>
+  </div>
+
+  <div class="toolbar">
+    <label for="sortSelect">Sort by:</label>
+    <select class="sort-select" id="sortSelect">
+      <optgroup label="Name">
+        <option value="name-asc">Name (A → Z)</option>
+        <option value="name-desc">Name (Z → A)</option>
+      </optgroup>
+      <optgroup label="Date Modified">
+        <option value="date-desc">Date Modified (Newest First)</option>
+        <option value="date-asc">Date Modified (Oldest First)</option>
+      </optgroup>
+      <optgroup label="Subject">
+        <option value="subject">Subject (Grouped)</option>
+      </optgroup>
+    </select>
+    <span class="sort-badge" id="sortBadge"></span>
+  </div>
+
+  <div class="deck-grid" id="deckGrid">
+    <div class="deck-card create-deck-card" id="createDeckBtn">
+      <div class="create-icon">＋</div>
+      <h3>Create New Deck</h3>
+    </div>
+  </div>
+</div>
+
+<!-- Create Deck Modal -->
+<div class="modal" id="createDeckModal">
+  <div class="modal-content">
+    <h2>Create New Flashcard Deck</h2>
+    <div class="form-group">
+      <label for="deckTitleInput">Deck Title</label>
+      <input type="text" id="deckTitleInput" placeholder="e.g., Chapter 5: Algorithms">
+    </div>
+    <div class="form-group">
+      <label for="deckClass">Class</label>
+      <select id="deckClass">
+        <option value="">Select a class...</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label>Tags (optional)</label>
+      <div class="tag-input-wrapper">
+        <input type="text" id="tagInput" placeholder="e.g., Biology, Chapter 3...">
+        <button class="tag-add-btn" id="tagAddBtn">+ Add</button>
+      </div>
+      <div class="tag-error" id="tagError"></div>
+      <div class="tag-preview" id="tagPreview"></div>
+    </div>
+    <div class="button-group">
+      <button class="btn btn-secondary" id="cancelBtn">Cancel</button>
+      <button class="btn btn-primary" id="submitBtn">Create Deck</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  const classes = [
+    { id: 'cs101',   name: 'Computer Science 101' },
+    { id: 'math201', name: 'Calculus II' },
+    { id: 'phys150', name: 'Physics I' },
+    { id: 'eng210',  name: 'Engineering Design' }
+  ];
+
+  // ── TAG DATA STRUCTURE: tags field added as array of strings ──
+  let decks = [
+    { id: 1, title: 'Data Structures Basics',  class: 'cs101',   cards: 24, mastered: 18, dateModified: new Date('2025-04-10'), tags: ['Algorithms', 'CS Fundamentals'] },
+    { id: 2, title: 'Sorting Algorithms',      class: 'cs101',   cards: 15, mastered: 10, dateModified: new Date('2025-04-01'), tags: ['Algorithms', 'Performance'] },
+    { id: 3, title: 'Integration Techniques',  class: 'math201', cards: 30, mastered: 22, dateModified: new Date('2025-04-14'), tags: ['Calculus', 'Integration'] },
+    { id: 4, title: 'Limits and Derivatives',  class: 'math201', cards: 20, mastered: 15, dateModified: new Date('2025-03-28'), tags: ['Calculus', 'Derivatives'] },
+    { id: 5, title: "Newton's Laws",           class: 'phys150', cards: 18, mastered: 12, dateModified: new Date('2025-04-08'), tags: ['Mechanics', 'Forces'] },
+    { id: 6, title: 'Kinematics',              class: 'phys150', cards: 25, mastered: 20, dateModified: new Date('2025-04-15'), tags: ['Mechanics', 'Motion'] },
+    { id: 7, title: 'Design Process',          class: 'eng210',  cards: 12, mastered: 8,  dateModified: new Date('2025-03-20'), tags: ['Engineering', 'Process'] }
+  ];
+
+  let currentSort = 'name-asc';
+  let pendingTags = []; // tags being built in the modal
+
+  // ── SORT HELPERS ──
+  function getSortedDecks() {
+    const sorted = [...decks];
+    switch (currentSort) {
+      case 'name-asc':  return sorted.sort((a, b) => a.title.localeCompare(b.title));
+      case 'name-desc': return sorted.sort((a, b) => b.title.localeCompare(a.title));
+      case 'date-desc': return sorted.sort((a, b) => b.dateModified - a.dateModified);
+      case 'date-asc':  return sorted.sort((a, b) => a.dateModified - b.dateModified);
+      case 'subject':
+        return sorted.sort((a, b) => {
+          const nA = classes.find(c => c.id === a.class)?.name || '';
+          const nB = classes.find(c => c.id === b.class)?.name || '';
+          return nA.localeCompare(nB) || a.title.localeCompare(b.title);
+        });
+      default: return sorted;
+    }
+  }
+
+  function formatDate(d) {
+    return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+  }
+
+  function updateSortBadge(count) {
+    const labels = {
+      'name-asc':  `${count} decks — A → Z`,
+      'name-desc': `${count} decks — Z → A`,
+      'date-desc': `${count} decks — newest first`,
+      'date-asc':  `${count} decks — oldest first`,
+      'subject':   `${count} decks — grouped by subject`,
+    };
+    document.getElementById('sortBadge').textContent = labels[currentSort] || '';
+  }
+
+  // ── RENDER DECK GRID ──
+  function renderDecks() {
+    const grid = document.getElementById('deckGrid');
+    const createBtn = document.getElementById('createDeckBtn');
+    grid.innerHTML = '';
+    grid.appendChild(createBtn);
+
+    const sorted = getSortedDecks();
+    updateSortBadge(sorted.length);
+    let lastSubject = null;
+
+    sorted.forEach(deck => {
+      const cls = classes.find(c => c.id === deck.class);
+      const progress = (deck.mastered / deck.cards) * 100;
+
+      if (currentSort === 'subject' && cls.name !== lastSubject) {
+        lastSubject = cls.name;
+        const hdr = document.createElement('div');
+        hdr.className = 'subject-group-header';
+        hdr.innerHTML = `<span>${cls.name}</span><hr>`;
+        grid.appendChild(hdr);
+      }
+
+      // ── TAG PILLS: render assigned tags or "Untagged" fallback ──
+      const hasTags = deck.tags && deck.tags.length > 0;
+      const tagHTML = hasTags
+        ? deck.tags.map(t => `<span class="tag-pill">${t}</span>`).join('')
+        : `<span class="tag-pill untagged">Untagged</span>`;
+
+      const card = document.createElement('div');
+      card.className = 'deck-card';
+      card.innerHTML = `
+        <div class="deck-title">${deck.title}</div>
+        <div class="deck-class">${cls.name}</div>
+        <div class="deck-meta">Modified ${formatDate(deck.dateModified)}</div>
+        <div class="tag-pills">${tagHTML}</div>
+        <div class="deck-stats">
+          <div class="stat">
+            <span class="stat-label">Total Cards</span>
+            <span class="stat-value">${deck.cards}</span>
+          </div>
+          <div class="stat">
+            <span class="stat-label">Mastered</span>
+            <span class="stat-value">${deck.mastered}</span>
+          </div>
+        </div>
+        <div class="progress-bar">
+          <div class="progress-fill" style="width:${progress}%"></div>
+        </div>
+      `;
+      card.addEventListener('click', () => openDeck(deck.id));
+      grid.appendChild(card);
+    });
+  }
+
+  function populateClassSelect() {
+    const sel = document.getElementById('deckClass');
+    classes.forEach(cls => {
+      const opt = document.createElement('option');
+      opt.value = cls.id;
+      opt.textContent = cls.name;
+      sel.appendChild(opt);
+    });
+  }
+
+  document.getElementById('sortSelect').addEventListener('change', e => {
+    currentSort = e.target.value;
+    renderDecks();
+  });
+
+  // ── TAG INPUT LOGIC ──
+  function renderTagPreview() {
+    const preview = document.getElementById('tagPreview');
+    preview.innerHTML = pendingTags.map((t, i) => `
+      <span class="tag-preview-pill">
+        ${t}
+        <button class="tag-remove-btn" onclick="removeTag(${i})">×</button>
+      </span>
+    `).join('');
+  }
+
+  function removeTag(idx) {
+    pendingTags.splice(idx, 1);
+    renderTagPreview();
+  }
+
+  function addTag() {
+    const input = document.getElementById('tagInput');
+    const errEl = document.getElementById('tagError');
+    const val = input.value.trim();
+
+    // Validation: empty tag
+    if (!val) {
+      errEl.textContent = 'Tag cannot be empty.';
+      return;
+    }
+    // Validation: duplicate tag (case-insensitive)
+    if (pendingTags.some(t => t.toLowerCase() === val.toLowerCase())) {
+      errEl.textContent = `"${val}" has already been added.`;
+      return;
+    }
+
+    errEl.textContent = '';
+    pendingTags.push(val);
+    input.value = '';
+    renderTagPreview();
+  }
+
+  document.getElementById('tagAddBtn').addEventListener('click', addTag);
+  document.getElementById('tagInput').addEventListener('keydown', e => {
+    if (e.key === 'Enter') { e.preventDefault(); addTag(); }
+  });
+
+  // ── MODAL ──
+  const modal     = document.getElementById('createDeckModal');
+  const cancelBtn = document.getElementById('cancelBtn');
+  const submitBtn = document.getElementById('submitBtn');
+
+  document.getElementById('createDeckBtn').addEventListener('click', () => modal.classList.add('active'));
+  cancelBtn.addEventListener('click', () => { modal.classList.remove('active'); resetForm(); });
+  modal.addEventListener('click', e => { if (e.target === modal) { modal.classList.remove('active'); resetForm(); } });
+
+  function resetForm() {
+    document.getElementById('deckTitleInput').value = '';
+    document.getElementById('deckClass').value = '';
+    document.getElementById('tagInput').value = '';
+    document.getElementById('tagError').textContent = '';
+    pendingTags = [];
+    renderTagPreview();
+  }
+
+  submitBtn.addEventListener('click', () => {
+    const title   = document.getElementById('deckTitleInput').value.trim();
+    const classId = document.getElementById('deckClass').value;
+    if (!title || !classId) { alert('Please fill in all fields.'); return; }
+
+    decks.push({
+      id: decks.length + 1,
+      title,
+      class: classId,
+      cards: 0,
+      mastered: 0,
+      dateModified: new Date(),
+      tags: [...pendingTags]   // persist tags to deck data model
+    });
+    renderDecks();
+    modal.classList.remove('active');
+    resetForm();
+    alert(`Deck "${title}" created successfully!`);
+  });
+
+  function openDeck(deckId) {
+    sessionStorage.setItem('lastSort', currentSort);
+    window.location.href = `flashcards-individual.html?deckId=${deckId}`;
+  }
+
+  function init() {
+    populateClassSelect();
+    const saved = sessionStorage.getItem('lastSort');
+    if (saved) { currentSort = saved; document.getElementById('sortSelect').value = saved; }
+    renderDecks();
+  }
+
+  init();
+</script>
+</body>
+</html>

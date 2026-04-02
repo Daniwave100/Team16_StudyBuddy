@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>StudyBuddy - Flashcards</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: radial-gradient(ellipse at 60% 20%, #1a2744 0%, #0d1117 60%, #0a0e1a 100%);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    color: #fff;
+  }
+
+  /* ── NAV ── */
+  nav {
+    height: 56px;
+    background: rgba(10, 14, 26, 0.85);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid rgba(255,255,255,0.07);
+    display: flex;
+    align-items: center;
+    padding: 0 28px;
+    gap: 10px;
+    flex-shrink: 0;
+  }
+  .nav-logo {
+    width: 38px; height: 38px;
+    background: linear-gradient(135deg, #4fc3a1, #4f8ef7, #a259f7);
+    border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px; flex-shrink: 0;
+  }
+  .nav-brand { display: flex; flex-direction: column; }
+  .nav-title { font-size: 15px; font-weight: 700; color: #fff; line-height: 1.2; }
+  .nav-sub   { font-size: 12px; color: #6b7a99; }
+  .nav-actions { margin-left: auto; display: flex; gap: 10px; }
+  .nav-btn {
+    padding: 8px 16px;
+    background: transparent;
+    color: #c8d3ea;
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 50px;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 500;
+    transition: background 0.2s, border-color 0.2s;
+  }
+  .nav-btn:hover { background: rgba(255,255,255,0.07); border-color: rgba(255,255,255,0.25); }
+
+  /* ── BODY LAYOUT ── */
+  .layout {
+    display: flex;
+    flex: 1;
+    overflow: hidden;
+  }
+
+  /* ── SIDEBAR ── */
+  .sidebar {
+    width: 260px;
+    background: rgba(255,255,255,0.03);
+    border-right: 1px solid rgba(255,255,255,0.07);
+    padding: 28px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    flex-shrink: 0;
+  }
+
+  /* ── SIDEBAR SKELETON ── */
+  .skel-line {
+    background: rgba(255,255,255,0.07);
+    border-radius: 4px;
+    position: relative;
+    overflow: hidden;
+  }
+  .skel-line::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.04) 50%, transparent 100%);
+    animation: shimmer 1.4s infinite;
+  }
+  @keyframes shimmer {
+    0%   { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
+  }
+
+  .sidebar-title {
+    font-size: 17px;
+    font-weight: 700;
+    color: #fff;
+    word-break: break-word;
+    line-height: 1.3;
+  }
+  .sidebar-subject {
+    font-size: 13px;
+    color: #4f8ef7;
+    font-weight: 500;
+    margin-bottom: 2px;
+  }
+
+  .sidebar-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+    margin-bottom: 6px;
+  }
+  .sidebar-tag-pill {
+    font-size: 11px;
+    font-weight: 500;
+    color: #c8d3ea;
+    background: rgba(79,142,247,0.12);
+    border: 1px solid rgba(79,142,247,0.22);
+    border-radius: 20px;
+    padding: 3px 9px;
+    white-space: nowrap;
+  }
+  .sidebar-tag-pill.untagged {
+    color: #4a5568;
+    background: rgba(255,255,255,0.04);
+    border-color: rgba(255,255,255,0.08);
+    font-style: italic;
+  }
+
+  .sidebar-btn {
+    width: 100%;
+    padding: 10px 16px;
+    background: transparent;
+    color: #c8d3ea;
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 500;
+    text-align: left;
+    transition: background 0.2s, border-color 0.2s;
+  }
+  .sidebar-btn:hover {
+    background: rgba(255,255,255,0.06);
+    border-color: rgba(255,255,255,0.22);
+  }
+
+  .progress-section {
+    margin-top: auto;
+    padding-top: 20px;
+    border-top: 1px solid rgba(255,255,255,0.07);
+  }
+  .progress-label {
+    font-size: 12px;
+    color: #6b7a99;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 8px;
+  }
+  .progress-count {
+    font-size: 22px;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 10px;
+  }
+  .progress-bar {
+    width: 100%; height: 5px;
+    background: rgba(255,255,255,0.07);
+    border-radius: 3px; overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #4f8ef7, #a259f7);
+    transition: width 0.3s ease;
+  }
+
+  /* ── MAIN ── */
+  .main-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 40px;
+    gap: 32px;
+  }
+
+  /* ── API ERROR STATE ── */
+  .load-error {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+    text-align: center;
+  }
+  .load-error.visible { display: flex; }
+  .load-error-icon { font-size: 42px; }
+  .load-error h3 { font-size: 18px; color: #c8d3ea; }
+  .load-error p  { font-size: 14px; color: #4a5568; max-width: 300px; line-height: 1.6; }
+  .load-error button {
+    padding: 9px 22px;
+    background: transparent;
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 50px;
+    color: #c8d3ea;
+    font-size: 13px;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+  .load-error button:hover { background: rgba(255,255,255,0.07); }
+
+  /* ── FLASHCARD ── */
+  .flashcard-container {
+    perspective: 1000px;
+    width: 100%;
+    max-width: 620px;
+    height: 380px;
+  }
+
+  .flashcard {
+    width: 100%; height: 100%;
+    position: relative;
+    transform-style: preserve-3d;
+    transition: transform 0.6s;
+    cursor: pointer;
+  }
+  .flashcard.flipped { transform: rotateY(180deg); }
+
+  .card-face {
+    position: absolute;
+    width: 100%; height: 100%;
+    backface-visibility: hidden;
+    border-radius: 16px;
+    border: 1px solid rgba(255,255,255,0.09);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 40px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+  }
+
+  .card-front { background: rgba(255,255,255,0.05); }
+  .card-back  {
+    background: rgba(79,142,247,0.07);
+    border-color: rgba(79,142,247,0.2);
+    transform: rotateY(180deg);
+  }
+
+  .card-label {
+    font-size: 11px;
+    color: #4f8ef7;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    margin-bottom: 20px;
+  }
+  .card-back .card-label { color: #a259f7; }
+
+  .card-content {
+    font-size: 22px;
+    color: #fff;
+    text-align: center;
+    line-height: 1.55;
+  }
+
+  .flip-hint {
+    position: absolute;
+    bottom: 18px;
+    font-size: 12px;
+    color: #4a5568;
+  }
+
+  /* ── CONTROLS ── */
+  .controls { display: flex; align-items: center; gap: 28px; }
+
+  .arrow-button {
+    width: 48px; height: 48px;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 50%;
+    font-size: 20px;
+    color: #c8d3ea;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.2s;
+  }
+  .arrow-button:hover:not(:disabled) {
+    background: rgba(79,142,247,0.2);
+    border-color: rgba(79,142,247,0.4);
+    color: #fff;
+  }
+  .arrow-button:disabled { opacity: 0.25; cursor: not-allowed; }
+
+  .card-counter { font-size: 16px; color: #8a9bbf; font-weight: 600; min-width: 60px; text-align: center; }
+
+  /* ── ACTION BUTTONS ── */
+  .action-buttons { display: flex; gap: 12px; }
+
+  .action-btn {
+    padding: 10px 22px;
+    background: transparent;
+    border: 1px solid rgba(255,255,255,0.15);
+    color: #c8d3ea;
+    border-radius: 50px;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 500;
+    transition: background 0.2s, border-color 0.2s;
+  }
+  .action-btn:hover { background: rgba(255,255,255,0.07); border-color: rgba(255,255,255,0.28); }
+  .action-btn.known  { border-color: rgba(79,247,141,0.3); color: #4ff78d; }
+  .action-btn.known:hover  { background: rgba(79,247,141,0.08); }
+  .action-btn.review { border-color: rgba(247,179,79,0.3); color: #f7b34f; }
+  .action-btn.review:hover { background: rgba(247,179,79,0.08); }
+
+  @media (max-width: 768px) {
+    .sidebar { display: none; }
+    .main-content { padding: 24px 16px; }
+    .flashcard-container { height: 300px; }
+    .card-content { font-size: 18px; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-logo">📚</div>
+  <div class="nav-brand">
+    <span class="nav-title">StudyBuddy</span>
+    <span class="nav-sub" id="navSub">Flashcards</span>
+  </div>
+  <div class="nav-actions">
+    <button class="nav-btn" onclick="goHome()">← Homepage</button>
+  </div>
+</nav>
+
+<div class="layout">
+  <div class="sidebar">
+    <div class="sidebar-title" id="deckTitle">
+      <!-- skeleton placeholder -->
+      <div class="skel-line" style="height:18px;width:80%;margin-bottom:8px"></div>
+    </div>
+    <div class="sidebar-subject" id="deckSubject">
+      <div class="skel-line" style="height:13px;width:55%"></div>
+    </div>
+    <div class="sidebar-tags" id="deckTags"></div>
+    <button class="sidebar-btn" onclick="shuffleCards()">🔀 &nbsp;Shuffle Cards</button>
+    <button class="sidebar-btn" onclick="resetProgress()">↺ &nbsp;Reset Progress</button>
+    <div class="progress-section">
+      <div class="progress-label">Progress</div>
+      <div class="progress-count" id="progressText">0 / 0</div>
+      <div class="progress-bar">
+        <div class="progress-fill" id="progressFill" style="width:0%"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="main-content">
+    <!-- Error state (hidden until needed) -->
+    <div class="load-error" id="loadError">
+      <div class="load-error-icon">⚠️</div>
+      <h3>Couldn't load deck</h3>
+      <p id="loadErrorMsg">Something went wrong fetching this deck. Please try again.</p>
+      <button onclick="loadDeckMetadata()">Retry</button>
+    </div>
+
+    <!-- Flashcard UI (hidden until metadata loads) -->
+    <div class="flashcard-container" id="flashcardContainer" style="display:none">
+      <div class="flashcard" id="flashcard" onclick="flipCard()">
+        <div class="card-face card-front">
+          <div class="card-label">Question</div>
+          <div class="card-content" id="questionText"></div>
+          <div class="flip-hint">Click to flip</div>
+        </div>
+        <div class="card-face card-back">
+          <div class="card-label">Answer</div>
+          <div class="card-content" id="answerText"></div>
+          <div class="flip-hint">Click to flip back</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="controls" id="controls" style="display:none">
+      <button class="arrow-button" id="prevBtn" onclick="previousCard()">←</button>
+      <div class="card-counter" id="counter">1 / 1</div>
+      <button class="arrow-button" id="nextBtn" onclick="nextCard()">→</button>
+    </div>
+
+    <div class="action-buttons" id="actionButtons" style="display:none">
+      <button class="action-btn known"  onclick="markKnown()">✓ &nbsp;I Know This</button>
+      <button class="action-btn review" onclick="markReview()">? &nbsp;Review Later</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  // ── CONFIG ──
+  // TODO: replace with environment variable or config module before production
+  const API_BASE = 'http://localhost:8000';
+
+  const classes = [
+    { id: 'cs101',   name: 'Computer Science 101' },
+    { id: 'math201', name: 'Calculus II' },
+    { id: 'phys150', name: 'Physics I' },
+    { id: 'eng210',  name: 'Engineering Design' }
+  ];
+
+  // Hardcoded flashcard Q&A — to be replaced when GET /api/decks/{id}/cards is implemented
+  const flashcards = [
+    { question: "What is the time complexity of binary search?", answer: "O(log n) — Binary search halves the search space with each iteration." },
+    { question: "What is encapsulation in OOP?", answer: "Encapsulation bundles data and methods within a single class, hiding internal state from outside access." },
+    { question: "What is the difference between stack and heap memory?", answer: "Stack: automatic LIFO allocation, fast, limited size. Heap: manual management, flexible size, slower access." },
+    { question: "What is polymorphism?", answer: "Polymorphism allows objects of different classes to be treated as a common superclass, with methods behaving differently based on object type." },
+    { question: "What is a RESTful API?", answer: "A RESTful API uses HTTP methods (GET, POST, PUT, DELETE) and follows stateless communication principles for web services." }
+  ];
+
+  const params     = new URLSearchParams(window.location.search);
+  const deckId     = parseInt(params.get('deckId'));
+  let currentCardIndex = 0;
+  let knownCards   = new Set();
+
+  // ════════════════════════════════════════
+  // FETCH DECK METADATA
+  // ════════════════════════════════════════
+
+  async function loadDeckMetadata() {
+    // Reset error state, show skeleton in sidebar
+    document.getElementById('loadError').classList.remove('visible');
+    document.getElementById('deckTitle').innerHTML   = '<div class="skel-line" style="height:18px;width:80%;margin-bottom:8px"></div>';
+    document.getElementById('deckSubject').innerHTML = '<div class="skel-line" style="height:13px;width:55%"></div>';
+    document.getElementById('deckTags').innerHTML    = '';
+
+    // Hide card UI until metadata resolves
+    document.getElementById('flashcardContainer').style.display = 'none';
+    document.getElementById('controls').style.display           = 'none';
+    document.getElementById('actionButtons').style.display      = 'none';
+
+    if (!deckId || isNaN(deckId)) {
+      redirectToError();
+      return;
+    }
+
+    try {
+      const res = await fetch(`${API_BASE}/api/decks/${deckId}`);
+      if (res.status === 404) { redirectToError(); return; }
+      if (!res.ok) throw new Error(`Server returned ${res.status}`);
+
+      const deck = await res.json();
+      applyDeckMetadata(deck);
+
+    } catch {
+      // Show inline error — let user retry without losing the page
+      document.getElementById('deckTitle').textContent   = '';
+      document.getElementById('deckSubject').textContent = '';
+      document.getElementById('loadErrorMsg').textContent =
+        'Something went wrong fetching this deck. Please check your connection and try again.';
+      document.getElementById('loadError').classList.add('visible');
+    }
+  }
+
+  function applyDeckMetadata(deck) {
+    const classInfo = classes.find(c => c.id === deck.class);
+
+    document.title = `${deck.title} — StudyBuddy`;
+    document.getElementById('deckTitle').textContent   = deck.title;
+    document.getElementById('deckSubject').textContent = classInfo ? classInfo.name : deck.class;
+    document.getElementById('navSub').textContent      = deck.title;
+
+    // Tag pills
+    const tagsEl = document.getElementById('deckTags');
+    const hasTags = deck.tags && deck.tags.length > 0;
+    tagsEl.innerHTML = hasTags
+      ? deck.tags.map(t => `<span class="sidebar-tag-pill">${t}</span>`).join('')
+      : `<span class="sidebar-tag-pill untagged">Untagged</span>`;
+
+    // Show flashcard UI
+    document.getElementById('flashcardContainer').style.display = '';
+    document.getElementById('controls').style.display           = '';
+    document.getElementById('actionButtons').style.display      = '';
+
+    loadCard();
+  }
+
+  function redirectToError() {
+    window.location.href = `flashcards-error-page.html?deckId=${deckId}`;
+  }
+
+  // ════════════════════════════════════════
+  // FLASHCARD LOGIC
+  // ════════════════════════════════════════
+
+  function loadCard() {
+    const card = flashcards[currentCardIndex];
+    document.getElementById('questionText').textContent = card.question;
+    document.getElementById('answerText').textContent   = card.answer;
+    document.getElementById('counter').textContent      = `${currentCardIndex + 1} / ${flashcards.length}`;
+    document.getElementById('flashcard').classList.remove('flipped');
+    document.getElementById('prevBtn').disabled = currentCardIndex === 0;
+    document.getElementById('nextBtn').disabled = currentCardIndex === flashcards.length - 1;
+    updateProgress();
+  }
+
+  function flipCard()     { document.getElementById('flashcard').classList.toggle('flipped'); }
+  function nextCard()     { if (currentCardIndex < flashcards.length - 1) { currentCardIndex++; loadCard(); } }
+  function previousCard() { if (currentCardIndex > 0) { currentCardIndex--; loadCard(); } }
+  function goHome()       { window.location.href = 'flashcards-homepage.html'; }
+
+  function shuffleCards() {
+    for (let i = flashcards.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [flashcards[i], flashcards[j]] = [flashcards[j], flashcards[i]];
+    }
+    currentCardIndex = 0;
+    loadCard();
+  }
+
+  function markKnown()  { knownCards.add(currentCardIndex);    updateProgress(); if (currentCardIndex < flashcards.length - 1) nextCard(); }
+  function markReview() { knownCards.delete(currentCardIndex); updateProgress(); if (currentCardIndex < flashcards.length - 1) nextCard(); }
+
+  function updateProgress() {
+    const pct = flashcards.length > 0 ? (knownCards.size / flashcards.length) * 100 : 0;
+    document.getElementById('progressFill').style.width  = pct + '%';
+    document.getElementById('progressText').textContent  = `${knownCards.size} / ${flashcards.length}`;
+  }
+
+  function resetProgress() { knownCards.clear(); currentCardIndex = 0; updateProgress(); loadCard(); }
+
+  document.addEventListener('keydown', e => {
+    if (e.key === 'ArrowLeft')  previousCard();
+    else if (e.key === 'ArrowRight') nextCard();
+    else if (e.key === ' ')     { e.preventDefault(); flipCard(); }
+  });
+
+  // ════════════════════════════════════════
+  // INIT
+  // ════════════════════════════════════════
+
+  loadDeckMetadata();
+</script>
+</body>
+</html>
