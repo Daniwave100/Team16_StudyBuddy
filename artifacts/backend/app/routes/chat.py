@@ -242,7 +242,7 @@ async def chat(request: ChatRequest):
         messages_db[session_id].append(user_message)
         
         # Call the agent with chat mode
-        result = run(
+        result = await run(
             mode="chat",
             class_id=request.class_id,
             message=request.message,

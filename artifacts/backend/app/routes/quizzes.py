@@ -34,7 +34,7 @@ async def create_quiz(request: QuizCreateRequest):
     """
     try:
         # Generate questions using the agent
-        result = run(
+        result = await run(
             mode="quiz",
             class_id=request.class_id,
             focus=request.focus,

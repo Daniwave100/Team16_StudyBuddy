@@ -74,7 +74,7 @@ async def generate_flashcards(request: FlashcardRequest):
     """
     try:
         # Call the agent with flashcard mode
-        result = run(
+        result = await run(
             mode="flashcard",
             class_id=request.class_id,
             focus=request.focus,
@@ -179,7 +179,7 @@ async def generate_quiz(request: QuizRequest):
     """
     try:
         # Call the agent with quiz mode
-        result = run(
+        result = await run(
             mode="quiz",
             class_id=request.class_id,
             focus=request.focus,
