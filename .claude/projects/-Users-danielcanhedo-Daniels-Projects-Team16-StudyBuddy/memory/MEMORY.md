@@ -1,0 +1,2 @@
+- [Project Overview](project_overview.md) — AI-powered study app (Quizlet-like) with FastAPI + vanilla JS + OpenAI Agents + Supabase pgvector
+- [User Profile](user_daniel.md) — Daniel, team member on Team16 StudyBuddy project
