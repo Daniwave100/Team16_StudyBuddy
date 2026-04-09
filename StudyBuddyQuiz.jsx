@@ -871,6 +871,69 @@ const CSS = `
 }
 .sb-delete-btn:hover { background: rgba(248,113,113,0.16); border-color: rgba(248,113,113,0.45); }
 .sb-manage-empty { text-align: center; padding: 48px 24px; color: #5e5880; font-size: 14px; }
+.sb-add-form {
+  background: #13131f;
+  border: 1px solid rgba(139,92,246,0.22);
+  border-radius: 18px;
+  padding: 24px 22px;
+  margin-top: 24px;
+}
+.sb-add-form-title {
+  font-family: 'Syne', sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  color: #c4b5fd;
+  letter-spacing: 0.2px;
+  margin-bottom: 16px;
+}
+.sb-add-field { display: flex; flex-direction: column; gap: 6px; margin-bottom: 14px; }
+.sb-add-label { font-size: 11.5px; font-weight: 600; color: #5e5880; letter-spacing: 0.8px; text-transform: uppercase; }
+.sb-add-input {
+  background: rgba(139,92,246,0.06);
+  border: 1px solid rgba(139,92,246,0.2);
+  border-radius: 10px;
+  color: #f0eeff;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13.5px;
+  padding: 10px 14px;
+  outline: none;
+  transition: border-color 0.18s;
+  resize: none;
+}
+.sb-add-input:focus { border-color: rgba(139,92,246,0.55); }
+.sb-add-input::placeholder { color: #3e3860; }
+.sb-add-options { display: flex; flex-direction: column; gap: 8px; }
+.sb-add-opt-row { display: flex; align-items: center; gap: 8px; }
+.sb-add-opt-mark {
+  width: 28px; height: 28px;
+  border-radius: 7px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px; font-weight: 800;
+  font-family: 'Syne', sans-serif;
+  background: rgba(139,92,246,0.1);
+  color: #8b5cf6;
+  flex-shrink: 0;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: all 0.18s;
+}
+.sb-add-opt-mark.selected { background: rgba(52,211,153,0.14); color: #34d399; border-color: rgba(52,211,153,0.4); }
+.sb-add-form-actions { display: flex; gap: 10px; margin-top: 18px; }
+.sb-btn-add-open {
+  background: rgba(139,92,246,0.09);
+  color: #a78bfa;
+  border: 1px solid rgba(139,92,246,0.28);
+  border-radius: 11px;
+  padding: 11px 20px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: 'DM Sans', sans-serif;
+  transition: all 0.18s;
+  margin-top: 20px;
+  display: flex; align-items: center; gap: 7px;
+}
+.sb-btn-add-open:hover { background: rgba(139,92,246,0.17); border-color: rgba(139,92,246,0.48); }
 .sb-reorder-btns { display: flex; flex-direction: column; gap: 4px; flex-shrink: 0; }
 .sb-reorder-btn {
   background: rgba(139,92,246,0.08);
@@ -948,6 +1011,30 @@ export default function StudyBuddyQuiz() {
     setCurrentQ(q=>q+1);
     setSelectedAnswer(null); setShowExplanation(false);
     setAnimKey(k=>k+1);
+  };
+
+  const BLANK_Q = { text:"", opts:["","","",""], answer:0, explanation:"" };
+  const [showAddForm, setShowAddForm] = useState(false);
+  const [newQ, setNewQ]               = useState(BLANK_Q);
+
+  const addQuestion = (subject, level) => {
+    if (!newQ.text.trim() || newQ.opts.some(o=>!o.trim())) return;
+    const question = {
+      id: `custom-${Date.now()}`,
+      question: newQ.text.trim(),
+      options: newQ.opts.map(o=>o.trim()),
+      answer: newQ.answer,
+      explanation: newQ.explanation.trim() || "No explanation provided.",
+    };
+    setQuizData(prev => ({
+      ...prev,
+      [subject]: {
+        ...prev[subject],
+        [level]: [...prev[subject][level], question],
+      },
+    }));
+    setNewQ(BLANK_Q);
+    setShowAddForm(false);
   };
 
   const openManage = (subject, level) => {
@@ -1104,6 +1191,47 @@ export default function StudyBuddyQuiz() {
                   ))
               }
             </div>
+
+            {!showAddForm
+              ? <button className="sb-btn-add-open" onClick={()=>setShowAddForm(true)}>＋ Add Question</button>
+              : (
+                <div className="sb-add-form sb-fade">
+                  <div className="sb-add-form-title">New Question</div>
+
+                  <div className="sb-add-field">
+                    <label className="sb-add-label">Question</label>
+                    <textarea className="sb-add-input" rows={3} placeholder="Enter your question…"
+                      value={newQ.text} onChange={e=>setNewQ(q=>({...q, text:e.target.value}))}/>
+                  </div>
+
+                  <div className="sb-add-field">
+                    <label className="sb-add-label">Options — click a letter to mark correct answer</label>
+                    <div className="sb-add-options">
+                      {["A","B","C","D"].map((mark,i)=>(
+                        <div key={i} className="sb-add-opt-row">
+                          <span className={`sb-add-opt-mark${newQ.answer===i?" selected":""}`}
+                            onClick={()=>setNewQ(q=>({...q, answer:i}))} title="Mark as correct">{mark}</span>
+                          <input className="sb-add-input" style={{flex:1}} placeholder={`Option ${mark}`}
+                            value={newQ.opts[i]}
+                            onChange={e=>{const opts=[...newQ.opts]; opts[i]=e.target.value; setNewQ(q=>({...q,opts}));}}/>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="sb-add-field">
+                    <label className="sb-add-label">Explanation (optional)</label>
+                    <textarea className="sb-add-input" rows={2} placeholder="Explain the correct answer…"
+                      value={newQ.explanation} onChange={e=>setNewQ(q=>({...q, explanation:e.target.value}))}/>
+                  </div>
+
+                  <div className="sb-add-form-actions">
+                    <button className="sb-btn-primary" onClick={()=>addQuestion(managingSubject, managingLevel)}>Add Question</button>
+                    <button className="sb-btn-ghost" onClick={()=>{setShowAddForm(false); setNewQ(BLANK_Q);}}>Cancel</button>
+                  </div>
+                </div>
+              )
+            }
           </div>
         </div>
       </div>
