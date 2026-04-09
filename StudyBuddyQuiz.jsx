@@ -871,6 +871,20 @@ const CSS = `
 }
 .sb-delete-btn:hover { background: rgba(248,113,113,0.16); border-color: rgba(248,113,113,0.45); }
 .sb-manage-empty { text-align: center; padding: 48px 24px; color: #5e5880; font-size: 14px; }
+.sb-reorder-btns { display: flex; flex-direction: column; gap: 4px; flex-shrink: 0; }
+.sb-reorder-btn {
+  background: rgba(139,92,246,0.08);
+  border: 1px solid rgba(139,92,246,0.22);
+  border-radius: 6px;
+  color: #8b5cf6;
+  cursor: pointer;
+  font-size: 10px;
+  padding: 3px 7px;
+  line-height: 1;
+  transition: all 0.18s;
+}
+.sb-reorder-btn:hover { background: rgba(139,92,246,0.2); border-color: rgba(139,92,246,0.5); }
+.sb-reorder-btn:disabled { opacity: 0.2; cursor: default; }
 
 /* ── ANIMATIONS ── */
 .sb-a0 { animation: sbUp 0.36s cubic-bezier(.4,0,.2,1) both; animation-delay: 0ms;   }
@@ -890,6 +904,9 @@ const CSS = `
 //  MAIN COMPONENT
 // ─────────────────────────────────────────────
 export default function StudyBuddyQuiz() {
+  const [quizData, setQuizData]               = useState(QUIZ_DATA);
+  const [managingSubject, setManagingSubject] = useState(null);
+  const [managingLevel, setManagingLevel]     = useState(null);
   const [screen, setScreen]                   = useState("home");
   const [selectedSubject, setSubject]         = useState(null);
   const [selectedLevel, setLevel]             = useState(null);
@@ -903,10 +920,10 @@ export default function StudyBuddyQuiz() {
   const [toast, setToast]                     = useState(null);
   const [quizSaved, setQuizSaved]             = useState(false);
 
-  const totalQ = SUBJECTS.reduce((t,s)=> t + LEVELS.reduce((t2,l)=> t2+(QUIZ_DATA[s]?.[l]?.length||0),0),0);
+  const totalQ = SUBJECTS.reduce((t,s)=> t + LEVELS.reduce((t2,l)=> t2+(quizData[s]?.[l]?.length||0),0),0);
 
   const startQuiz = (subject, level) => {
-    const qs = QUIZ_DATA[subject]?.[level];
+    const qs = quizData[subject]?.[level];
     if (!qs?.length) return;
     setSubject(subject); setLevel(level);
     setQuestions(qs); setCurrentQ(0);
@@ -931,6 +948,31 @@ export default function StudyBuddyQuiz() {
     setCurrentQ(q=>q+1);
     setSelectedAnswer(null); setShowExplanation(false);
     setAnimKey(k=>k+1);
+  };
+
+  const openManage = (subject, level) => {
+    setManagingSubject(subject);
+    setManagingLevel(level);
+    setScreen("manage");
+  };
+
+  const reorderQuestion = (subject, level, fromIndex, direction) => {
+    const toIndex = fromIndex + direction;
+    setQuizData(prev => {
+      const list = [...prev[subject][level]];
+      const [moved] = list.splice(fromIndex, 1);
+      list.splice(toIndex, 0, moved);
+      return { ...prev, [subject]: { ...prev[subject], [level]: list } };
+    });
+  };
+
+  const deleteQuestion = (subject, level, qIndex) => {
+    setQuizData(prev => {
+      const updated = { ...prev };
+      updated[subject] = { ...updated[subject] };
+      updated[subject][level] = updated[subject][level].filter((_, i) => i !== qIndex);
+      return updated;
+    });
   };
 
   const MARKS = ["A","B","C","D"];
@@ -990,18 +1032,21 @@ export default function StudyBuddyQuiz() {
                 <div className="sb-card-hr"/>
                 <div className="sb-level-list">
                   {LEVELS.map(level=>{
-                    const qs = QUIZ_DATA[subj]?.[level];
+                    const qs = quizData[subj]?.[level];
                     if (!qs?.length) return null;
                     const lm = LEVEL_META[level];
                     return (
-                      <button key={level} className="sb-lvl-btn"
-                        style={{background:lm.bg, color:lm.color, borderColor:lm.border}}
-                        onClick={()=>startQuiz(subj,level)}
-                      >
-                        <span className="sb-lvl-dot" style={{background:lm.color}}/>
-                        {level}
-                        <span className="sb-lvl-count">{qs.length} Q</span>
-                      </button>
+                      <div key={level} className="sb-lvl-row">
+                        <button className="sb-lvl-btn"
+                          style={{background:lm.bg, color:lm.color, borderColor:lm.border, flex:1}}
+                          onClick={()=>startQuiz(subj,level)}
+                        >
+                          <span className="sb-lvl-dot" style={{background:lm.color}}/>
+                          {level}
+                          <span className="sb-lvl-count">{qs.length} Q</span>
+                        </button>
+                        <button className="sb-edit-btn" onClick={()=>openManage(subj,level)} title="Manage questions">✎</button>
+                      </div>
                     );
                   })}
                 </div>
@@ -1012,6 +1057,58 @@ export default function StudyBuddyQuiz() {
       </div>
     </div>
   );
+
+  // ── MANAGE ────────────────────────────────
+  if (screen === "manage") {
+    const qs = quizData[managingSubject]?.[managingLevel] || [];
+    const lm = LEVEL_META[managingLevel];
+    return (
+      <div className="sb-root">
+        <style>{CSS}</style>
+        <div className="sb-inner">
+          <nav className="sb-nav">
+            <div style={{display:"flex",alignItems:"baseline"}}>
+              <span className="sb-logo">StudyBuddy</span>
+              <span className="sb-nav-tag">Manage</span>
+            </div>
+          </nav>
+          <div className="sb-quiz-body">
+            <div className="sb-quiz-top sb-fade">
+              <button className="sb-back" onClick={()=>setScreen("home")}>← Back to Subjects</button>
+              <div className="sb-chips">
+                <span className="sb-chip" style={{background:"rgba(255,255,255,0.04)",color:"#a59fc7",borderColor:"rgba(139,92,246,0.18)"}}>
+                  {SUBJECT_META[managingSubject].icon} {managingSubject}
+                </span>
+                <span className="sb-chip" style={{background:lm.bg, color:lm.color, borderColor:lm.border}}>
+                  {managingLevel}
+                </span>
+              </div>
+            </div>
+            <div className="sb-manage-header">
+              <div className="sb-manage-title">Manage Questions</div>
+              <div className="sb-manage-sub">{qs.length} question{qs.length!==1?"s":""} · click ✕ to delete</div>
+            </div>
+            <div className="sb-manage-list">
+              {qs.length === 0
+                ? <div className="sb-manage-empty">No questions remaining in this set.</div>
+                : qs.map((q, i) => (
+                    <div key={q.id} className="sb-manage-item sb-fade">
+                      <div className="sb-reorder-btns">
+                        <button className="sb-reorder-btn" disabled={i===0} onClick={()=>reorderQuestion(managingSubject, managingLevel, i, -1)} title="Move up">▲</button>
+                        <button className="sb-reorder-btn" disabled={i===qs.length-1} onClick={()=>reorderQuestion(managingSubject, managingLevel, i, 1)} title="Move down">▼</button>
+                      </div>
+                      <span className="sb-manage-num">{i + 1}</span>
+                      <span className="sb-manage-q">{q.question}</span>
+                      <button className="sb-delete-btn" onClick={()=>deleteQuestion(managingSubject, managingLevel, i)} title="Delete question">✕</button>
+                    </div>
+                  ))
+              }
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   // ── QUIZ ──────────────────────────────────
   if (screen === "quiz") {
