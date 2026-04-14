@@ -188,7 +188,7 @@ export default {
                 ${icon('chevronLeft', 16)} Previous
               </button>
               ${currentQ === total - 1 ? `
-                <button class="btn btn-primary" id="submit-quiz" ${Object.keys(answers).length < total ? '' : ''}>
+                <button class="btn btn-primary" id="submit-quiz" ${Object.keys(answers).length < total ? 'disabled' : ''}>
                   ${icon('check', 16)} Submit Quiz
                 </button>
               ` : `

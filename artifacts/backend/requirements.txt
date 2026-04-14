@@ -4,6 +4,7 @@ uvicorn
 pydantic
 python-dotenv
 openai
+openai-agents
 psycopg2-binary
 pypdf
 python-docx

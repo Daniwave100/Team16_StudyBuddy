@@ -49,10 +49,7 @@ async def create_quiz(request: QuizCreateRequest):
             quiz_data = json.loads(response_text)
             questions = []
             for i, q in enumerate(quiz_data):
-                question = QuizQuestion(
-                    id=f"q{i+1}",
-                    **q
-                )
+                question = QuizQuestion(**{**q, "id": q.get("id") or f"q{i+1}"})
                 questions.append(question)
         except json.JSONDecodeError:
             raise HTTPException(status_code=500, detail="Failed to parse quiz response from AI")

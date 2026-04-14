@@ -91,7 +91,7 @@ async def list_chat_sessions(class_id: Optional[str] = None):
                 message_count=len(session_messages),
                 created_at=s["created_at"],
                 updated_at=s["updated_at"],
-                last_message_preview=last_message["content"][:50] + "..." if last_message else None
+                last_message_preview=(last_message.get("content") or "")[:50] + "..." if last_message else None
             ))
         
         # Sort by updated_at descending (most recent first)
@@ -169,7 +169,7 @@ async def update_chat_session_title(session_id: str, title: str):
             message_count=len(session_messages),
             created_at=session["created_at"],
             updated_at=session["updated_at"],
-            last_message_preview=last_message["content"][:50] + "..." if last_message else None
+            last_message_preview=(last_message.get("content") or "")[:50] + "..." if last_message else None
         )
         
     except Exception as e:
