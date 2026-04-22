@@ -11,6 +11,23 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
   <style>
+    textarea{
+      background:#020617;
+      border-radius:10px;
+      border:1px solid rgba(51,65,85,.9);
+      padding:8px 10px;
+      color:var(--text);
+      font-family:var(--font);
+      font-size:14px;
+      resize:vertical;
+      width:100%;
+    }
+    textarea:focus{
+      outline:none;
+      border-color:#38bdf8;
+      box-shadow:0 0 0 1px rgba(56,189,248,.65);
+    }
+    textarea::placeholder{ color:#4b5563; }
     :root{
       --bg:#020617;
       --surface:#020617;
@@ -429,39 +446,56 @@
     <!-- SETUP -->
     <section id="setup" class="hidden">
       <div class="card">
-        <h1>Automata practice quiz</h1>
-        <p>
-          Answer a few multiple-choice questions. When you’re done, you’ll see your score,
-          a breakdown by question, and which topics to review.
-        </p>
+        <h1>Generate a Quiz</h1>
+        <p>Customize your quiz below, then hit Start. The AI will generate questions from your uploaded class materials.</p>
 
         <div class="divider"></div>
 
-        <div class="row" style="justify-content:space-between; align-items:flex-start;">
-          <div>
-            <div class="small">Quiz summary</div>
-            <div class="row" style="margin-top:6px;">
-              <span class="tag" id="setTopic">Automata</span>
-              <span class="tag" id="setDiff">Medium</span>
-              <span class="tag" id="setCount">3 questions</span>
-            </div>
-
-            <div class="field">
-              <label class="field-label">
-                <input type="checkbox" id="enableTimer" /> Enable timer
-              </label>
-              <div class="field-inline">
-                <label class="small" for="timerMinutes">Time limit (minutes)</label>
-                <input type="number" id="timerMinutes" min="1" max="120" value="10" style="width:80px;" />
-              </div>
-              <p class="small">
-                If enabled, a countdown starts when the quiz begins. When time is up, your quiz
-                is automatically submitted.
-              </p>
-            </div>
-          </div>
-          <button class="btn primary" id="btnStart">Start quiz</button>
+        <div class="field">
+          <label class="field-label" for="classIdInput">Class ID</label>
+          <input type="text" id="classIdInput" placeholder="e.g. cs101" style="width:100%;" />
+          <p class="small" style="margin-top:4px;">Enter the class ID you uploaded materials for.</p>
         </div>
+
+        <div class="field">
+          <label class="field-label" for="focusInput">Custom prompt / focus <span style="color:var(--muted2); font-weight:400;">(optional)</span></label>
+          <textarea id="focusInput" rows="3" placeholder="e.g. Focus on DFA minimization and the pumping lemma. Include at least two questions on NFA-to-DFA conversion."></textarea>
+          <p class="small" style="margin-top:4px;">Tell the AI exactly what to focus on. Leave blank to cover the material broadly.</p>
+        </div>
+
+        <div class="field">
+          <div class="field-inline">
+            <label class="field-label" for="questionCount">Number of questions</label>
+            <input type="number" id="questionCount" min="1" max="30" value="10" style="width:80px;" />
+          </div>
+        </div>
+
+        <div class="field">
+          <label class="field-label">
+            <input type="checkbox" id="enableTimer" /> Enable timer
+          </label>
+          <div class="field-inline">
+            <label class="small" for="timerMinutes">Time limit (minutes)</label>
+            <input type="number" id="timerMinutes" min="1" max="120" value="10" style="width:80px;" />
+          </div>
+        </div>
+
+        <div id="setupError" style="display:none; margin-top:12px; padding:10px 14px; border-radius:10px; background:rgba(239,68,68,.12); border:1px solid rgba(239,68,68,.4); color:#fca5a5; font-size:13px;"></div>
+
+        <div class="divider"></div>
+
+        <div class="row" style="justify-content:flex-end;">
+          <button class="btn primary" id="btnStart">Generate &amp; start quiz</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- LOADING -->
+    <section id="loading" class="hidden">
+      <div class="card" style="text-align:center; padding:48px 20px;">
+        <div style="font-size:32px; margin-bottom:16px;">⚡</div>
+        <h2 style="margin-bottom:8px;">Generating your quiz…</h2>
+        <p class="small">The AI is reading your materials and writing questions. This takes a few seconds.</p>
       </div>
     </section>
 
@@ -559,46 +593,10 @@
   </main>
 
   <script>
-    // ---------- Dummy quiz data ----------
-    const QUESTIONS = [
-      {
-        id: "q1",
-        topic: "DFA",
-        text: "In a DFA, for each state and input symbol, how many transitions are allowed?",
-        hint: "D = deterministic",
-        options: ["0", "1", "2", "Any number"],
-        correct: 1,
-        explanation: "A DFA must have exactly ONE transition per symbol from each state."
-      },
-      {
-        id: "q2",
-        topic: "NFA",
-        text: "What makes an NFA different from a DFA?",
-        hint: "Think: branching paths",
-        options: [
-          "It can have multiple transitions for the same symbol",
-          "It has no accept states",
-          "It cannot read input",
-          "It must accept every path"
-        ],
-        correct: 0,
-        explanation: "An NFA can have multiple possible next states (and sometimes ε-moves)."
-      },
-      {
-        id: "q3",
-        topic: "Regularity",
-        text: "A language is 'regular' if it can be recognized by:",
-        hint: "Three equivalent forms",
-        options: [
-          "A Turing machine only",
-          "A DFA/NFA (finite automaton)",
-          "A pushdown automaton",
-          "A context-free grammar only"
-        ],
-        correct: 1,
-        explanation: "Regular languages are exactly those recognized by finite automata (DFA/NFA) and regex."
-      }
-    ];
+    const API_BASE = 'http://localhost:8000';
+
+    // ---------- Quiz data (populated from backend) ----------
+    let QUESTIONS = [];
 
     // ---------- App state ----------
     let idx = 0;
@@ -614,7 +612,7 @@
     // ---------- Helpers ----------
     const $ = (id) => document.getElementById(id);
     const navButtons = document.querySelectorAll(".nav button");
-    const pages = ["setup","quiz","results","weak"];
+    const pages = ["setup","loading","quiz","results","weak"];
 
     function showPage(name){
       pages.forEach(p => {
@@ -682,6 +680,7 @@
     function resetQuiz(){
       idx = 0;
       for (const q of QUESTIONS) answers[q.id] = null;
+      if (QUESTIONS.length === 0) return;
       if (quizConfig.timerEnabled && quizConfig.timerSeconds > 0){
         startTimer();
       } else {
@@ -850,10 +849,62 @@
 
     const startBtn = $("btnStart");
     if (startBtn){
-      startBtn.addEventListener("click", () => {
+      startBtn.addEventListener("click", async () => {
+        const classId = $("classIdInput").value.trim();
+        const focus   = $("focusInput").value.trim();
+        const count   = parseInt($("questionCount").value, 10) || 10;
+        const errEl   = $("setupError");
+
+        if (!classId) {
+          errEl.textContent = "Please enter a Class ID before generating a quiz.";
+          errEl.style.display = "block";
+          return;
+        }
+        errEl.style.display = "none";
+
         applyTimerConfigFromUI();
-        resetQuiz();
-        showPage("quiz");
+        showPage("loading");
+        startBtn.disabled = true;
+
+        try {
+          const res = await fetch(`${API_BASE}/api/quiz`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ class_id: classId, focus: focus || null, count })
+          });
+
+          if (!res.ok) {
+            const err = await res.json().catch(() => ({}));
+            throw new Error(err.detail || `Server returned ${res.status}`);
+          }
+
+          const data = await res.json();
+
+          // Normalise backend response into the shape the quiz UI expects
+          QUESTIONS = data.questions.map((q, i) => {
+            const correctIdx = q.options.indexOf(q.answer);
+            return {
+              id: `q${i}`,
+              topic: q.topic || "General",
+              text: q.question,
+              hint: q.explanation || "",
+              options: q.options,
+              correct: correctIdx >= 0 ? correctIdx : 0,
+              explanation: q.explanation || ""
+            };
+          });
+
+          if (QUESTIONS.length === 0) throw new Error("No questions were returned. Try uploading materials for this class first.");
+
+          resetQuiz();
+          showPage("quiz");
+        } catch (err) {
+          showPage("setup");
+          errEl.textContent = err.message || "Failed to generate quiz. Check the backend is running.";
+          errEl.style.display = "block";
+        } finally {
+          startBtn.disabled = false;
+        }
       });
     }
 
@@ -900,7 +951,6 @@
     });
 
     // initial load
-    resetQuiz();
     showPage("setup");
   </script>
 </body>

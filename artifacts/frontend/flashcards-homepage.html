@@ -388,28 +388,28 @@
 <!-- CREATE DECK MODAL -->
 <div class="modal" id="createDeckModal">
   <div class="modal-content">
-    <h2>Create New Flashcard Deck</h2>
+    <h2>Generate Flashcard Deck</h2>
     <div class="form-group">
       <label for="deckTitleInput">Deck Title</label>
       <input type="text" id="deckTitleInput" placeholder="e.g., Chapter 5: Algorithms">
     </div>
     <div class="form-group">
-      <label for="deckClass">Class</label>
-      <select id="deckClass"><option value="">Select a class...</option></select>
+      <label for="deckClass">Class ID</label>
+      <input type="text" id="deckClass" placeholder="e.g. cs101 — must match your uploaded materials">
     </div>
     <div class="form-group">
-      <label>Tags (optional)</label>
-      <div class="tag-input-wrapper">
-        <input type="text" id="tagInput" placeholder="e.g., Biology, Chapter 3...">
-        <button class="tag-add-btn" id="tagAddBtn">+ Add</button>
-      </div>
-      <div class="tag-error" id="tagError"></div>
-      <div class="tag-preview" id="tagPreview"></div>
+      <label for="deckFocusInput">Custom prompt / focus <span style="color:#4a5568; font-weight:400;">(optional)</span></label>
+      <textarea id="deckFocusInput" rows="3" placeholder="e.g. Focus on Big-O notation and sorting algorithms. Include definitions and examples." style="width:100%; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.12); border-radius:8px; padding:10px 12px; color:#fff; font-size:14px; font-family:inherit; resize:vertical;"></textarea>
+      <div style="font-size:12px; color:#4a5568; margin-top:4px;">Tell the AI what to focus on, or leave blank to cover the material broadly.</div>
+    </div>
+    <div class="form-group">
+      <label for="deckCountInput">Number of cards</label>
+      <input type="number" id="deckCountInput" min="1" max="50" value="10" style="width:100px;">
     </div>
     <div class="modal-error" id="createError"></div>
     <div class="button-group">
       <button class="btn btn-secondary" id="cancelBtn">Cancel</button>
-      <button class="btn btn-primary" id="submitBtn">Create Deck</button>
+      <button class="btn btn-primary" id="submitBtn">Generate Deck</button>
     </div>
   </div>
 </div>
@@ -758,12 +758,11 @@
 
   function openCreateModal() {
     createTags = [];
-    document.getElementById('deckTitleInput').value = '';
-    document.getElementById('deckClass').value = '';
-    document.getElementById('tagInput').value = '';
-    document.getElementById('tagError').textContent = '';
+    document.getElementById('deckTitleInput').value  = '';
+    document.getElementById('deckClass').value       = '';
+    document.getElementById('deckFocusInput').value  = '';
+    document.getElementById('deckCountInput').value  = '10';
     document.getElementById('createError').classList.remove('visible');
-    renderTagPreview(createTags, 'tagPreview');
     document.getElementById('createDeckModal').classList.add('active');
   }
 
@@ -774,36 +773,55 @@
       document.getElementById('createDeckModal').classList.remove('active');
   });
 
-  document.getElementById('tagAddBtn').addEventListener('click', () =>
-    addTagFromInput('tagInput', 'tagError', createTags, 'tagPreview'));
-  document.getElementById('tagInput').addEventListener('keydown', e => {
-    if (e.key === 'Enter') { e.preventDefault(); addTagFromInput('tagInput', 'tagError', createTags, 'tagPreview'); }
-  });
-
   document.getElementById('submitBtn').addEventListener('click', async () => {
     const title   = document.getElementById('deckTitleInput').value.trim();
-    const classId = document.getElementById('deckClass').value;
+    const classId = document.getElementById('deckClass').value.trim();
+    const focus   = document.getElementById('deckFocusInput').value.trim();
+    const count   = parseInt(document.getElementById('deckCountInput').value, 10) || 10;
     const errEl   = document.getElementById('createError');
+
     if (!title || !classId) {
-      errEl.textContent = 'Please fill in all required fields.';
+      errEl.textContent = 'Please enter a deck title and class ID.';
       errEl.classList.add('visible'); return;
     }
 
     const btn = document.getElementById('submitBtn');
-    btn.disabled = true; btn.textContent = 'Creating…';
+    btn.disabled = true; btn.textContent = 'Generating…';
     errEl.classList.remove('visible');
 
     try {
-      const newDeck = await createDeck({ title, class: classId, tags: [...createTags] });
-      // Normalise tags on the returned deck before pushing to local state
-      decks.push({ ...newDeck, tags: normaliseTags(newDeck.tags) });
+      const res = await fetch(`${API_BASE}/api/flashcards`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ class_id: classId, focus: focus || null, count })
+      });
+
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.detail || `Server returned ${res.status}`);
+      }
+
+      const data = await res.json();
+
+      // Add to local deck list so it shows immediately without a round-trip to /api/decks
+      const now = new Date().toISOString();
+      decks.push({
+        id: data.id,
+        title,
+        class: classId,
+        tags: [],
+        cards: data.count,
+        mastered: 0,
+        dateModified: now,
+        _flashcards: data.flashcards
+      });
       renderDecks();
       document.getElementById('createDeckModal').classList.remove('active');
-    } catch {
-      errEl.textContent = 'Failed to create deck. Please try again.';
+    } catch (err) {
+      errEl.textContent = err.message || 'Failed to generate flashcards. Make sure the backend is running and materials are uploaded for this class.';
       errEl.classList.add('visible');
     } finally {
-      btn.disabled = false; btn.textContent = 'Create Deck';
+      btn.disabled = false; btn.textContent = 'Generate Deck';
     }
   });
 
