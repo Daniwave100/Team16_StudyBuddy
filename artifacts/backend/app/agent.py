@@ -22,7 +22,7 @@ def _build_context_block(class_id: str, query: str) -> str:
         lines.append(f"[{index}] Source: {chunk['source']}\n{chunk['text']}")
     return "\n\n".join(lines)
 
-def run(mode, class_id, message=None, focus=None):
+async def run(mode, class_id, message=None, focus=None):
 
     if mode == "chat":
         prompt_template = CHAT_PROMPT
@@ -42,12 +42,13 @@ def run(mode, class_id, message=None, focus=None):
         user_focus_prompt=focus or "No specific focus provided",
     )
 
-    # call openaI and return response
+    # call OpenAI and return response (async)
     agent = Agent(name="Assistant", instructions=system_prompt)
-    result = Runner.run_sync(agent, message or "Help me study this class.")
+    result = await Runner.run(agent, message or "Help me study this class.")
     return result
 
 # use this to test this functionality running
 if __name__ == "__main__":
-    result = run(mode="chat", class_id="demo-class", message="Write a haiku")
+    import asyncio
+    result = asyncio.run(run(mode="chat", class_id="demo-class", message="Write a haiku"))
     print(result.final_output)

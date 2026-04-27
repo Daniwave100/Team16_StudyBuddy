@@ -71,8 +71,8 @@ Rules:
 [
   {{
     "question": "question text",
-    "options": ["A", "B", "C", "D"],
-    "answer": "correct option letter",
+    "options": ["option A text", "option B text", "option C text", "option D text"],
+    "answer": "exact text of the correct option",
     "explanation": "brief explanation"
   }}
 ]

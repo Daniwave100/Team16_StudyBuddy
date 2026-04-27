@@ -238,16 +238,27 @@ def retrieve_chunks(class_id: str, query: str, top_k: int = 5) -> list[dict[str,
 
 	query_tokens = set(_tokenize(query))
 	if not query_tokens:
-		return []
+		# No query tokens: return most recent chunks
+		return [
+			{"source": c["source"], "text": c["text"], "score": 0}
+			for c in chunks[-top_k:]
+		]
 
 	scored: list[tuple[int, dict[str, Any]]] = []
 	for chunk in chunks:
 		chunk_tokens = set(chunk.get("tokens", []))
 		score = len(query_tokens & chunk_tokens)
-		if score > 0:
-			scored.append((score, chunk))
+		scored.append((score, chunk))
 
 	scored.sort(key=lambda item: item[0], reverse=True)
+
+	# If no token overlap found, return most recent chunks as fallback
+	if scored[0][0] == 0:
+		return [
+			{"source": c["source"], "text": c["text"], "score": 0}
+			for c in chunks[-top_k:]
+		]
+
 	return [
 		{"source": chunk["source"], "text": chunk["text"], "score": score}
 		for score, chunk in scored[:top_k]

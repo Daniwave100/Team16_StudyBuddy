@@ -3,18 +3,15 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>StudyBuddy - Flashcards</title>
+<title>StudyBuddy – Flashcards</title>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
-
   body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     background: radial-gradient(ellipse at 60% 20%, #1a2744 0%, #0d1117 60%, #0a0e1a 100%);
     min-height: 100vh;
     color: #fff;
   }
-
-  /* ── NAV ── */
   nav {
     position: fixed;
     top: 0; left: 0; right: 0;
@@ -52,19 +49,10 @@
     backdrop-filter: blur(6px);
   }
   .nav-btn:hover { background: rgba(255,255,255,0.07); border-color: rgba(255,255,255,0.25); }
-
-  /* ── PAGE ── */
-  .page-wrapper {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 84px 28px 40px;
-  }
-
+  .page-wrapper { max-width: 1200px; margin: 0 auto; padding: 84px 28px 40px; }
   .page-header { margin-bottom: 28px; }
   .page-header h1 { font-size: 32px; font-weight: 700; color: #fff; }
   .page-header p  { font-size: 15px; color: #6b7a99; margin-top: 6px; }
-
-  /* ── TOOLBAR ── */
   .toolbar {
     background: rgba(255,255,255,0.04);
     border: 1px solid rgba(255,255,255,0.08);
@@ -76,7 +64,6 @@
     gap: 12px;
   }
   .toolbar label { font-weight: 600; color: #8a9bbf; font-size: 13px; white-space: nowrap; }
-
   .sort-select {
     padding: 8px 36px 8px 12px;
     border: 1px solid rgba(255,255,255,0.12);
@@ -91,10 +78,7 @@
   }
   .sort-select option, .sort-select optgroup { background: #1a2133; color: #c8d3ea; }
   .sort-select:focus { outline: none; border-color: #4f8ef7; }
-
   .sort-badge { margin-left: auto; font-size: 12px; color: #4a5568; }
-
-  /* ── SUBJECT GROUP HEADER ── */
   .subject-group-header {
     grid-column: 1 / -1;
     display: flex;
@@ -113,15 +97,11 @@
     white-space: nowrap;
   }
   .subject-group-header hr { flex: 1; border: none; border-top: 1px solid rgba(255,255,255,0.07); }
-
-  /* ── DECK GRID ── */
   .deck-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
     gap: 18px;
   }
-
-  /* ── SKELETON LOADING ── */
   .skeleton-card {
     background: rgba(255,255,255,0.04);
     border: 1px solid rgba(255,255,255,0.07);
@@ -138,17 +118,8 @@
     background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.04) 50%, transparent 100%);
     animation: shimmer 1.4s infinite;
   }
-  @keyframes shimmer {
-    0%   { transform: translateX(-100%); }
-    100% { transform: translateX(100%); }
-  }
-  .skel-line {
-    background: rgba(255,255,255,0.07);
-    border-radius: 4px;
-    margin-bottom: 10px;
-  }
-
-  /* ── EMPTY STATE ── */
+  @keyframes shimmer { 0% { transform: translateX(-100%); } 100% { transform: translateX(100%); } }
+  .skel-line { background: rgba(255,255,255,0.07); border-radius: 4px; margin-bottom: 10px; }
   .empty-state {
     grid-column: 1 / -1;
     display: flex;
@@ -162,8 +133,6 @@
   .empty-icon { font-size: 48px; }
   .empty-state h3 { font-size: 20px; font-weight: 600; color: #c8d3ea; }
   .empty-state p  { font-size: 14px; color: #4a5568; max-width: 320px; line-height: 1.6; }
-
-  /* ── API ERROR BANNER ── */
   .error-banner {
     display: none;
     grid-column: 1 / -1;
@@ -188,8 +157,6 @@
     cursor: pointer;
   }
   .error-banner button:hover { background: rgba(248,113,113,0.1); }
-
-  /* ── DECK CARD ── */
   .deck-card {
     background: rgba(255,255,255,0.04);
     border: 1px solid rgba(255,255,255,0.09);
@@ -212,8 +179,6 @@
     width: 100%; height: 3px;
     background: linear-gradient(90deg, #4f8ef7, #a259f7);
   }
-
-  /* ── CARD ACTION BUTTONS (edit / delete) ── */
   .card-actions {
     position: absolute;
     top: 14px; right: 14px;
@@ -224,7 +189,6 @@
     z-index: 2;
   }
   .deck-card:hover .card-actions { opacity: 1; }
-
   .card-action-btn {
     width: 30px; height: 30px;
     border-radius: 8px;
@@ -239,8 +203,6 @@
   }
   .card-action-btn.edit:hover  { background: rgba(79,142,247,0.2); border-color: rgba(79,142,247,0.4); color: #4f8ef7; }
   .card-action-btn.delete:hover{ background: rgba(248,113,113,0.15); border-color: rgba(248,113,113,0.35); color: #f87171; }
-
-  /* ── CREATE CARD ── */
   .create-deck-card {
     background: rgba(79,142,247,0.06);
     border: 1px dashed rgba(79,142,247,0.3);
@@ -259,18 +221,10 @@
   }
   .create-icon { font-size: 36px; color: #4f8ef7; }
   .create-deck-card h3 { font-size: 16px; font-weight: 600; color: #4f8ef7; }
-
   .deck-title  { color: #fff; font-size: 17px; font-weight: 600; margin-bottom: 4px; padding-right: 64px; }
   .deck-class  { color: #4f8ef7; font-size: 13px; font-weight: 500; }
   .deck-meta   { font-size: 12px; color: #4a5568; margin-top: 3px; }
-
-  /* ── TAG PILLS ── */
-  .tag-pills {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 6px;
-    margin-top: 10px;
-  }
+  .tag-pills { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
   .tag-pill {
     font-size: 11px;
     font-weight: 500;
@@ -287,7 +241,6 @@
     border-color: rgba(255,255,255,0.08);
     font-style: italic;
   }
-
   .deck-stats {
     display: flex;
     gap: 18px;
@@ -298,20 +251,8 @@
   .stat { display: flex; flex-direction: column; gap: 3px; }
   .stat-label { color: #6b7a99; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; }
   .stat-value { color: #fff; font-size: 18px; font-weight: 700; }
-
-  .progress-bar {
-    width: 100%; height: 5px;
-    background: rgba(255,255,255,0.07);
-    border-radius: 3px; overflow: hidden;
-    margin-top: 12px;
-  }
-  .progress-fill {
-    height: 100%;
-    background: linear-gradient(90deg, #4f8ef7, #a259f7);
-    transition: width 0.3s ease;
-  }
-
-  /* ── MODAL (shared styles) ── */
+  .progress-bar { width: 100%; height: 5px; background: rgba(255,255,255,0.07); border-radius: 3px; overflow: hidden; margin-top: 12px; }
+  .progress-fill { height: 100%; background: linear-gradient(90deg, #4f8ef7, #a259f7); transition: width 0.3s ease; }
   .modal {
     display: none;
     position: fixed;
@@ -324,7 +265,6 @@
     backdrop-filter: blur(4px);
   }
   .modal.active { display: flex; }
-
   .modal-content {
     background: #111827;
     border: 1px solid rgba(255,255,255,0.1);
@@ -335,7 +275,6 @@
     box-shadow: 0 20px 60px rgba(0,0,0,0.5);
   }
   .modal-content h2 { color: #fff; font-size: 20px; margin-bottom: 24px; }
-
   .form-group { margin-bottom: 18px; }
   .form-group label { display: block; color: #8a9bbf; font-size: 13px; font-weight: 500; margin-bottom: 8px; }
   .form-group input, .form-group select {
@@ -350,8 +289,6 @@
   .form-group select option { background: #1a2133; }
   .form-group input::placeholder { color: #4a5568; }
   .form-group input:focus, .form-group select:focus { outline: none; border-color: #4f8ef7; }
-
-  /* ── TAG INPUT UI ── */
   .tag-input-wrapper { display: flex; gap: 8px; align-items: center; }
   .tag-input-wrapper input { flex: 1; }
   .tag-add-btn {
@@ -368,14 +305,7 @@
     flex-shrink: 0;
   }
   .tag-add-btn:hover { background: rgba(79,142,247,0.25); border-color: rgba(79,142,247,0.5); }
-
-  .tag-preview {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 6px;
-    margin-top: 10px;
-    min-height: 0;
-  }
+  .tag-preview { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; min-height: 0; }
   .tag-preview-pill {
     font-size: 12px;
     font-weight: 500;
@@ -388,15 +318,9 @@
     align-items: center;
     gap: 6px;
   }
-  .tag-remove-btn {
-    background: none; border: none;
-    color: #4a5568; cursor: pointer;
-    font-size: 14px; line-height: 1; padding: 0;
-    transition: color 0.2s;
-  }
+  .tag-remove-btn { background: none; border: none; color: #4a5568; cursor: pointer; font-size: 14px; line-height: 1; padding: 0; transition: color 0.2s; }
   .tag-remove-btn:hover { color: #f87171; }
   .tag-error { font-size: 12px; color: #f87171; margin-top: 6px; min-height: 16px; }
-
   .button-group { display: flex; gap: 10px; justify-content: flex-end; margin-top: 24px; }
   .btn { padding: 10px 22px; border: none; border-radius: 50px; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.2s; }
   .btn-primary { background: linear-gradient(135deg, #4f8ef7 0%, #a259f7 100%); color: white; }
@@ -404,28 +328,14 @@
   .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
   .btn-secondary { background: transparent; color: #c8d3ea; border: 1px solid rgba(255,255,255,0.15); }
   .btn-secondary:hover { background: rgba(255,255,255,0.07); }
-
-  /* ── CONFIRM DELETE MODAL ── */
   .confirm-modal-content { max-width: 400px; }
   .confirm-modal-content p { color: #8a9bbf; font-size: 14px; line-height: 1.6; margin-bottom: 6px; }
   .confirm-modal-content .deck-name-highlight { color: #fff; font-weight: 600; }
   .confirm-warning { font-size: 12px; color: #f87171; margin-top: 8px; }
   .btn-danger { background: rgba(248,113,113,0.15); color: #f87171; border: 1px solid rgba(248,113,113,0.3); }
   .btn-danger:hover { background: rgba(248,113,113,0.25); border-color: rgba(248,113,113,0.5); }
-
-  /* ── MODAL ERROR ── */
-  .modal-error {
-    background: rgba(248,113,113,0.08);
-    border: 1px solid rgba(248,113,113,0.25);
-    border-radius: 8px;
-    padding: 10px 14px;
-    color: #f87171;
-    font-size: 13px;
-    margin-top: 16px;
-    display: none;
-  }
+  .modal-error { background: rgba(248,113,113,0.08); border: 1px solid rgba(248,113,113,0.25); border-radius: 8px; padding: 10px 14px; color: #f87171; font-size: 13px; margin-top: 16px; display: none; }
   .modal-error.visible { display: block; }
-
   @media (max-width: 768px) {
     .deck-grid { grid-template-columns: 1fr; }
     .toolbar { flex-wrap: wrap; }
@@ -472,43 +382,39 @@
     <span class="sort-badge" id="sortBadge"></span>
   </div>
 
-  <div class="deck-grid" id="deckGrid">
-    <!-- populated by JS -->
-  </div>
+  <div class="deck-grid" id="deckGrid"></div>
 </div>
 
-<!-- ── CREATE DECK MODAL ── -->
+<!-- CREATE DECK MODAL -->
 <div class="modal" id="createDeckModal">
   <div class="modal-content">
-    <h2>Create New Flashcard Deck</h2>
+    <h2>Generate Flashcard Deck</h2>
     <div class="form-group">
       <label for="deckTitleInput">Deck Title</label>
       <input type="text" id="deckTitleInput" placeholder="e.g., Chapter 5: Algorithms">
     </div>
     <div class="form-group">
-      <label for="deckClass">Class</label>
-      <select id="deckClass">
-        <option value="">Select a class...</option>
-      </select>
+      <label for="deckClass">Class ID</label>
+      <input type="text" id="deckClass" placeholder="e.g. cs101 — must match your uploaded materials">
     </div>
     <div class="form-group">
-      <label>Tags (optional)</label>
-      <div class="tag-input-wrapper">
-        <input type="text" id="tagInput" placeholder="e.g., Biology, Chapter 3...">
-        <button class="tag-add-btn" id="tagAddBtn">+ Add</button>
-      </div>
-      <div class="tag-error" id="tagError"></div>
-      <div class="tag-preview" id="tagPreview"></div>
+      <label for="deckFocusInput">Custom prompt / focus <span style="color:#4a5568; font-weight:400;">(optional)</span></label>
+      <textarea id="deckFocusInput" rows="3" placeholder="e.g. Focus on Big-O notation and sorting algorithms. Include definitions and examples." style="width:100%; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.12); border-radius:8px; padding:10px 12px; color:#fff; font-size:14px; font-family:inherit; resize:vertical;"></textarea>
+      <div style="font-size:12px; color:#4a5568; margin-top:4px;">Tell the AI what to focus on, or leave blank to cover the material broadly.</div>
+    </div>
+    <div class="form-group">
+      <label for="deckCountInput">Number of cards</label>
+      <input type="number" id="deckCountInput" min="1" max="50" value="10" style="width:100px;">
     </div>
     <div class="modal-error" id="createError"></div>
     <div class="button-group">
       <button class="btn btn-secondary" id="cancelBtn">Cancel</button>
-      <button class="btn btn-primary" id="submitBtn">Create Deck</button>
+      <button class="btn btn-primary" id="submitBtn">Generate Deck</button>
     </div>
   </div>
 </div>
 
-<!-- ── EDIT DECK MODAL ── -->
+<!-- EDIT DECK MODAL -->
 <div class="modal" id="editDeckModal">
   <div class="modal-content">
     <h2>Edit Deck</h2>
@@ -518,9 +424,7 @@
     </div>
     <div class="form-group">
       <label for="editDeckClass">Class</label>
-      <select id="editDeckClass">
-        <option value="">Select a class...</option>
-      </select>
+      <select id="editDeckClass"><option value="">Select a class...</option></select>
     </div>
     <div class="form-group">
       <label>Tags (optional)</label>
@@ -539,7 +443,7 @@
   </div>
 </div>
 
-<!-- ── CONFIRM DELETE MODAL ── -->
+<!-- CONFIRM DELETE MODAL -->
 <div class="modal" id="confirmDeleteModal">
   <div class="modal-content confirm-modal-content">
     <h2>Delete Deck</h2>
@@ -567,27 +471,37 @@
 
   let decks = [];
   let currentSort = 'name-asc';
-
-  // ── TAG STATE (one set per modal) ──
   let createTags = [];
   let editTags   = [];
-  let editingDeckId = null;
+  let editingDeckId  = null;
   let deletingDeckId = null;
 
-  // ════════════════════════════════════════
+  // ════════════════════════════════
   // API CALLS
-  // ════════════════════════════════════════
+  // ════════════════════════════════
 
   async function fetchDecks() {
     renderSkeletons();
     try {
       const res = await fetch(`${API_BASE}/api/decks`);
       if (!res.ok) throw new Error(`Server returned ${res.status}`);
-      decks = await res.json();
+      const data = await res.json();
+      // Normalise tags: ensure every deck has a tags array (handles null/undefined from DB)
+      decks = data.map(d => ({ ...d, tags: normaliseTags(d.tags) }));
       renderDecks();
     } catch (err) {
       showGridError('Could not load decks. Please check your connection and try again.', fetchDecks);
     }
+  }
+
+  async function createDeck(payload) {
+    const res = await fetch(`${API_BASE}/api/decks`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    if (!res.ok) throw new Error(`Server returned ${res.status}`);
+    return res.json();
   }
 
   async function patchDeck(id, payload) {
@@ -600,14 +514,30 @@
     return res.json();
   }
 
-  async function deleteDeck(id) {
+  async function deleteDeckReq(id) {
     const res = await fetch(`${API_BASE}/api/decks/${id}`, { method: 'DELETE' });
     if (!res.ok) throw new Error(`Server returned ${res.status}`);
   }
 
-  // ════════════════════════════════════════
+  // ════════════════════════════════
+  // TAG NORMALISATION
+  // Handles null | undefined | [] consistently so the
+  // rest of the UI never has to worry about bad shapes.
+  // ════════════════════════════════
+
+  function normaliseTags(raw) {
+    if (!raw) return [];
+    if (Array.isArray(raw)) return raw;
+    // Supabase sometimes returns a postgres array string like "{tag1,tag2}"
+    if (typeof raw === 'string' && raw.startsWith('{')) {
+      return raw.replace(/^\{|\}$/g, '').split(',').map(t => t.trim()).filter(Boolean);
+    }
+    return [];
+  }
+
+  // ════════════════════════════════
   // LOADING / ERROR STATES
-  // ════════════════════════════════════════
+  // ════════════════════════════════
 
   function renderSkeletons() {
     const grid = document.getElementById('deckGrid');
@@ -619,8 +549,7 @@
         <div class="skel-line" style="height:18px;width:70%;margin-bottom:12px"></div>
         <div class="skel-line" style="height:13px;width:45%"></div>
         <div class="skel-line" style="height:13px;width:30%;margin-top:8px"></div>
-        <div class="skel-line" style="height:5px;width:100%;margin-top:40px;border-radius:3px"></div>
-      `;
+        <div class="skel-line" style="height:5px;width:100%;margin-top:40px;border-radius:3px"></div>`;
       grid.appendChild(skel);
     }
     rebindCreateBtn();
@@ -642,24 +571,24 @@
     rebindCreateBtn();
   }
 
-  // ════════════════════════════════════════
+  // ════════════════════════════════
   // SORT HELPERS
-  // ════════════════════════════════════════
+  // ════════════════════════════════
 
   function getSortedDecks() {
-    const sorted = [...decks];
+    const s = [...decks];
     switch (currentSort) {
-      case 'name-asc':  return sorted.sort((a, b) => a.title.localeCompare(b.title));
-      case 'name-desc': return sorted.sort((a, b) => b.title.localeCompare(a.title));
-      case 'date-desc': return sorted.sort((a, b) => new Date(b.dateModified) - new Date(a.dateModified));
-      case 'date-asc':  return sorted.sort((a, b) => new Date(a.dateModified) - new Date(b.dateModified));
+      case 'name-asc':  return s.sort((a, b) => a.title.localeCompare(b.title));
+      case 'name-desc': return s.sort((a, b) => b.title.localeCompare(a.title));
+      case 'date-desc': return s.sort((a, b) => new Date(b.dateModified) - new Date(a.dateModified));
+      case 'date-asc':  return s.sort((a, b) => new Date(a.dateModified) - new Date(b.dateModified));
       case 'subject':
-        return sorted.sort((a, b) => {
+        return s.sort((a, b) => {
           const nA = classes.find(c => c.id === a.class)?.name || '';
           const nB = classes.find(c => c.id === b.class)?.name || '';
           return nA.localeCompare(nB) || a.title.localeCompare(b.title);
         });
-      default: return sorted;
+      default: return s;
     }
   }
 
@@ -678,16 +607,15 @@
     document.getElementById('sortBadge').textContent = labels[currentSort] || '';
   }
 
-  // ════════════════════════════════════════
+  // ════════════════════════════════
   // RENDER DECK GRID
-  // ════════════════════════════════════════
+  // ════════════════════════════════
 
   function getCreateCardHTML() {
-    return `
-      <div class="deck-card create-deck-card" id="createDeckBtn">
-        <div class="create-icon">＋</div>
-        <h3>Create New Deck</h3>
-      </div>`;
+    return `<div class="deck-card create-deck-card" id="createDeckBtn">
+      <div class="create-icon">＋</div>
+      <h3>Create New Deck</h3>
+    </div>`;
   }
 
   function renderDecks() {
@@ -698,7 +626,6 @@
     const sorted = getSortedDecks();
     updateSortBadge(sorted.length);
 
-    // Empty state
     if (sorted.length === 0) {
       const empty = document.createElement('div');
       empty.className = 'empty-state';
@@ -712,10 +639,11 @@
 
     let lastSubject = null;
     sorted.forEach(deck => {
-      const cls = classes.find(c => c.id === deck.class);
+      const cls     = classes.find(c => c.id === deck.class);
       const clsName = cls ? cls.name : deck.class;
       const progress = deck.cards > 0 ? (deck.mastered / deck.cards) * 100 : 0;
 
+      // Subject group header (only in subject sort)
       if (currentSort === 'subject' && clsName !== lastSubject) {
         lastSubject = clsName;
         const hdr = document.createElement('div');
@@ -724,9 +652,10 @@
         grid.appendChild(hdr);
       }
 
-      const hasTags = deck.tags && deck.tags.length > 0;
-      const tagHTML = hasTags
-        ? deck.tags.map(t => `<span class="tag-pill">${t}</span>`).join('')
+      // Tag pills — uses live tags from API response
+      const tags    = normaliseTags(deck.tags);
+      const tagHTML = tags.length > 0
+        ? tags.map(t => `<span class="tag-pill">${t}</span>`).join('')
         : `<span class="tag-pill untagged">Untagged</span>`;
 
       const card = document.createElement('div');
@@ -753,36 +682,29 @@
         </div>
         <div class="progress-bar">
           <div class="progress-fill" style="width:${progress}%"></div>
-        </div>
-      `;
+        </div>`;
 
-      // Navigate on card click — but NOT if clicking an action button
       card.addEventListener('click', e => {
         if (e.target.closest('.card-action-btn')) return;
         openDeck(deck.id);
       });
-
-      // Edit / delete buttons
       card.querySelector('.card-action-btn.edit').addEventListener('click', e => {
-        e.stopPropagation();
-        openEditModal(deck.id);
+        e.stopPropagation(); openEditModal(deck.id);
       });
       card.querySelector('.card-action-btn.delete').addEventListener('click', e => {
-        e.stopPropagation();
-        openDeleteModal(deck.id);
+        e.stopPropagation(); openDeleteModal(deck.id);
       });
 
       grid.appendChild(card);
     });
   }
 
-  // ════════════════════════════════════════
-  // CLASS SELECT POPULATION (both modals)
-  // ════════════════════════════════════════
+  // ════════════════════════════════
+  // CLASS SELECT POPULATION
+  // ════════════════════════════════
 
   function populateClassSelect(selectId) {
     const sel = document.getElementById(selectId);
-    // clear all but placeholder
     while (sel.options.length > 1) sel.remove(1);
     classes.forEach(cls => {
       const opt = document.createElement('option');
@@ -792,30 +714,29 @@
     });
   }
 
-  // ════════════════════════════════════════
-  // TAG INPUT LOGIC (generic, works for both modals)
-  // ════════════════════════════════════════
+  // ════════════════════════════════
+  // TAG INPUT LOGIC
+  // ════════════════════════════════
 
-  function renderTagPreview(tagsArr, previewId, tagState) {
+  function renderTagPreview(tagsArr, previewId) {
     const preview = document.getElementById(previewId);
     preview.innerHTML = tagsArr.map((t, i) => `
       <span class="tag-preview-pill">
         ${t}
         <button class="tag-remove-btn" data-idx="${i}">×</button>
-      </span>
-    `).join('');
+      </span>`).join('');
     preview.querySelectorAll('.tag-remove-btn').forEach(btn => {
       btn.addEventListener('click', () => {
-        tagState.splice(parseInt(btn.dataset.idx), 1);
-        renderTagPreview(tagState, previewId, tagState);
+        tagsArr.splice(parseInt(btn.dataset.idx), 1);
+        renderTagPreview(tagsArr, previewId);
       });
     });
   }
 
   function addTagFromInput(inputId, errorId, tagsArr, previewId) {
-    const input  = document.getElementById(inputId);
-    const errEl  = document.getElementById(errorId);
-    const val    = input.value.trim();
+    const input = document.getElementById(inputId);
+    const errEl = document.getElementById(errorId);
+    const val   = input.value.trim();
     if (!val) { errEl.textContent = 'Tag cannot be empty.'; return; }
     if (tagsArr.some(t => t.toLowerCase() === val.toLowerCase())) {
       errEl.textContent = `"${val}" has already been added.`; return;
@@ -823,96 +744,108 @@
     errEl.textContent = '';
     tagsArr.push(val);
     input.value = '';
-    renderTagPreview(tagsArr, previewId, tagsArr);
+    renderTagPreview(tagsArr, previewId);
   }
 
-  // ════════════════════════════════════════
+  // ════════════════════════════════
   // CREATE DECK MODAL
-  // ════════════════════════════════════════
+  // ════════════════════════════════
 
   function rebindCreateBtn() {
     const btn = document.getElementById('createDeckBtn');
-    if (btn) btn.addEventListener('click', () => openCreateModal());
+    if (btn) btn.addEventListener('click', openCreateModal);
   }
 
   function openCreateModal() {
     createTags = [];
-    document.getElementById('deckTitleInput').value = '';
-    document.getElementById('deckClass').value = '';
-    document.getElementById('tagInput').value = '';
-    document.getElementById('tagError').textContent = '';
+    document.getElementById('deckTitleInput').value  = '';
+    document.getElementById('deckClass').value       = '';
+    document.getElementById('deckFocusInput').value  = '';
+    document.getElementById('deckCountInput').value  = '10';
     document.getElementById('createError').classList.remove('visible');
-    renderTagPreview(createTags, 'tagPreview', createTags);
     document.getElementById('createDeckModal').classList.add('active');
   }
 
-  document.getElementById('cancelBtn').addEventListener('click', () => {
-    document.getElementById('createDeckModal').classList.remove('active');
-  });
+  document.getElementById('cancelBtn').addEventListener('click', () =>
+    document.getElementById('createDeckModal').classList.remove('active'));
   document.getElementById('createDeckModal').addEventListener('click', e => {
     if (e.target === document.getElementById('createDeckModal'))
       document.getElementById('createDeckModal').classList.remove('active');
   });
 
-  document.getElementById('tagAddBtn').addEventListener('click', () =>
-    addTagFromInput('tagInput', 'tagError', createTags, 'tagPreview'));
-  document.getElementById('tagInput').addEventListener('keydown', e => {
-    if (e.key === 'Enter') { e.preventDefault(); addTagFromInput('tagInput', 'tagError', createTags, 'tagPreview'); }
-  });
-
   document.getElementById('submitBtn').addEventListener('click', async () => {
     const title   = document.getElementById('deckTitleInput').value.trim();
-    const classId = document.getElementById('deckClass').value;
+    const classId = document.getElementById('deckClass').value.trim();
+    const focus   = document.getElementById('deckFocusInput').value.trim();
+    const count   = parseInt(document.getElementById('deckCountInput').value, 10) || 10;
     const errEl   = document.getElementById('createError');
-    if (!title || !classId) { errEl.textContent = 'Please fill in all required fields.'; errEl.classList.add('visible'); return; }
+
+    if (!title || !classId) {
+      errEl.textContent = 'Please enter a deck title and class ID.';
+      errEl.classList.add('visible'); return;
+    }
 
     const btn = document.getElementById('submitBtn');
-    btn.disabled = true;
-    btn.textContent = 'Creating…';
+    btn.disabled = true; btn.textContent = 'Generating…';
     errEl.classList.remove('visible');
 
     try {
-      const res = await fetch(`${API_BASE}/api/decks`, {
+      const res = await fetch(`${API_BASE}/api/flashcards`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ title, class: classId, tags: [...createTags] })
+        body: JSON.stringify({ class_id: classId, focus: focus || null, count })
       });
-      if (!res.ok) throw new Error(`Server returned ${res.status}`);
-      const newDeck = await res.json();
-      decks.push(newDeck);
+
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.detail || `Server returned ${res.status}`);
+      }
+
+      const data = await res.json();
+
+      // Add to local deck list so it shows immediately without a round-trip to /api/decks
+      const now = new Date().toISOString();
+      decks.push({
+        id: data.id,
+        title,
+        class: classId,
+        tags: [],
+        cards: data.count,
+        mastered: 0,
+        dateModified: now,
+        _flashcards: data.flashcards
+      });
       renderDecks();
       document.getElementById('createDeckModal').classList.remove('active');
-    } catch {
-      errEl.textContent = 'Failed to create deck. Please try again.';
+    } catch (err) {
+      errEl.textContent = err.message || 'Failed to generate flashcards. Make sure the backend is running and materials are uploaded for this class.';
       errEl.classList.add('visible');
     } finally {
-      btn.disabled = false;
-      btn.textContent = 'Create Deck';
+      btn.disabled = false; btn.textContent = 'Generate Deck';
     }
   });
 
-  // ════════════════════════════════════════
+  // ════════════════════════════════
   // EDIT DECK MODAL
-  // ════════════════════════════════════════
+  // ════════════════════════════════
 
   function openEditModal(id) {
     const deck = decks.find(d => d.id === id);
     if (!deck) return;
     editingDeckId = id;
-    editTags = deck.tags ? [...deck.tags] : [];
+    editTags = normaliseTags(deck.tags);
 
-    document.getElementById('editTitleInput').value = deck.title;
-    document.getElementById('editDeckClass').value  = deck.class;
-    document.getElementById('editTagInput').value   = '';
+    document.getElementById('editTitleInput').value  = deck.title;
+    document.getElementById('editDeckClass').value   = deck.class;
+    document.getElementById('editTagInput').value    = '';
     document.getElementById('editTagError').textContent = '';
     document.getElementById('editError').classList.remove('visible');
-    renderTagPreview(editTags, 'editTagPreview', editTags);
+    renderTagPreview(editTags, 'editTagPreview');
     document.getElementById('editDeckModal').classList.add('active');
   }
 
-  document.getElementById('editCancelBtn').addEventListener('click', () => {
-    document.getElementById('editDeckModal').classList.remove('active');
-  });
+  document.getElementById('editCancelBtn').addEventListener('click', () =>
+    document.getElementById('editDeckModal').classList.remove('active'));
   document.getElementById('editDeckModal').addEventListener('click', e => {
     if (e.target === document.getElementById('editDeckModal'))
       document.getElementById('editDeckModal').classList.remove('active');
@@ -928,32 +861,32 @@
     const title   = document.getElementById('editTitleInput').value.trim();
     const classId = document.getElementById('editDeckClass').value;
     const errEl   = document.getElementById('editError');
-    if (!title || !classId) { errEl.textContent = 'Please fill in all required fields.'; errEl.classList.add('visible'); return; }
+    if (!title || !classId) {
+      errEl.textContent = 'Please fill in all required fields.';
+      errEl.classList.add('visible'); return;
+    }
 
     const btn = document.getElementById('editSubmitBtn');
-    btn.disabled = true;
-    btn.textContent = 'Saving…';
+    btn.disabled = true; btn.textContent = 'Saving…';
     errEl.classList.remove('visible');
 
     try {
       const updated = await patchDeck(editingDeckId, { title, class: classId, tags: [...editTags] });
-      // Merge updated fields back into local state
       const idx = decks.findIndex(d => d.id === editingDeckId);
-      if (idx !== -1) decks[idx] = { ...decks[idx], ...updated };
+      if (idx !== -1) decks[idx] = { ...decks[idx], ...updated, tags: normaliseTags(updated.tags) };
       renderDecks();
       document.getElementById('editDeckModal').classList.remove('active');
     } catch {
       errEl.textContent = 'Failed to save changes. Please try again.';
       errEl.classList.add('visible');
     } finally {
-      btn.disabled = false;
-      btn.textContent = 'Save Changes';
+      btn.disabled = false; btn.textContent = 'Save Changes';
     }
   });
 
-  // ════════════════════════════════════════
+  // ════════════════════════════════
   // DELETE DECK MODAL
-  // ════════════════════════════════════════
+  // ════════════════════════════════
 
   function openDeleteModal(id) {
     const deck = decks.find(d => d.id === id);
@@ -964,9 +897,8 @@
     document.getElementById('confirmDeleteModal').classList.add('active');
   }
 
-  document.getElementById('deleteCancelBtn').addEventListener('click', () => {
-    document.getElementById('confirmDeleteModal').classList.remove('active');
-  });
+  document.getElementById('deleteCancelBtn').addEventListener('click', () =>
+    document.getElementById('confirmDeleteModal').classList.remove('active'));
   document.getElementById('confirmDeleteModal').addEventListener('click', e => {
     if (e.target === document.getElementById('confirmDeleteModal'))
       document.getElementById('confirmDeleteModal').classList.remove('active');
@@ -975,12 +907,11 @@
   document.getElementById('deleteConfirmBtn').addEventListener('click', async () => {
     const btn   = document.getElementById('deleteConfirmBtn');
     const errEl = document.getElementById('deleteError');
-    btn.disabled = true;
-    btn.textContent = 'Deleting…';
+    btn.disabled = true; btn.textContent = 'Deleting…';
     errEl.classList.remove('visible');
 
     try {
-      await deleteDeck(deletingDeckId);
+      await deleteDeckReq(deletingDeckId);
       decks = decks.filter(d => d.id !== deletingDeckId);
       renderDecks();
       document.getElementById('confirmDeleteModal').classList.remove('active');
@@ -988,14 +919,13 @@
       errEl.textContent = 'Failed to delete deck. Please try again.';
       errEl.classList.add('visible');
     } finally {
-      btn.disabled = false;
-      btn.textContent = 'Delete';
+      btn.disabled = false; btn.textContent = 'Delete';
     }
   });
 
-  // ════════════════════════════════════════
+  // ════════════════════════════════
   // SORT & NAVIGATION
-  // ════════════════════════════════════════
+  // ════════════════════════════════
 
   document.getElementById('sortSelect').addEventListener('change', e => {
     currentSort = e.target.value;
@@ -1007,9 +937,9 @@
     window.location.href = `flashcards-individual.html?deckId=${deckId}`;
   }
 
-  // ════════════════════════════════════════
+  // ════════════════════════════════
   // INIT
-  // ════════════════════════════════════════
+  // ════════════════════════════════
 
   function init() {
     populateClassSelect('deckClass');
